@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, UserPlus, Gavel, CalendarDays, Trophy, ClipboardList, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, UserPlus, Gavel, CalendarDays, Trophy, ClipboardList, Settings, LogOut, Radio } from "lucide-react";
 
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,6 +19,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
     { name: "Players", icon: UserPlus, href: "/admin/dashboard/players" },
     { name: "Auction Room", icon: Gavel, href: "/admin/dashboard/auction" },
     { name: "Matches", icon: CalendarDays, href: "/admin/dashboard/matches" },
+    { name: "Live Controller", icon: Radio, href: "/admin/dashboard/live" },
     { name: "Points Table", icon: Trophy, href: "/admin/dashboard/points" },
     { name: "Registrations", icon: ClipboardList, href: "/admin/dashboard/registrations" },
     { name: "Settings", icon: Settings, href: "/admin/dashboard/settings" },

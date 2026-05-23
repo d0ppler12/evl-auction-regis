@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trophy, Play, MapPin, Radio, ChevronRight, ChevronLeft } from "lucide-react";
 
 // Fake Data for UI
@@ -29,6 +29,25 @@ const upcomingMatches = [
 
 export default function Home() {
   const [scheduleTab, setScheduleTab] = useState('upcoming');
+  const [liveMatch, setLiveMatch] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchLiveMatch = async () => {
+      try {
+        const res = await fetch('/api/live');
+        const data = await res.json();
+        if (data.liveMatch) {
+          setLiveMatch(data.liveMatch);
+        }
+      } catch (e) {
+        console.error("Failed to fetch live match", e);
+      }
+    };
+    
+    fetchLiveMatch();
+    const interval = setInterval(fetchLiveMatch, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen overflow-x-hidden font-sans selection:bg-accent/30">
@@ -119,16 +138,16 @@ export default function Home() {
             
             <div className="flex items-center justify-center gap-6 md:gap-12 w-full md:w-auto">
               <div className="flex items-center gap-3">
-                <span className="font-bold text-lg text-primary hidden sm:block">TITANS</span>
-                <div className="w-8 h-8 bg-surface rounded-full border border-white/10 flex items-center justify-center font-bold text-primary text-xs">T</div>
+                <span className="font-bold text-lg text-primary hidden sm:block">{liveMatch ? liveMatch.team_a?.name : 'TITANS'}</span>
+                <div className="w-8 h-8 bg-surface rounded-full border border-white/10 flex items-center justify-center font-bold text-primary text-xs">{liveMatch ? liveMatch.team_a?.name[0] : 'T'}</div>
               </div>
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-black text-primary tracking-widest">1 - 0</span>
-                <span className="text-xs text-accent font-bold">SET 2</span>
+                <span className="text-3xl font-black text-primary tracking-widest">{liveMatch ? `${liveMatch.sets_team_a || 0} - ${liveMatch.sets_team_b || 0}` : '1 - 0'}</span>
+                <span className="text-xs text-accent font-bold">SET {liveMatch ? liveMatch.current_set : 2}</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-surface rounded-full border border-white/10 flex items-center justify-center font-bold text-primary text-xs">S</div>
-                <span className="font-bold text-lg text-primary hidden sm:block">SPARTANS</span>
+                <div className="w-8 h-8 bg-surface rounded-full border border-white/10 flex items-center justify-center font-bold text-primary text-xs">{liveMatch ? liveMatch.team_b?.name[0] : 'S'}</div>
+                <span className="font-bold text-lg text-primary hidden sm:block">{liveMatch ? liveMatch.team_b?.name : 'SPARTANS'}</span>
               </div>
             </div>
 
@@ -324,19 +343,19 @@ export default function Home() {
 
             <div className="flex justify-between items-center mb-8 relative z-10 px-0 sm:px-4 md:px-12">
               <div className="flex flex-col items-center gap-3 w-1/3">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-surface rounded-full border-2 border-accent shadow-[0_0_15px_rgba(96,165,250,0.3)] flex items-center justify-center font-bold text-primary text-xl">T</div>
-                <span className="font-black text-primary text-sm md:text-lg">TITANS</span>
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-surface rounded-full border-2 border-accent shadow-[0_0_15px_rgba(96,165,250,0.3)] flex items-center justify-center font-bold text-primary text-xl">{liveMatch ? liveMatch.team_a?.name[0] : 'T'}</div>
+                <span className="font-black text-primary text-sm md:text-lg">{liveMatch ? liveMatch.team_a?.name : 'TITANS'}</span>
               </div>
 
               <div className="flex flex-col items-center w-1/3">
-                <span className="text-[10px] font-bold text-muted tracking-widest mb-1 border border-white/10 px-2 py-0.5 rounded-sm bg-surface/50">SET 2</span>
-                <div className="text-4xl md:text-5xl font-black text-primary tracking-tighter mb-2 font-mono whitespace-nowrap">24 - 21</div>
-                <span className="text-[10px] md:text-xs font-bold text-accent whitespace-nowrap">TITANS LEAD 1 - 0</span>
+                <span className="text-[10px] font-bold text-muted tracking-widest mb-1 border border-white/10 px-2 py-0.5 rounded-sm bg-surface/50">SET {liveMatch ? liveMatch.current_set : 2}</span>
+                <div className="text-4xl md:text-5xl font-black text-primary tracking-tighter mb-2 font-mono whitespace-nowrap">{liveMatch ? `${liveMatch.points_team_a || 0} - ${liveMatch.points_team_b || 0}` : '24 - 21'}</div>
+                <span className="text-[10px] md:text-xs font-bold text-accent whitespace-nowrap uppercase">{liveMatch ? `${liveMatch.team_a?.name} ${liveMatch.sets_team_a || 0} - ${liveMatch.sets_team_b || 0} ${liveMatch.team_b?.name}` : 'TITANS LEAD 1 - 0'}</span>
               </div>
 
               <div className="flex flex-col items-center gap-3 w-1/3">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-surface rounded-full border-2 border-gold shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center justify-center font-bold text-primary text-xl">S</div>
-                <span className="font-black text-primary text-sm md:text-lg">SPARTANS</span>
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-surface rounded-full border-2 border-gold shadow-[0_0_15px_rgba(250,204,21,0.3)] flex items-center justify-center font-bold text-primary text-xl">{liveMatch ? liveMatch.team_b?.name[0] : 'S'}</div>
+                <span className="font-black text-primary text-sm md:text-lg">{liveMatch ? liveMatch.team_b?.name : 'SPARTANS'}</span>
               </div>
             </div>
 
@@ -353,10 +372,21 @@ export default function Home() {
                <div className="flex-1 bg-surface/50 rounded-xl border border-white/5 p-4 overflow-y-auto max-h-[150px] md:max-h-full text-sm">
                  <div className="text-xs font-bold text-muted mb-3 sticky top-0 bg-surface/90 py-1">LIVE FEED</div>
                  <div className="space-y-3">
-                   <div className="flex gap-3"><span className="text-muted font-mono text-xs">24-21</span> <span className="text-secondary">Arjun attacks out!</span></div>
-                   <div className="flex gap-3"><span className="text-muted font-mono text-xs">24-20</span> <span className="text-emerald-400 font-bold">Aryan Mishra | Monster block!</span></div>
-                   <div className="flex gap-3"><span className="text-muted font-mono text-xs">23-20</span> <span className="text-gold">Timeout - Spartans</span></div>
-                   <div className="flex gap-3"><span className="text-muted font-mono text-xs">23-19</span> <span className="text-accent font-bold">Ace! Rohit Kumar</span></div>
+                   {liveMatch && liveMatch.live_feed ? (
+                     liveMatch.live_feed.map((feed: any, i: number) => (
+                       <div key={i} className="flex gap-3">
+                         <span className="text-muted font-mono text-xs">{feed.score}</span> 
+                         <span className="text-secondary">{feed.text}</span>
+                       </div>
+                     ))
+                   ) : (
+                     <>
+                       <div className="flex gap-3"><span className="text-muted font-mono text-xs">24-21</span> <span className="text-secondary">Arjun attacks out!</span></div>
+                       <div className="flex gap-3"><span className="text-muted font-mono text-xs">24-20</span> <span className="text-emerald-400 font-bold">Aryan Mishra | Monster block!</span></div>
+                       <div className="flex gap-3"><span className="text-muted font-mono text-xs">23-20</span> <span className="text-gold">Timeout - Spartans</span></div>
+                       <div className="flex gap-3"><span className="text-muted font-mono text-xs">23-19</span> <span className="text-accent font-bold">Ace! Rohit Kumar</span></div>
+                     </>
+                   )}
                  </div>
                </div>
                
