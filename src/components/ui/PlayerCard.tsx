@@ -44,7 +44,11 @@ export function PlayerCard({ player, index = 0, className, onClick }: PlayerCard
 
         {/* Player Image */}
         <div className="w-20 h-20 rounded-full bg-elevated border-2 border-border mb-4 overflow-hidden flex items-center justify-center">
-          <span className="text-muted text-xs font-bold uppercase">Photo</span>
+          {player.photo_url && player.photo_url !== 'placeholder' ? (
+            <img src={player.photo_url} alt={player.full_name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-muted text-xs font-bold uppercase">Photo</span>
+          )}
         </div>
 
         {/* Player Name */}

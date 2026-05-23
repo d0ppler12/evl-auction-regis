@@ -4,7 +4,28 @@
 
 @layer base {
   body {
-    background-color: #0f172a;
-    color: #e2e8f0;
+    @apply bg-background text-secondary antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-primary font-display;
+  }
+}
+
+@layer components {
+  .card-base {
+    @apply bg-[rgba(255,255,255,0.08)] border border-white/10 rounded-2xl backdrop-blur-md shadow-xl transition-all duration-300;
+  }
+  
+  .card-hover {
+    @apply hover:bg-[rgba(255,255,255,0.12)] hover:-translate-y-1 hover:shadow-2xl hover:border-accent/40;
+  }
+  
+  .glass-panel {
+    @apply bg-surface/80 backdrop-blur-xl border border-white/5;
+  }
+  
+  .neon-text {
+    @apply text-accent drop-shadow-[0_0_8px_rgba(96,165,250,0.8)];
   }
 }

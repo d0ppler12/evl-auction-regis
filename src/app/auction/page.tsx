@@ -146,7 +146,11 @@ export default function AuctionPage() {
                   <div className="bg-black/80 rounded-[22px] p-8">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
                       <div className="w-64 h-64 rounded-full bg-gray-800 border-4 border-secondary/50 overflow-hidden shadow-[0_0_30px_rgba(59,130,246,0.3)] shrink-0 flex items-center justify-center">
-                        <span className="text-gray-500 text-xl font-bold uppercase tracking-widest">Photo</span>
+                        {currentPlayer.photo_url && currentPlayer.photo_url !== 'placeholder' ? (
+                          <img src={currentPlayer.photo_url} alt={currentPlayer.full_name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-gray-500 text-xl font-bold uppercase tracking-widest">Photo</span>
+                        )}
                       </div>
                       
                       <div className="flex-1 text-center md:text-left">

@@ -71,6 +71,15 @@ export default function AdminDashboard() {
     await refresh()
   }
 
+  const handleShufflePool = async () => {
+    if (!confirm('Are you sure you want to shuffle the entire remaining player queue?')) return
+    await adminFetch('/api/admin/auction', {
+      method: 'POST',
+      body: JSON.stringify({ action: 'shuffle_pool' }),
+    })
+    await refresh()
+  }
+
   return (
     <div>
       <div className="bg-surface border-b border-border px-6 py-4 flex justify-between items-center rounded-2xl mb-6 border-white/10">
@@ -87,10 +96,15 @@ export default function AdminDashboard() {
         <div className="xl:col-span-4 flex flex-col gap-6">
           <div className="bg-slate-900 rounded-2xl p-5 border border-white/10 flex-1 flex flex-col overflow-hidden" style={{ maxHeight: 'calc(100vh - 120px)' }}>
             <div className="flex justify-between items-center mb-5">
-              <h2 className="text-base font-bold text-white uppercase tracking-widest">Player Queue</h2>
-              <span className="text-xs font-mono text-slate-400">{players.filter(p => p.auction_status !== 'sold').length} remaining</span>
+              <div>
+                <h2 className="text-base font-bold text-white uppercase tracking-widest">Player Queue</h2>
+                <span className="text-xs font-mono text-slate-450">{players.filter(p => p.auction_status !== 'sold' && p.status === 'approved').length} remaining</span>
+              </div>
+              <Button variant="secondary" size="sm" onClick={handleShufflePool} className="bg-slate-800 hover:bg-slate-700 text-xs border border-white/5 py-1 px-3">
+                🔀 Shuffle
+              </Button>
             </div>
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+            <div className="flex-grow overflow-y-auto space-y-2 pr-1">
               {players.filter(p => p.auction_status !== 'sold' && p.status === 'approved').map(p => (
                 <div key={p.id} className={`flex justify-between items-center p-4 rounded-xl border transition-all ${
                   currentPlayer?.id === p.id ? 'bg-blue-600/10 border-blue-500' : 'bg-slate-800/50 border-white/5 hover:border-white/20'

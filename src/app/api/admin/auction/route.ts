@@ -6,20 +6,76 @@ export async function GET() {
   try {
     requireAdmin()
     const [playersRes, teamsRes, stateRes] = await Promise.all([
-      supabaseAdmin.from('players').select('*').order('created_at'),
+      supabaseAdmin.from('players').select('*'),
       supabaseAdmin.from('teams').select('*').order('name'),
       supabaseAdmin.from('auction_state').select('*').eq('id', 1).single(),
     ])
     if (playersRes.error) throw playersRes.error
     if (teamsRes.error) throw teamsRes.error
 
+    const allPlayers = playersRes.data || []
+    const approvedUnsoldPlayers = allPlayers.filter(p => p.status === 'approved' && p.auction_status !== 'sold')
+
+    // Fetch existing auction_order table
+    const { data: orderData, error: orderError } = await supabaseAdmin
+      .from('auction_order')
+      .select('*')
+    if (orderError) throw orderError
+
+    const orderMap = new Map(orderData?.map(o => [o.player_id, o.sequence_number]) || [])
+
+    // Find any approved unsold player missing from auction_order
+    const missingPlayers = approvedUnsoldPlayers.filter(p => !orderMap.has(p.id))
+
+    if (missingPlayers.length > 0) {
+      let maxSeq = 0
+      if (orderData && orderData.length > 0) {
+        maxSeq = Math.max(...orderData.map(o => o.sequence_number))
+      }
+
+      // Shuffle missing players
+      const shuffledMissing = [...missingPlayers].sort(() => Math.random() - 0.5)
+      
+      const insertData = shuffledMissing.map((p, i) => ({
+        player_id: p.id,
+        sequence_number: maxSeq + i + 1,
+        is_completed: false
+      }))
+
+      const { error: insertErr } = await supabaseAdmin
+        .from('auction_order')
+        .insert(insertData)
+      
+      if (!insertErr) {
+        insertData.forEach(item => {
+          orderMap.set(item.player_id, item.sequence_number)
+        })
+      }
+    }
+
+    // Sort players: approved & unsold players by sequence_number, then others
+    const sortedPlayers = [...allPlayers].sort((a, b) => {
+      const aApproved = a.status === 'approved' && a.auction_status !== 'sold'
+      const bApproved = b.status === 'approved' && b.auction_status !== 'sold'
+
+      if (aApproved && bApproved) {
+        const aSeq = orderMap.get(a.id) ?? 999999
+        const bSeq = orderMap.get(b.id) ?? 999999
+        return aSeq - bSeq
+      }
+      if (aApproved) return -1
+      if (bApproved) return 1
+      
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    })
+
     const state = stateRes.data
     const currentPlayer = state?.current_player_id
-      ? playersRes.data?.find((p) => p.id === state.current_player_id)
+      ? sortedPlayers.find((p) => p.id === state.current_player_id)
       : null
 
     return NextResponse.json({
-      players: playersRes.data,
+      players: sortedPlayers,
       teams: teamsRes.data,
       auctionState: state,
       currentPlayer,
@@ -161,6 +217,37 @@ export async function POST(request: Request) {
         .single()
       if (error) throw error
       return NextResponse.json(data)
+    }
+
+    if (action === 'shuffle_pool') {
+      const { data: players } = await supabaseAdmin
+        .from('players')
+        .select('id')
+        .eq('status', 'approved')
+        .neq('auction_status', 'sold')
+
+      if (players && players.length > 0) {
+        const playerIds = players.map(p => p.id)
+        
+        await supabaseAdmin
+          .from('auction_order')
+          .delete()
+          .in('player_id', playerIds)
+
+        const shuffled = [...playerIds].sort(() => Math.random() - 0.5)
+
+        const insertData = shuffled.map((id, index) => ({
+          player_id: id,
+          sequence_number: index + 1,
+          is_completed: false
+        }))
+
+        const { error } = await supabaseAdmin
+          .from('auction_order')
+          .insert(insertData)
+        if (error) throw error
+      }
+      return NextResponse.json({ success: true })
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })

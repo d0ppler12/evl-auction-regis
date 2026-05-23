@@ -6,12 +6,32 @@ import { Button } from '@/components/ui/Button'
 export default function RegisterPage() {
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState('')
   const [formData, setFormData] = useState({
     fullName: '', age: '', phoneNumber: '', wingBuilding: '',
-    jerseyName: '', jerseySize: '', jerseyNumber: '', experience: '', utrNumber: ''
+    jerseyName: '', jerseySize: '', jerseyNumber: '', experience: '', utrNumber: '',
+    photo: ''
   })
 
   const handleInputChange = (e: any) => setFormData({ ...formData, [e.target.name]: e.target.value })
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size should be less than 5MB")
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const base64String = reader.result as string
+      setPhotoPreview(base64String)
+      setFormData(prev => ({ ...prev, photo: base64String }))
+    }
+    reader.readAsDataURL(file)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,6 +50,7 @@ export default function RegisterPage() {
           jersey_number: formData.jerseyNumber,
           utr_number: formData.utrNumber,
           volleyball_experience: formData.experience,
+          photo: formData.photo,
         }),
       })
       const data = await res.json()
@@ -90,6 +111,26 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-bold text-body mb-2">Player Photo</label>
+                  <div className="flex items-center gap-4 bg-slate-800 border border-slate-700 rounded-xl p-3">
+                    <div className="w-16 h-16 rounded-full bg-slate-900 overflow-hidden flex items-center justify-center border border-white/10 shrink-0">
+                      {photoPreview ? (
+                        <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-[10px] text-slate-400 font-bold uppercase">No Image</span>
+                      )}
+                    </div>
+                    <div className="flex-grow">
+                      <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" id="photo-upload-input" />
+                      <label htmlFor="photo-upload-input" className="inline-block px-4 py-2 bg-slate-700 hover:bg-slate-600 border border-white/5 rounded-lg text-xs font-bold text-white cursor-pointer transition-all">
+                        Choose Photo
+                      </label>
+                      <p className="text-[10px] text-slate-400 mt-1">JPEG/PNG up to 5MB</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
                   <label className="block text-sm font-bold text-body mb-2">Jersey Name</label>
                   <input required name="jerseyName" value={formData.jerseyName} onChange={handleInputChange} type="text" placeholder="Enter Jersey Name" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
                 </div>
@@ -112,8 +153,8 @@ export default function RegisterPage() {
                 <Button 
                   variant="primary" size="lg" className="w-full mt-4"
                   onClick={() => {
-                    if(formData.fullName && formData.age && formData.phoneNumber && formData.wingBuilding && formData.jerseyName && formData.jerseySize && formData.jerseyNumber) setStep(2)
-                    else alert('Please fill all required fields.')
+                    if(formData.fullName && formData.age && formData.phoneNumber && formData.wingBuilding && formData.jerseyName && formData.jerseySize && formData.jerseyNumber && formData.photo) setStep(2)
+                    else alert('Please fill all required fields, including uploading a player photo.')
                   }}
                 >
                   Continue to Payment →

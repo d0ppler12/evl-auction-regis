@@ -120,8 +120,12 @@ export default function RegistrationsManagement() {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-slate-400" />
+                      <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
+                        {player.photo_url && player.photo_url !== 'placeholder' ? (
+                          <img src={player.photo_url} alt={player.full_name} className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-5 h-5 text-slate-400" />
+                        )}
                       </div>
                       <div>
                         <h3 className="font-bold text-white leading-tight">{player.full_name}</h3>
@@ -152,6 +156,16 @@ export default function RegistrationsManagement() {
                 <span className={`px-3 py-1 rounded text-xs font-bold uppercase border ${getStatusColor(selectedPlayer.status || 'pending')}`}>
                   {selectedPlayer.status || 'pending'}
                 </span>
+              </div>
+              <div className="flex flex-col items-center mb-6 border-b border-white/10 pb-6">
+                <div className="w-24 h-24 rounded-full bg-slate-800 border-2 border-blue-500 overflow-hidden flex items-center justify-center shadow-lg shadow-blue-500/20 mb-3">
+                  {selectedPlayer.photo_url && selectedPlayer.photo_url !== 'placeholder' ? (
+                    <img src={selectedPlayer.photo_url} alt={selectedPlayer.full_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="w-10 h-10 text-slate-400" />
+                  )}
+                </div>
+                <h3 className="text-xl font-bold text-white text-center leading-tight">{selectedPlayer.full_name}</h3>
               </div>
 
               <div className="space-y-4 mb-8">

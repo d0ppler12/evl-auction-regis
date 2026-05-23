@@ -8,13 +8,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ className, variant = 'primary', size = 'md', children, ...props }: ButtonProps) {
-  const base = "inline-flex items-center justify-center font-display font-bold tracking-wide rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50"
+  const base = "inline-flex items-center justify-center font-display font-bold tracking-wide rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50"
   
   const variants: Record<string, string> = {
-    primary: "bg-primary text-white hover:bg-primary-light shadow-lg hover:shadow-xl hover:-translate-y-0.5",
-    secondary: "bg-surface text-heading border border-border hover:bg-elevated hover:border-border-light hover:-translate-y-0.5",
-    danger: "bg-danger text-white hover:bg-red-500 shadow-lg",
-    ghost: "bg-transparent text-muted hover:text-heading hover:bg-surface",
+    primary: "bg-accent text-background hover:bg-blue-400 shadow-lg hover:shadow-xl hover:-translate-y-0.5",
+    secondary: "bg-surface/50 text-primary border border-white/5 hover:bg-surface hover:border-white/10 hover:-translate-y-0.5",
+    danger: "bg-red-500 text-white hover:bg-red-400 shadow-lg",
+    ghost: "bg-transparent text-muted hover:text-primary hover:bg-surface/50",
   }
 
   const sizes: Record<string, string> = {
