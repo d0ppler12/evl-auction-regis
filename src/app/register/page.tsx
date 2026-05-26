@@ -1,14 +1,14 @@
 "use client"
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/Button'
+import { User, Phone, Building2, Shirt, Hash, UploadCloud, CheckCircle2, ChevronRight, Image as ImageIcon } from 'lucide-react'
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [photoPreview, setPhotoPreview] = useState('')
   const [formData, setFormData] = useState({
-    fullName: '', age: '', phoneNumber: '', wingBuilding: '',
+    fullName: '', age: '', phoneNumber: '', wing: '', flatNumber: '',
     jerseyName: '', jerseySize: '', jerseyNumber: '', experience: '', utrNumber: '',
     photo: ''
   })
@@ -44,7 +44,7 @@ export default function RegisterPage() {
           full_name: formData.fullName,
           age: formData.age,
           phone_number: formData.phoneNumber,
-          wing_building: formData.wingBuilding,
+          wing_building: `${formData.wing}-${formData.flatNumber}`,
           jersey_name: formData.jerseyName,
           jersey_size: formData.jerseySize,
           jersey_number: formData.jerseyNumber,
@@ -64,149 +64,306 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md z-10">
-        
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-primary mx-auto flex items-center justify-center mb-4 shadow-lg">
-            <span className="font-display font-bold text-2xl text-white">V</span>
-          </div>
-          <h2 className="text-3xl font-display font-black text-heading uppercase tracking-wide">Draft Entry</h2>
-          <p className="text-muted mt-2">Join the tournament player pool</p>
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#0B1121] overflow-hidden selection:bg-blue-500/30">
+      
+      {/* Left Visual Section */}
+      <div className="w-full lg:w-1/2 relative min-h-[400px] lg:min-h-screen flex flex-col justify-center p-8 lg:p-16 overflow-hidden">
+        {/* Background Image & Overlays */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B1121] via-[#0B1121]/80 to-transparent z-10 lg:bg-gradient-to-r lg:from-[#0B1121] lg:via-[#0B1121]/50 lg:to-transparent" />
+          <div className="absolute inset-0 bg-blue-900/30 mix-blend-overlay z-10" />
+          <img 
+            src="https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?q=80&w=2000" 
+            alt="Volleyball Player" 
+            className="w-full h-full object-cover object-center opacity-60 scale-105"
+          />
         </div>
 
-        {/* Form Card */}
-        <div className="card-elevated rounded-3xl p-8">
-          <AnimatePresence mode="wait">
+        {/* Floating Particles/Glows */}
+        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-600/30 blur-[100px] rounded-full mix-blend-screen animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/20 blur-[120px] rounded-full mix-blend-screen animate-pulse delay-1000" />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-20 flex flex-col h-full justify-center max-w-xl mt-12 lg:mt-0 pt-12 lg:pt-0">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+                <span className="font-black text-white italic text-xl tracking-tighter">EVL</span>
+              </div>
+              <span className="text-blue-400 font-bold tracking-widest uppercase text-sm">Season 1 Draft</span>
+            </div>
             
-            {/* Step 1: Player Info */}
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-5">
-                
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-bold text-heading text-lg">Player Profile</h3>
-                  <span className="text-xs text-primary font-mono font-bold">Step 1 / 2</span>
-                </div>
+            <h1 className="text-5xl lg:text-7xl font-black text-white leading-[1.1] tracking-tighter mb-6 italic">
+              ENTER THE<br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-200">AUCTION.</span>
+            </h1>
+            
+            <p className="text-lg lg:text-xl text-slate-300 font-medium mb-12 max-w-md">
+              Only the elite get drafted. Secure your spot in the player pool and prove your worth on the court.
+            </p>
 
-                <div>
-                  <label className="block text-sm font-bold text-body mb-2">Full Name</label>
-                  <input required name="fullName" value={formData.fullName} onChange={handleInputChange} type="text" placeholder="Enter your full name" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
-                </div>
+            <div className="border-t border-white/10 pt-8">
+               <div>
+                 <div className="text-3xl font-black text-white mb-1">₹500</div>
+                 <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">Entry Fee</div>
+               </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-body mb-2">Age</label>
-                    <input required name="age" value={formData.age} onChange={handleInputChange} type="number" placeholder="Age" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-body mb-2">Wing/Bldg</label>
-                    <input required name="wingBuilding" value={formData.wingBuilding} onChange={handleInputChange} type="text" placeholder="Building" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
-                  </div>
-                </div>
+      {/* Right Form Section */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 lg:p-12 z-20 overflow-y-auto min-h-screen bg-[#0B1121] lg:bg-transparent shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
+        <div className="w-full max-w-xl">
+           
+           {/* Glassmorphism Card */}
+           <div className="bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 lg:p-10 shadow-2xl relative overflow-hidden">
+             
+             {/* Card ambient glow */}
+             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
 
-                <div>
-                  <label className="block text-sm font-bold text-body mb-2">Phone Number</label>
-                  <input required name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} type="tel" placeholder="+91 XXXXX XXXXX" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
-                </div>
+             <AnimatePresence mode="wait">
+               
+               {/* STEP 1: PLAYER INFO */}
+               {step === 1 && (
+                 <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="relative z-10 space-y-6">
+                   
+                   {/* Header & Stepper */}
+                   <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-6">
+                     <div>
+                       <h3 className="text-2xl font-black text-white tracking-tight mb-1">Player Profile</h3>
+                       <p className="text-sm text-slate-400">Fill in your athletic details.</p>
+                     </div>
+                     <div className="flex items-center gap-2">
+                       <div className="w-8 h-1 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                       <div className="w-4 h-1 bg-slate-700 rounded-full" />
+                     </div>
+                   </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-body mb-2">Player Photo</label>
-                  <div className="flex items-center gap-4 bg-slate-800 border border-slate-700 rounded-xl p-3">
-                    <div className="w-16 h-16 rounded-full bg-slate-900 overflow-hidden flex items-center justify-center border border-white/10 shrink-0">
-                      {photoPreview ? (
-                        <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-[10px] text-slate-400 font-bold uppercase">No Image</span>
-                      )}
-                    </div>
-                    <div className="flex-grow">
-                      <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" id="photo-upload-input" />
-                      <label htmlFor="photo-upload-input" className="inline-block px-4 py-2 bg-slate-700 hover:bg-slate-600 border border-white/5 rounded-lg text-xs font-bold text-white cursor-pointer transition-all">
-                        Choose Photo
-                      </label>
-                      <p className="text-[10px] text-slate-400 mt-1">JPEG/PNG up to 5MB</p>
-                    </div>
-                  </div>
-                </div>
+                   {/* Form Grid */}
+                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                     
+                     {/* Full Name */}
+                     <div className="lg:col-span-2">
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Full Name</label>
+                       <div className="relative">
+                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                           <User className="w-5 h-5 text-slate-500" />
+                         </div>
+                         <input required name="fullName" value={formData.fullName} onChange={handleInputChange} type="text" placeholder="Enter your full name" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
+                       </div>
+                     </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-body mb-2">Jersey Name</label>
-                  <input required name="jerseyName" value={formData.jerseyName} onChange={handleInputChange} type="text" placeholder="Enter Jersey Name" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
-                </div>
+                     {/* Age */}
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Age</label>
+                       <div className="relative">
+                         <input required name="age" value={formData.age} onChange={handleInputChange} type="number" placeholder="Years" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
+                       </div>
+                     </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-body mb-2">Jersey Size</label>
-                  <select required name="jerseySize" value={formData.jerseySize} onChange={handleInputChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer">
-                    <option value="" disabled className="text-gray-400">Select Jersey Size</option>
-                    <option value="S" className="bg-slate-800 text-white">S</option>
-                    <option value="M" className="bg-slate-800 text-white">M</option>
-                    <option value="L" className="bg-slate-800 text-white">L</option>
-                  </select>
-                </div>
+                     {/* Wing and Flat Number */}
+                     <div className="flex gap-4">
+                        <div className="w-1/2">
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Wing</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Building2 className="w-4 h-4 text-slate-500" />
+                            </div>
+                            <select required name="wing" value={formData.wing} onChange={handleInputChange} className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-9 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all appearance-none cursor-pointer">
+                              <option value="" disabled className="text-gray-500">Wing</option>
+                              <option value="A">A</option>
+                              <option value="B">B</option>
+                              <option value="C">C</option>
+                              <option value="D">D</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="w-1/2">
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Flat No.</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Hash className="w-4 h-4 text-slate-500" />
+                            </div>
+                            <input required name="flatNumber" value={formData.flatNumber} onChange={handleInputChange} type="text" placeholder="101" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-9 pr-2 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
+                          </div>
+                        </div>
+                     </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-body mb-2">Jersey Number</label>
-                  <input required name="jerseyNumber" value={formData.jerseyNumber} onChange={handleInputChange} type="number" placeholder="Enter Jersey Number" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" />
-                </div>
+                     {/* Phone Number */}
+                     <div className="lg:col-span-2">
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Phone Number</label>
+                       <div className="relative">
+                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                           <Phone className="w-5 h-5 text-slate-500" />
+                         </div>
+                         <input required name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} type="tel" placeholder="+91 XXXXX XXXXX" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
+                       </div>
+                     </div>
 
-                <Button 
-                  variant="primary" size="lg" className="w-full mt-4"
-                  onClick={() => {
-                    if(formData.fullName && formData.age && formData.phoneNumber && formData.wingBuilding && formData.jerseyName && formData.jerseySize && formData.jerseyNumber && formData.photo) setStep(2)
-                    else alert('Please fill all required fields, including uploading a player photo.')
-                  }}
-                >
-                  Continue to Payment →
-                </Button>
-              </motion.div>
-            )}
+                     {/* Jersey Name */}
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Jersey Name</label>
+                       <div className="relative">
+                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                           <Shirt className="w-5 h-5 text-slate-500" />
+                         </div>
+                         <input required name="jerseyName" value={formData.jerseyName} onChange={handleInputChange} type="text" placeholder="Name on back" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
+                       </div>
+                     </div>
 
-            {/* Step 2: Payment */}
-            {step === 2 && (
-              <motion.form key="step2" onSubmit={handleSubmit} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6 text-center">
-                
-                <div className="flex justify-between items-center">
-                  <button type="button" onClick={() => setStep(1)} className="text-sm text-primary font-bold hover:underline">← Back</button>
-                  <span className="text-xs text-secondary font-mono font-bold">Step 2 / 2</span>
-                </div>
+                     {/* Jersey Size & Number */}
+                     <div className="flex gap-4">
+                        <div className="w-1/2">
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Size</label>
+                          <select required name="jerseySize" value={formData.jerseySize} onChange={handleInputChange} className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all appearance-none cursor-pointer">
+                            <option value="" disabled className="text-gray-500">Size</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                          </select>
+                        </div>
+                        <div className="w-1/2">
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">No.</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <Hash className="w-4 h-4 text-slate-500" />
+                            </div>
+                            <input required name="jerseyNumber" value={formData.jerseyNumber} onChange={handleInputChange} type="number" placeholder="10" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-9 pr-2 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
+                          </div>
+                        </div>
+                     </div>
 
-                <div>
-                  <h3 className="text-4xl font-display font-black text-heading">₹500</h3>
-                  <p className="text-sm text-muted uppercase tracking-widest mt-1">Tournament Entry Fee</p>
-                </div>
+                     {/* Photo Upload */}
+                     <div className="lg:col-span-2 pt-2">
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Player Photo</label>
+                       
+                       <label htmlFor="photo-upload" className={`flex items-center gap-6 p-4 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${photoPreview ? 'border-blue-500/50 bg-blue-500/5' : 'border-slate-700 hover:border-slate-500 bg-slate-800/30'}`}>
+                          <div className="relative w-20 h-20 shrink-0">
+                            <div className={`absolute inset-0 rounded-full border-2 ${photoPreview ? 'border-blue-500' : 'border-slate-600'} overflow-hidden shadow-lg flex items-center justify-center bg-slate-900`}>
+                              {photoPreview ? (
+                                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                              ) : (
+                                <ImageIcon className="w-8 h-8 text-slate-600" />
+                              )}
+                            </div>
+                            {photoPreview && (
+                              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-slate-900 flex items-center justify-center text-white">
+                                <CheckCircle2 className="w-4 h-4" />
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex-grow">
+                            <h4 className="text-sm font-bold text-white mb-1">{photoPreview ? 'Photo Selected' : 'Upload Image'}</h4>
+                            <p className="text-xs text-slate-400 mb-2">{photoPreview ? 'Click to change photo' : 'Drag & drop or click to browse'}</p>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2 py-1 rounded">
+                              <UploadCloud className="w-3 h-3" /> Max 5MB
+                            </span>
+                          </div>
+                       </label>
+                       <input type="file" id="photo-upload" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                     </div>
 
-                <div className="w-48 h-48 bg-white mx-auto rounded-2xl flex items-center justify-center shadow-lg">
-                  <p className="text-surface font-bold font-mono text-sm">[UPI QR Code]</p>
-                </div>
+                   </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-body mb-2 text-left">Transaction UTR Number</label>
-                  <input required name="utrNumber" value={formData.utrNumber} onChange={handleInputChange} type="text" placeholder="Enter UTR from payment" className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-gray-400 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all" />
-                </div>
+                   <button 
+                     type="button"
+                     className="w-full mt-8 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
+                     onClick={() => {
+                       if(formData.fullName && formData.age && formData.phoneNumber && formData.wing && formData.flatNumber && formData.jerseyName && formData.jerseySize && formData.jerseyNumber && formData.photo) setStep(2)
+                       else alert('Please fill all required fields, including uploading a player photo.')
+                     }}
+                   >
+                     Continue to Payment <ChevronRight className="w-5 h-5" />
+                   </button>
+                 </motion.div>
+               )}
 
-                <Button type="submit" variant="primary" size="lg" className="w-full bg-secondary hover:bg-violet-500" disabled={isSubmitting}>
-                  {isSubmitting ? 'Submitting...' : '✓ Submit Draft Entry'}
-                </Button>
-              </motion.form>
-            )}
+               {/* STEP 2: PAYMENT */}
+               {step === 2 && (
+                 <motion.form key="step2" onSubmit={handleSubmit} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="relative z-10 space-y-8 text-center py-4">
+                   
+                   <div className="flex justify-between items-center mb-4">
+                     <button type="button" onClick={() => setStep(1)} className="text-sm text-slate-400 font-bold hover:text-white transition-colors flex items-center gap-1">
+                       ← Back
+                     </button>
+                     <div className="flex items-center gap-2">
+                       <div className="w-4 h-1 bg-blue-500/30 rounded-full" />
+                       <div className="w-8 h-1 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                     </div>
+                   </div>
 
-            {/* Step 3: Success */}
-            {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-8 space-y-6">
-                <div className="w-20 h-20 bg-success/20 border-2 border-success rounded-full flex items-center justify-center mx-auto">
-                  <svg className="w-10 h-10 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                </div>
-                <h3 className="text-2xl font-display font-bold text-heading uppercase">Entry Received!</h3>
-                <p className="text-body">Your registration is pending payment verification.</p>
-                
-                <Button variant="primary" size="lg" className="w-full bg-[#25D366] hover:bg-[#20bd5a]" onClick={() => window.open(`https://wa.me/1234567890?text=Registered! Name: ${formData.fullName}, UTR: ${formData.utrNumber}`, '_blank')}>
-                  📱 Send Proof on WhatsApp
-                </Button>
-              </motion.div>
-            )}
+                   <div>
+                     <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-400 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(16,185,129,0.3)] transform -rotate-6">
+                        <span className="text-3xl font-black text-white">₹</span>
+                     </div>
+                     <h3 className="text-5xl font-black text-white tracking-tighter mb-2">500</h3>
+                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Tournament Entry Fee</p>
+                   </div>
 
-          </AnimatePresence>
+                   <div className="w-56 h-56 bg-white mx-auto rounded-3xl flex items-center justify-center shadow-2xl p-4">
+                     <div className="w-full h-full border-4 border-dashed border-slate-200 rounded-xl flex items-center justify-center bg-slate-50">
+                       <p className="text-slate-400 font-bold font-mono text-sm">[ UPI QR CODE ]</p>
+                     </div>
+                   </div>
+
+                   <div className="text-left">
+                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Transaction UTR Number</label>
+                     <input required name="utrNumber" value={formData.utrNumber} onChange={handleInputChange} type="text" placeholder="Enter 12-digit UTR" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:bg-slate-800 transition-all shadow-inner text-center font-mono tracking-widest text-lg" />
+                   </div>
+
+                   <button 
+                     type="submit" 
+                     disabled={isSubmitting}
+                     className="w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                   >
+                     {isSubmitting ? (
+                       <span className="animate-pulse">Verifying...</span>
+                     ) : (
+                       <>Complete Registration <CheckCircle2 className="w-5 h-5" /></>
+                     )}
+                   </button>
+                 </motion.form>
+               )}
+
+               {/* STEP 3: SUCCESS */}
+               {step === 3 && (
+                 <motion.div key="step3" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative z-10 text-center py-12 space-y-6">
+                   <div className="w-24 h-24 bg-green-500/20 border-2 border-green-500 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(34,197,94,0.3)]">
+                     <CheckCircle2 className="w-12 h-12 text-green-400" />
+                   </div>
+                   
+                   <div>
+                     <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-2">Draft Entry Saved</h3>
+                     <p className="text-slate-400 text-sm max-w-xs mx-auto">Your registration is pending payment verification by the admins.</p>
+                   </div>
+                   
+                   <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 my-8 text-left">
+                     <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Player</p>
+                     <p className="text-lg font-black text-white">{formData.fullName}</p>
+                     <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-3 mb-1">UTR</p>
+                     <p className="text-sm font-mono text-white">{formData.utrNumber}</p>
+                   </div>
+
+                   <button 
+                     onClick={() => window.open(`https://wa.me/1234567890?text=Registered! Name: ${formData.fullName}, UTR: ${formData.utrNumber}`, '_blank')}
+                     className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,211,102,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                   >
+                     Send Proof on WhatsApp
+                   </button>
+                 </motion.div>
+               )}
+
+             </AnimatePresence>
+           </div>
         </div>
       </div>
     </div>

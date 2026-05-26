@@ -219,6 +219,54 @@ export async function POST(request: Request) {
       return NextResponse.json(data)
     }
 
+    if (action === 'pause') {
+      const { data, error } = await supabaseAdmin
+        .from('auction_state')
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq('id', 1)
+        .select()
+      if (error) throw error
+      return NextResponse.json(data?.[0] ?? data)
+    }
+
+    if (action === 'resume') {
+      const { data: state } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).single()
+      if (!state?.current_player_id) {
+        return NextResponse.json({ error: 'Select a player first' }, { status: 400 })
+      }
+      const { data, error } = await supabaseAdmin
+        .from('auction_state')
+        .update({ is_active: true, updated_at: new Date().toISOString() })
+        .eq('id', 1)
+        .select()
+      if (error) throw error
+      return NextResponse.json(data?.[0] ?? data)
+    }
+
+    if (action === 'reset_lot') {
+      const { data: state } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).single()
+      if (!state?.current_player_id) {
+        return NextResponse.json({ error: 'No player on block' }, { status: 400 })
+      }
+      const { data: player } = await supabaseAdmin
+        .from('players')
+        .select('base_price')
+        .eq('id', state.current_player_id)
+        .single()
+      const { data, error } = await supabaseAdmin
+        .from('auction_state')
+        .update({
+          current_bid: player?.base_price || 0,
+          current_bid_team_id: null,
+          is_active: true,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', 1)
+        .select()
+      if (error) throw error
+      return NextResponse.json(data?.[0] ?? data)
+    }
+
     if (action === 'shuffle_pool') {
       const { data: players } = await supabaseAdmin
         .from('players')

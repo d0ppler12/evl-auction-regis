@@ -1,203 +1,160 @@
-"use client"
-import { useEffect, useState, useCallback } from 'react'
-import { adminFetch } from '@/lib/admin-fetch'
-import { Button } from '@/components/ui/Button'
-import { motion } from 'framer-motion'
+"use client";
 
-export default function AdminDashboard() {
-  const [auctionState, setAuctionState] = useState<any>({ current_bid: 0 })
-  const [players, setPlayers] = useState<any[]>([])
-  const [teams, setTeams] = useState<any[]>([])
-  const [currentPlayer, setCurrentPlayer] = useState<any>(null)
-  const [selectedTeamId, setSelectedTeamId] = useState('')
-  const [bidAmount, setBidAmount] = useState('')
+import { useEffect, useState, useCallback } from "react";
+import { adminFetch } from "@/lib/admin-fetch";
+import { AuctionQueuePanel } from "@/components/auction/AuctionQueuePanel";
+import { AuctionStagePanel } from "@/components/auction/AuctionStagePanel";
+import { AuctionTeamsPanel } from "@/components/auction/AuctionTeamsPanel";
+
+export default function AuctionControlRoom() {
+  const [auctionState, setAuctionState] = useState<any>({ current_bid: 0, is_active: false });
+  const [players, setPlayers] = useState<any[]>([]);
+  const [teams, setTeams] = useState<any[]>([]);
+  const [currentPlayer, setCurrentPlayer] = useState<any>(null);
+  const [selectedTeamId, setSelectedTeamId] = useState("");
+  const [bidAmount, setBidAmount] = useState("");
+  const [queueSearch, setQueueSearch] = useState("");
+  const [banner, setBanner] = useState<"sold" | "unsold" | null>(null);
 
   const refresh = useCallback(async () => {
     try {
-      const data = await adminFetch<any>('/api/admin/auction')
-      setPlayers(data.players || [])
-      setTeams(data.teams || [])
-      setAuctionState(data.auctionState || { current_bid: 0 })
-      setCurrentPlayer(data.currentPlayer || null)
-    } catch { /* ignore */ }
-  }, [])
+      const data = await adminFetch<any>("/api/admin/auction");
+      setPlayers(data.players || []);
+      setTeams(data.teams || []);
+      setAuctionState(data.auctionState || { current_bid: 0, is_active: false });
+      setCurrentPlayer(data.currentPlayer || null);
+      if (data.auctionState?.current_bid_team_id) {
+        setSelectedTeamId(data.auctionState.current_bid_team_id);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
-    refresh()
-    const interval = setInterval(refresh, 3000)
-    return () => clearInterval(interval)
-  }, [refresh])
+    refresh();
+    const interval = setInterval(refresh, 2500);
+    return () => clearInterval(interval);
+  }, [refresh]);
+
+  const auctionAction = async (body: Record<string, unknown>) => {
+    await adminFetch("/api/admin/auction", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    await refresh();
+  };
 
   const handleSetPlayer = async (playerId: string) => {
-    const player = players.find(p => p.id === playerId)
-    setCurrentPlayer(player)
-    await adminFetch('/api/admin/auction', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'set_player', player_id: playerId }),
-    })
-    await refresh()
-  }
+    const player = players.find((p) => p.id === playerId);
+    setCurrentPlayer(player);
+    setBanner(null);
+    await auctionAction({ action: "set_player", player_id: playerId });
+  };
 
   const handleIncrementBid = async (increment: number) => {
-    if (!selectedTeamId) return alert('Select a bidding team first.')
-    await adminFetch('/api/admin/auction', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'bid', team_id: selectedTeamId, increment }),
-    })
-    await refresh()
-  }
+    if (!selectedTeamId) return alert("Select a bidding team from the right panel.");
+    await auctionAction({ action: "bid", team_id: selectedTeamId, increment });
+  };
 
   const handleCustomBid = async () => {
-    if (!selectedTeamId || !bidAmount) return
-    await adminFetch('/api/admin/auction', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'bid', team_id: selectedTeamId, amount: parseInt(bidAmount) }),
-    })
-    setBidAmount('')
-    await refresh()
-  }
+    if (!selectedTeamId || !bidAmount) return;
+    await auctionAction({
+      action: "bid",
+      team_id: selectedTeamId,
+      amount: parseInt(bidAmount, 10),
+    });
+    setBidAmount("");
+  };
 
   const handleMarkSold = async () => {
-    if (!currentPlayer || !auctionState.current_bid_team_id) return alert('No active bid.')
-    await adminFetch('/api/admin/auction', { method: 'POST', body: JSON.stringify({ action: 'sold' }) })
-    setCurrentPlayer(null)
-    await refresh()
-  }
+    if (!currentPlayer || !auctionState.current_bid_team_id) return alert("No active bid.");
+    setBanner("sold");
+    await auctionAction({ action: "sold" });
+    setTimeout(() => setBanner(null), 2200);
+    setCurrentPlayer(null);
+  };
 
   const handleMarkUnsold = async () => {
-    if (!currentPlayer) return
-    await adminFetch('/api/admin/auction', { method: 'POST', body: JSON.stringify({ action: 'unsold' }) })
-    setCurrentPlayer(null)
-    await refresh()
-  }
+    if (!currentPlayer) return;
+    setBanner("unsold");
+    await auctionAction({ action: "unsold" });
+    setTimeout(() => setBanner(null), 2200);
+    setCurrentPlayer(null);
+  };
 
   const handleShufflePool = async () => {
-    if (!confirm('Are you sure you want to shuffle the entire remaining player queue?')) return
-    await adminFetch('/api/admin/auction', {
-      method: 'POST',
-      body: JSON.stringify({ action: 'shuffle_pool' }),
-    })
-    await refresh()
-  }
+    if (!confirm("Shuffle the remaining player queue?")) return;
+    await auctionAction({ action: "shuffle_pool" });
+  };
+
+  const livePlayerId = currentPlayer?.id ?? auctionState.current_player_id ?? null;
 
   return (
-    <div>
-      <div className="bg-surface border-b border-border px-6 py-4 flex justify-between items-center rounded-2xl mb-6 border-white/10">
+    <div className="space-y-4 -m-2 p-2">
+      {/* Broadcast header */}
+      <header className="flex flex-wrap items-center justify-between gap-4 px-2 py-3 rounded-2xl border border-blue-500/20 bg-gradient-to-r from-[#0f1a2e] to-[#0b1121] shadow-[0_0_30px_rgba(37,99,235,0.12)]">
         <div className="flex items-center gap-3">
-          <motion.div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-          <h1 className="text-lg font-display font-bold text-white uppercase tracking-widest">Auction Control Room</h1>
-        </div>
-        <div className="text-sm font-mono text-slate-400">
-          {new Date().toLocaleTimeString()}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        <div className="xl:col-span-4 flex flex-col gap-6">
-          <div className="bg-slate-900 rounded-2xl p-5 border border-white/10 flex-1 flex flex-col overflow-hidden" style={{ maxHeight: 'calc(100vh - 120px)' }}>
-            <div className="flex justify-between items-center mb-5">
-              <div>
-                <h2 className="text-base font-bold text-white uppercase tracking-widest">Player Queue</h2>
-                <span className="text-xs font-mono text-slate-450">{players.filter(p => p.auction_status !== 'sold' && p.status === 'approved').length} remaining</span>
-              </div>
-              <Button variant="secondary" size="sm" onClick={handleShufflePool} className="bg-slate-800 hover:bg-slate-700 text-xs border border-white/5 py-1 px-3">
-                🔀 Shuffle
-              </Button>
-            </div>
-            <div className="flex-grow overflow-y-auto space-y-2 pr-1">
-              {players.filter(p => p.auction_status !== 'sold' && p.status === 'approved').map(p => (
-                <div key={p.id} className={`flex justify-between items-center p-4 rounded-xl border transition-all ${
-                  currentPlayer?.id === p.id ? 'bg-blue-600/10 border-blue-500' : 'bg-slate-800/50 border-white/5 hover:border-white/20'
-                }`}>
-                  <div>
-                    <p className="font-bold text-white text-sm">{p.full_name}</p>
-                    <p className="text-xs text-slate-400 font-mono">₹{p.base_price} · {p.playing_position}</p>
-                  </div>
-                  <Button variant="primary" size="sm" onClick={() => handleSetPlayer(p.id)} disabled={currentPlayer?.id === p.id}>
-                    Set Live
-                  </Button>
-                </div>
-              ))}
-            </div>
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+          </span>
+          <div>
+            <h1 className="text-lg sm:text-xl font-black text-white uppercase tracking-[0.15em]">
+              Auction Control Room
+            </h1>
+            <p className="text-[10px] text-blue-400/80 font-bold uppercase tracking-widest">EVL Mega Draft · Live</p>
           </div>
         </div>
+        <div className="text-right">
+          <p className="text-[10px] text-slate-500 uppercase tracking-widest">Broadcast clock</p>
+          <p className="text-lg font-mono font-bold text-slate-200 tabular-nums">
+            {new Date().toLocaleTimeString()}
+          </p>
+        </div>
+      </header>
 
-        <div className="xl:col-span-8 flex flex-col gap-6">
-          <div className="bg-slate-900 rounded-2xl p-6 border-2 border-blue-500/30">
-            <h2 className="text-base font-bold text-white uppercase tracking-widest mb-5">Live Auction Block</h2>
-            {currentPlayer ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-3xl font-display font-black text-white mb-2">{currentPlayer.full_name}</h3>
-                  <span className="inline-block px-3 py-1 bg-blue-500/20 rounded-lg text-sm text-blue-400 font-bold uppercase tracking-wider mb-4">
-                    {currentPlayer.playing_position}
-                  </span>
-                  <div className="space-y-2">
-                    <div className="flex justify-between p-3 bg-slate-800 rounded-lg border border-white/10">
-                      <span className="text-slate-400 text-sm">Base Price</span>
-                      <span className="font-mono font-bold text-white">₹{currentPlayer.base_price}</span>
-                    </div>
-                    <div className="flex justify-between p-3 bg-slate-800 rounded-lg border border-white/10">
-                      <span className="text-slate-400 text-sm">Building</span>
-                      <span className="font-bold text-white">{currentPlayer.wing_building || '—'}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center justify-center md:border-l md:border-white/10 md:pl-8">
-                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Current Bid</p>
-                  <motion.div key={auctionState.current_bid} initial={{ scale: 1.1 }} animate={{ scale: 1 }} className="text-5xl font-display font-black text-yellow-400 mb-4 font-mono">
-                    ₹{auctionState.current_bid?.toLocaleString()}
-                  </motion.div>
-                  <div className="px-4 py-2 bg-slate-800 rounded-lg border border-white/10">
-                    <p className="text-sm font-bold text-white">
-                      Leading: {auctionState.current_bid_team_id ? teams.find(t => t.id === auctionState.current_bid_team_id)?.name : '—'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="h-40 flex items-center justify-center border-2 border-dashed border-white/20 rounded-2xl">
-                <p className="text-slate-500 uppercase tracking-widest font-bold">Select a player from the queue</p>
-              </div>
-            )}
-          </div>
+      {/* 3-column layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-4 lg:gap-5 min-h-0">
+        <div className="md:col-span-1 xl:col-span-3 order-2 md:order-1 xl:order-1">
+          <AuctionQueuePanel
+            players={players}
+            livePlayerId={livePlayerId}
+            search={queueSearch}
+            onSearchChange={setQueueSearch}
+            onSetLive={handleSetPlayer}
+            onShuffle={handleShufflePool}
+          />
+        </div>
 
-          {currentPlayer && (
-            <div className="bg-slate-900 rounded-2xl p-6 space-y-6 border border-white/10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bidding Franchise</label>
-                  <select value={selectedTeamId} onChange={e => setSelectedTeamId(e.target.value)} className="w-full bg-slate-800 border border-white/10 rounded-xl p-3.5 text-white focus:ring-2 focus:ring-blue-500 outline-none">
-                    <option value="">— Choose Team —</option>
-                    {teams.map(t => (<option key={t.id} value={t.id}>{t.name} (₹{t.purse_remaining})</option>))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Custom Amount</label>
-                  <div className="flex gap-3">
-                    <input type="number" value={bidAmount} onChange={e => setBidAmount(e.target.value)} placeholder="Enter amount" className="flex-1 bg-slate-800 border border-white/10 rounded-xl p-3.5 text-white font-mono focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-500" />
-                    <Button variant="primary" onClick={handleCustomBid}>Set</Button>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Quick Bid</label>
-                <div className="grid grid-cols-4 gap-3">
-                  {[100, 500, 1000, 5000].map(amount => (
-                    <button key={amount} onClick={() => handleIncrementBid(amount)} className="bg-slate-800 border border-white/10 rounded-xl py-4 text-xl font-mono font-bold text-white hover:bg-slate-700 hover:border-white/30 transition-all active:scale-95">
-                      +{amount}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
-                <Button variant="primary" size="lg" className="h-16 text-xl tracking-widest bg-emerald-600 hover:bg-emerald-500 border-none" onClick={handleMarkSold}>🔨 SOLD</Button>
-                <Button variant="secondary" size="lg" className="h-16 text-base bg-red-600 hover:bg-red-500 text-white border-none" onClick={handleMarkUnsold}>PASS / UNSOLD</Button>
-              </div>
-            </div>
-          )}
+        <div className="md:col-span-1 xl:col-span-6 order-1 md:order-2 xl:order-2">
+          <AuctionStagePanel
+            currentPlayer={currentPlayer}
+            auctionState={auctionState}
+            teams={teams}
+            selectedTeamId={selectedTeamId}
+            bidAmount={bidAmount}
+            banner={banner}
+            onBidAmountChange={setBidAmount}
+            onIncrement={handleIncrementBid}
+            onCustomBid={handleCustomBid}
+            onSold={handleMarkSold}
+            onUnsold={handleMarkUnsold}
+            onPause={() => auctionAction({ action: "pause" })}
+            onResume={() => auctionAction({ action: "resume" })}
+            onResetLot={() => auctionAction({ action: "reset_lot" })}
+          />
+        </div>
+
+        <div className="md:col-span-2 xl:col-span-3 order-3">
+          <AuctionTeamsPanel
+            teams={teams}
+            activeTeamId={auctionState.current_bid_team_id ?? null}
+            selectedTeamId={selectedTeamId}
+            onSelectTeam={setSelectedTeamId}
+          />
         </div>
       </div>
     </div>
-  )
+  );
 }

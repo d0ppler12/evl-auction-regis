@@ -21,15 +21,12 @@ const pointsTable = [
   { pos: 5, team: "LEGENDS", p: 6, w: 1, l: 5, sw: 4, sl: 11, pts: 3, form: ['L','L','L','W','L'] },
 ];
 
-const upcomingMatches = [
-  { id: 1, date: "MAY 12, 2024", time: "05:00 PM", teamA: "TITANS", teamB: "PHOENIX", venue: "Eternia Arena" },
-  { id: 2, date: "MAY 12, 2024", time: "07:00 PM", teamA: "WARRIORS", teamB: "STRIKERS", venue: "Eternia Arena" },
-  { id: 3, date: "MAY 13, 2024", time: "05:00 PM", teamA: "SPARTANS", teamB: "LEGENDS", venue: "Eternia Arena" },
-];
+// Dynamic matches are fetched from DB
 
 export default function Home() {
-  const [scheduleTab, setScheduleTab] = useState('upcoming');
+  const [scheduleTab, setScheduleTab] = useState('scheduled');
   const [liveMatch, setLiveMatch] = useState<any>(null);
+  const [matches, setMatches] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchLiveMatch = async () => {
@@ -46,8 +43,22 @@ export default function Home() {
     
     fetchLiveMatch();
     const interval = setInterval(fetchLiveMatch, 5000);
+
+    const fetchMatches = async () => {
+      try {
+        const res = await fetch('/api/public/matches', { cache: 'no-store' });
+        const data = await res.json();
+        if (Array.isArray(data)) setMatches(data);
+      } catch (e) {
+        console.error("Failed to fetch matches", e);
+      }
+    };
+    fetchMatches();
+
     return () => clearInterval(interval);
   }, []);
+
+  const filteredMatches = matches.filter(m => m.status === scheduleTab);
 
   return (
     <div className="min-h-screen overflow-x-hidden font-sans selection:bg-accent/30">
@@ -202,24 +213,28 @@ export default function Home() {
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {upcomingMatches.map((match) => (
+                {filteredMatches.slice(0, 3).map((match) => (
                   <div key={match.id} className="card-base card-hover p-4 cursor-pointer group">
                     <div className="flex justify-between items-center mb-4">
                       <div className="text-center w-1/3">
-                        <div className="w-8 h-8 md:w-10 md:h-10 mx-auto bg-surface rounded-full border border-white/10 flex items-center justify-center text-primary text-xs font-bold mb-1 group-hover:scale-110 transition-transform">{match.teamA[0]}</div>
-                        <span className="text-[10px] font-bold text-secondary">{match.teamA}</span>
+                        <div className="w-8 h-8 md:w-10 md:h-10 mx-auto bg-surface rounded-full border border-white/10 flex items-center justify-center text-primary text-xs font-bold mb-1 group-hover:scale-110 transition-transform overflow-hidden">
+                          {match.team_a?.logo_url ? <img src={match.team_a.logo_url} alt="Logo" className="w-full h-full object-cover" /> : match.team_a?.name?.[0] || 'T'}
+                        </div>
+                        <span className="text-[10px] font-bold text-secondary">{match.team_a?.name || 'TBD'}</span>
                       </div>
                       <div className="text-center w-1/3">
-                        <div className="text-[9px] md:text-[10px] text-accent font-bold mb-1">{match.date}</div>
-                        <div className="text-xs md:text-sm font-black text-primary">{match.time}</div>
+                        <div className="text-[9px] md:text-[10px] text-accent font-bold mb-1">{match.match_date || 'TBD'}</div>
+                        <div className="text-xs md:text-sm font-black text-primary">{match.match_time || 'TBD'}</div>
                       </div>
                       <div className="text-center w-1/3">
-                        <div className="w-8 h-8 md:w-10 md:h-10 mx-auto bg-surface rounded-full border border-white/10 flex items-center justify-center text-primary text-xs font-bold mb-1 group-hover:scale-110 transition-transform">{match.teamB[0]}</div>
-                        <span className="text-[10px] font-bold text-secondary">{match.teamB}</span>
+                        <div className="w-8 h-8 md:w-10 md:h-10 mx-auto bg-surface rounded-full border border-white/10 flex items-center justify-center text-primary text-xs font-bold mb-1 group-hover:scale-110 transition-transform overflow-hidden">
+                          {match.team_b?.logo_url ? <img src={match.team_b.logo_url} alt="Logo" className="w-full h-full object-cover" /> : match.team_b?.name?.[0] || 'T'}
+                        </div>
+                        <span className="text-[10px] font-bold text-secondary">{match.team_b?.name || 'TBD'}</span>
                       </div>
                     </div>
                     <div className="text-center text-[10px] text-muted font-medium flex items-center justify-center gap-1">
-                      <MapPin className="w-3 h-3" /> {match.venue}
+                      <MapPin className="w-3 h-3" /> {match.venue || 'Eternia Arena'}
                     </div>
                   </div>
                 ))}
@@ -412,7 +427,7 @@ export default function Home() {
             </div>
             
             <div className="flex gap-2 border-b border-white/5 mb-4 pb-2">
-              {['UPCOMING', 'LIVE', 'COMPLETED'].map(tab => (
+              {['SCHEDULED', 'LIVE', 'COMPLETED'].map(tab => (
                 <button 
                   key={tab}
                   onClick={() => setScheduleTab(tab.toLowerCase())}
@@ -424,18 +439,25 @@ export default function Home() {
             </div>
 
             <div className="space-y-3">
-              {upcomingMatches.map((match) => (
+              {filteredMatches.length === 0 && (
+                <div className="text-center py-8 text-muted font-bold text-sm">No matches found for this status.</div>
+              )}
+              {filteredMatches.map((match) => (
                 <div key={match.id} className="flex flex-col sm:flex-row items-center justify-between p-4 card-base card-hover gap-4">
                   <div className="w-full sm:w-1/4 text-center sm:text-left border-b sm:border-b-0 border-white/5 pb-2 sm:pb-0">
-                    <div className="text-xs text-muted font-medium">{match.date}</div>
-                    <div className="text-sm font-bold text-primary">{match.time}</div>
+                    <div className="text-xs text-muted font-medium">{match.match_date || 'TBD'}</div>
+                    <div className="text-sm font-bold text-primary">{match.match_time || 'TBD'}</div>
                   </div>
                   <div className="flex items-center justify-center gap-4 w-full sm:w-1/2">
-                    <span className="font-bold text-sm hidden sm:block w-20 text-right text-secondary">{match.teamA}</span>
-                    <div className="w-8 h-8 bg-surface rounded-full border border-white/10 flex items-center justify-center text-primary text-xs font-bold">{match.teamA[0]}</div>
+                    <span className="font-bold text-sm hidden sm:block w-20 text-right text-secondary">{match.team_a?.name || 'TBD'}</span>
+                    <div className="w-8 h-8 bg-surface rounded-full border border-white/10 flex items-center justify-center text-primary text-xs font-bold overflow-hidden">
+                      {match.team_a?.logo_url ? <img src={match.team_a.logo_url} alt="Logo" className="w-full h-full object-cover" /> : match.team_a?.name?.[0] || 'T'}
+                    </div>
                     <span className="text-xs text-muted font-bold">VS</span>
-                    <div className="w-8 h-8 bg-surface rounded-full border border-white/10 flex items-center justify-center text-primary text-xs font-bold">{match.teamB[0]}</div>
-                    <span className="font-bold text-sm hidden sm:block w-20 text-left text-secondary">{match.teamB}</span>
+                    <div className="w-8 h-8 bg-surface rounded-full border border-white/10 flex items-center justify-center text-primary text-xs font-bold overflow-hidden">
+                      {match.team_b?.logo_url ? <img src={match.team_b.logo_url} alt="Logo" className="w-full h-full object-cover" /> : match.team_b?.name?.[0] || 'T'}
+                    </div>
+                    <span className="font-bold text-sm hidden sm:block w-20 text-left text-secondary">{match.team_b?.name || 'TBD'}</span>
                   </div>
                   <div className="w-full sm:w-1/4 text-center sm:text-right">
                     <button className="w-full sm:w-auto px-6 py-2 bg-white/5 hover:bg-accent text-xs font-bold text-primary hover:text-background rounded-lg transition-colors border border-white/10">VIEW</button>

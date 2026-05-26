@@ -27,27 +27,41 @@ export default function RegistrationsManagement() {
 
   const handleApprove = async (id: string) => {
     try {
-      await adminFetch(`/api/admin/players/${id}/approve`, { method: 'POST' });
-      setPlayers(players.map(p => p.id === id ? { ...p, status: 'approved' } : p));
-      if (selectedPlayer?.id === id) setSelectedPlayer({ ...selectedPlayer, status: 'approved' });
+      const saved = await adminFetch<any>(`/api/admin/players/${id}/approve`, { method: 'POST' });
+      setPlayers(players.map(p => p.id === id ? { ...p, ...saved } : p));
+      if (selectedPlayer?.id === id) {
+        setSelectedPlayer({ ...selectedPlayer, ...saved });
+        setEditData(saved);
+      }
     } catch (e: any) { alert(e.message); }
   };
 
   const handleReject = async (id: string) => {
     try {
-      await adminFetch(`/api/admin/players/${id}/reject`, { method: 'POST' });
-      setPlayers(players.map(p => p.id === id ? { ...p, status: 'rejected' } : p));
-      if (selectedPlayer?.id === id) setSelectedPlayer({ ...selectedPlayer, status: 'rejected' });
+      const saved = await adminFetch<any>(`/api/admin/players/${id}/reject`, { method: 'POST' });
+      setPlayers(players.map(p => p.id === id ? { ...p, ...saved } : p));
+      if (selectedPlayer?.id === id) {
+        setSelectedPlayer({ ...selectedPlayer, ...saved });
+        setEditData(saved);
+      }
     } catch (e: any) { alert(e.message); }
   };
 
   const handleSaveEdit = async () => {
     if (!selectedPlayer) return;
+    const editable = ['full_name', 'age', 'phone_number', 'wing_building', 'jersey_name', 'jersey_size', 'jersey_number'] as const;
+    const updates: Record<string, unknown> = {};
+    for (const key of editable) {
+      if (editData[key] !== undefined) updates[key] = editData[key];
+    }
     try {
-      const { id, created_at, ...updates } = editData;
-      await adminFetch(`/api/admin/players/${selectedPlayer.id}`, { method: 'PUT', body: JSON.stringify(updates) });
-      setPlayers(players.map(p => p.id === selectedPlayer.id ? { ...p, ...editData } : p));
-      setSelectedPlayer({ ...selectedPlayer, ...editData });
+      const saved = await adminFetch<any>(`/api/admin/players/${selectedPlayer.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updates),
+      });
+      setPlayers(players.map(p => p.id === selectedPlayer.id ? { ...p, ...saved } : p));
+      setSelectedPlayer({ ...selectedPlayer, ...saved });
+      setEditData(saved);
       alert("Changes saved!");
     } catch (e: any) { alert(e.message); }
   };
