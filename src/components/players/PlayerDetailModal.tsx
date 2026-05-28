@@ -20,9 +20,20 @@ interface PlayerDetailModalProps {
 }
 
 function statusBadge(status: string) {
-  if (status === "sold") return { label: "SOLD", cls: "bg-emerald-500/25 text-emerald-300 border-emerald-400/50" };
-  if (status === "in_auction") return { label: "AVAILABLE", cls: "bg-blue-500/25 text-blue-200 border-blue-400/50" };
-  return { label: "UNSOLD", cls: "bg-red-500/25 text-red-300 border-red-400/50" };
+  if (status === "sold")
+    return {
+      label: "SOLD",
+      cls: "bg-emerald-500/25 text-emerald-300 border-emerald-400/50",
+    };
+  if (status === "in_auction")
+    return {
+      label: "AVAILABLE",
+      cls: "bg-blue-500/25 text-blue-200 border-blue-400/50",
+    };
+  return {
+    label: "UNSOLD",
+    cls: "bg-red-500/25 text-red-300 border-red-400/50",
+  };
 }
 
 export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
@@ -89,7 +100,11 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
                   <div className="absolute -inset-2 bg-blue-500/40 blur-2xl rounded-3xl opacity-60" />
                   <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl border-2 border-blue-400/50 overflow-hidden bg-[#1a2744] shadow-2xl">
                     {player.photo_url && player.photo_url !== "placeholder" ? (
-                      <img src={player.photo_url} alt={player.full_name} className="w-full h-full object-cover" />
+                      <img
+                        src={player.photo_url}
+                        alt={player.full_name}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-5xl font-black text-blue-400 font-display">
                         {player.full_name?.charAt(0)}
@@ -99,7 +114,9 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
                 </div>
 
                 <div className="flex-1 text-center sm:text-left pb-2">
-                  <span className={`inline-block mb-3 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-lg border ${badge?.cls}`}>
+                  <span
+                    className={`inline-block mb-3 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-lg border ${badge?.cls}`}
+                  >
                     {badge?.label}
                   </span>
                   <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight mb-2">
@@ -107,7 +124,11 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
                   </h2>
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-slate-300">
                     {player.teams?.logo_url && (
-                      <img src={player.teams.logo_url} alt="" className="w-8 h-8 rounded-lg object-cover border border-white/10" />
+                      <img
+                        src={player.teams.logo_url}
+                        alt=""
+                        className="w-8 h-8 rounded-lg object-cover border border-white/10"
+                      />
                     )}
                     <span className="font-bold text-blue-300 uppercase tracking-wider text-sm">
                       {player.teams?.name || "No Team"}
@@ -115,13 +136,21 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
                   </div>
                   <div className="flex flex-wrap gap-4 mt-6 justify-center sm:justify-start">
                     <div className="px-5 py-3 rounded-xl bg-black/40 border border-blue-500/20">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Base Price</p>
-                      <p className="text-xl font-mono font-black text-blue-300">{(player.base_price ?? 0).toLocaleString()} PTS</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                        Base Price
+                      </p>
+                      <p className="text-xl font-mono font-black text-blue-300">
+                        {(player.base_price ?? 0).toLocaleString()} PTS
+                      </p>
                     </div>
                     <div className="px-5 py-3 rounded-xl bg-black/40 border border-amber-500/20">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Current Bid</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                        Current Bid
+                      </p>
                       <p className="text-xl font-mono font-black text-amber-300">
-                        {player.currentBid != null ? `${player.currentBid.toLocaleString()} PTS` : "—"}
+                        {player.currentBid != null
+                          ? `${player.currentBid.toLocaleString()} PTS`
+                          : "—"}
                       </p>
                     </div>
                   </div>
@@ -132,19 +161,31 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
             {/* Details */}
             <div className="px-6 sm:px-10 py-8 space-y-8">
               <div>
-                <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-4">Player Profile</h3>
+                <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-4">
+                  Player Profile
+                </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {[
                     { label: "Age", value: player.age ?? "—" },
-                    { label: "Height", value: "—" },
-                    { label: "Wing / Building", value: player.wing_building || "—" },
+                    // { label: "Height", value: "—" },
+                    {
+                      label: "Wing / Building",
+                      value: player.wing_building || "—",
+                    },
                     { label: "Jersey Size", value: player.jersey_size || "—" },
-                    { label: "Dominant Hand", value: player.playing_position || "—" },
-                    { label: "Experience", value: player.volleyball_experience || player.previous_tournament_experience || "—" },
+                    // { label: "Dominant Hand", value: player.playing_position || "—" },
+                    // { label: "Experience", value: player.volleyball_experience || player.previous_tournament_experience || "—" },
                   ].map((item) => (
-                    <div key={item.label} className="rounded-xl bg-white/[0.03] border border-white/10 p-4 hover:border-blue-500/25 transition-colors">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{item.label}</p>
-                      <p className="text-sm font-bold text-white">{item.value}</p>
+                    <div
+                      key={item.label}
+                      className="rounded-xl bg-white/[0.03] border border-white/10 p-4 hover:border-blue-500/25 transition-colors"
+                    >
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                        {item.label}
+                      </p>
+                      <p className="text-sm font-bold text-white">
+                        {item.value}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -152,18 +193,26 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
 
               {player.teams?.owner_name && (
                 <div className="rounded-2xl bg-gradient-to-r from-blue-600/10 to-transparent border border-blue-500/20 p-5">
-                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">Team Owner</p>
+                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-2">
+                    Team
+                  </p>
                   <p className="text-slate-200 text-sm leading-relaxed italic">
-                    &ldquo;Representing {player.teams.name} — Owner: {player.teams.owner_name}&rdquo;
+                    &ldquo;{player.teams.name}&rdquo;
                   </p>
                 </div>
               )}
 
               <div>
-                <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-4">Season Stats</h3>
+                <h3 className="text-xs font-black text-blue-400 uppercase tracking-[0.2em] mb-4">
+                  Season Stats
+                </h3>
                 <div className="rounded-2xl bg-gradient-to-br from-blue-600/15 to-indigo-900/20 border border-blue-500/25 p-8 text-center max-w-xs">
-                  <p className="text-5xl font-black font-mono text-white mb-1">{player.matchesPlayed ?? 0}</p>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Matches Played</p>
+                  <p className="text-5xl font-black font-mono text-white mb-1">
+                    {player.matchesPlayed ?? 0}
+                  </p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    Matches Played
+                  </p>
                 </div>
               </div>
             </div>
