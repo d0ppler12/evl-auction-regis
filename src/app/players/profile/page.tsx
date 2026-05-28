@@ -185,11 +185,6 @@ export default function PlayerProfilePage() {
               <h2 className="text-2xl font-black text-white italic tracking-tight uppercase leading-tight">
                 {player.full_name}
               </h2>
-              <p
-                className={`text-xs font-black uppercase tracking-widest mt-1 mb-6 ${isSold ? "text-yellow-400" : "text-blue-400"}`}
-              >
-                {player.playing_position || "Outside Hitter"}
-              </p>
 
               {/* Roster stats shortcut */}
               <div className="w-full grid grid-cols-2 gap-4 border-t border-white/5 pt-5 mb-2 text-left">
@@ -300,11 +295,11 @@ export default function PlayerProfilePage() {
                         Active Pool
                       </span>
                       <h4 className="text-xl font-black text-white italic uppercase mt-1">
-                        Ready for Auction Draft
+                        Ready for Auction Pool
                       </h4>
                       <p className="text-xs text-slate-400 mt-1">
-                        You are verified and in the auction registry. Draft
-                        commences shortly.
+                        You are now eligible for EVL’s Monsoon Smash auction and
+                        team selection process!
                       </p>
                     </div>
                     <div className="text-right">
@@ -367,14 +362,6 @@ export default function PlayerProfilePage() {
                       {player.email || "—"}
                     </span>
                   </div>
-                  <div className="flex justify-between py-2.5">
-                    <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                      Verification UTR
-                    </span>
-                    <span className="text-slate-200 font-mono font-semibold">
-                      {player.utr_number || "—"}
-                    </span>
-                  </div>
                 </div>
               </motion.div>
 
@@ -386,8 +373,7 @@ export default function PlayerProfilePage() {
                 className="bg-slate-900/40 border border-white/10 rounded-3xl p-6 relative overflow-hidden backdrop-blur-md shadow-xl"
               >
                 <h3 className="text-xs font-black text-slate-400 tracking-widest uppercase mb-5 flex items-center gap-2">
-                  <Shirt className="w-4 h-4 text-blue-500" /> Jersey &
-                  Experience Specs
+                  <Shirt className="w-4 h-4 text-blue-500" /> Jersey Specs
                 </h3>
 
                 <div className="space-y-4 text-sm">
@@ -415,22 +401,6 @@ export default function PlayerProfilePage() {
                       #{player.jersey_number || "—"}
                     </span>
                   </div>
-                  <div className="flex justify-between py-2.5 border-b border-white/5">
-                    <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                      Volleyball Position
-                    </span>
-                    <span className="text-slate-200 font-semibold">
-                      {player.playing_position || "—"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-2.5">
-                    <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                      Experience Level
-                    </span>
-                    <span className="text-slate-200 font-semibold truncate max-w-[180px]">
-                      {player.volleyball_experience || "—"}
-                    </span>
-                  </div>
                 </div>
               </motion.div>
             </div>
@@ -455,15 +425,6 @@ export default function PlayerProfilePage() {
                     </span>
                     <p className="text-slate-200 text-xs leading-relaxed">
                       {player.volleyball_experience || "No profile logs"}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">
-                      Tournament Background
-                    </span>
-                    <p className="text-slate-200 text-xs leading-relaxed">
-                      {player.previous_tournament_experience ||
-                        "No previous tournament logs"}
                     </p>
                   </div>
                 </div>
