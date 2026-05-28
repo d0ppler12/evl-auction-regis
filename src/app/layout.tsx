@@ -5,20 +5,22 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Volleyball Auction Platform",
-  description: "Elevate your tournament draft experience.",
+  title: "Eternia Volleyball League",
+  description: "One of the best leagues in Eternia",
 };
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} min-h-screen bg-slate-900 text-slate-50 antialiased`}>
+      <body
+        className={`${inter.className} min-h-screen bg-slate-900 text-slate-50 antialiased`}
+      >
         {children}
       </body>
     </html>
-  )
+  );
 }
