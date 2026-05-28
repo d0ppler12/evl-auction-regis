@@ -52,6 +52,18 @@ export async function POST(request: Request) {
       }
     }
 
+    if (body.email) {
+      const { data: existingPlayer } = await supabaseAdmin
+        .from('players')
+        .select('id')
+        .eq('email', body.email)
+        .limit(1)
+
+      if (existingPlayer && existingPlayer.length > 0) {
+        return NextResponse.json({ error: 'Email is already registered' }, { status: 400 })
+      }
+    }
+
     const { data, error } = await supabaseAdmin
       .from('players')
       .insert({
@@ -66,6 +78,8 @@ export async function POST(request: Request) {
         volleyball_experience: body.volleyball_experience || '',
         photo_url: photoUrl,
         status: 'pending',
+        email: body.email || null,
+        password: body.password || null,
       })
       .select()
       .single()

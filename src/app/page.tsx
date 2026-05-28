@@ -27,6 +27,7 @@ export default function Home() {
   const [scheduleTab, setScheduleTab] = useState('scheduled');
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [matches, setMatches] = useState<any[]>([]);
+  const [playerSession, setPlayerSession] = useState<any>(null);
 
   useEffect(() => {
     const fetchLiveMatch = async () => {
@@ -54,6 +55,19 @@ export default function Home() {
       }
     };
     fetchMatches();
+
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/players/me');
+        if (res.ok) {
+          const data = await res.json();
+          setPlayerSession(data.player);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    checkSession();
 
     return () => clearInterval(interval);
   }, []);
@@ -93,15 +107,44 @@ export default function Home() {
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
               LIVE
             </div>
-            <Link href="/admin" className="text-sm font-bold text-muted hover:text-primary transition-colors hidden sm:block">
-              ADMIN
-            </Link>
-            <Link 
-              href="/register" 
-              className="px-6 py-2.5 rounded-full bg-accent hover:bg-blue-400 text-sm font-bold text-background shadow-[0_0_20px_rgba(96,165,250,0.4)] transition-all hover:scale-105"
-            >
-              REGISTER
-            </Link>
+            
+            {playerSession ? (
+              <div className="flex items-center gap-4">
+                <Link href="/players/profile" className="text-sm font-bold text-accent hover:text-white transition-colors">
+                  MY PROFILE
+                </Link>
+                <button
+                  onClick={async () => {
+                    const res = await fetch('/api/players/logout', { method: 'POST' });
+                    if (res.ok) {
+                      setPlayerSession(null);
+                      window.location.reload();
+                    }
+                  }}
+                  className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-red-500/20 text-slate-300 hover:text-red-400 text-sm font-bold transition-all"
+                >
+                  LOGOUT
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link href="/admin" className="text-sm font-bold text-muted hover:text-primary transition-colors hidden sm:block">
+                  ADMIN
+                </Link>
+                <Link 
+                  href="/register" 
+                  className="px-6 py-2.5 rounded-full bg-accent hover:bg-blue-400 text-sm font-bold text-background shadow-[0_0_20px_rgba(96,165,250,0.4)] transition-all hover:scale-105"
+                >
+                  REGISTER
+                </Link>
+                <Link
+                  href="/players/login"
+                  className="px-5 py-2 rounded-full bg-slate-800 border border-white/10 hover:border-white/20 text-xs sm:text-sm font-bold text-white transition-all hover:scale-105"
+                >
+                  LOGIN
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>

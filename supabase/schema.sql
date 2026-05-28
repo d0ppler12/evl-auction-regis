@@ -21,6 +21,8 @@ CREATE TABLE public.players (
     auction_status TEXT DEFAULT 'unsold', -- 'unsold', 'sold', 'in_auction'
     team_id UUID,
     sold_price INTEGER,
+    email TEXT UNIQUE,
+    password TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

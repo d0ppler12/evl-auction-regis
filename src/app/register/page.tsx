@@ -1,7 +1,7 @@
 "use client"
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Phone, Building2, Shirt, Hash, UploadCloud, CheckCircle2, ChevronRight, Image as ImageIcon } from 'lucide-react'
+import { User, Phone, Building2, Shirt, Hash, UploadCloud, CheckCircle2, ChevronRight, Image as ImageIcon, Mail, Lock } from 'lucide-react'
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1)
@@ -10,7 +10,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     fullName: '', age: '', phoneNumber: '', wing: '', flatNumber: '',
     jerseyName: '', jerseySize: '', jerseyNumber: '', experience: '', utrNumber: '',
-    photo: ''
+    photo: '', email: '', password: ''
   })
 
   const handleInputChange = (e: any) => setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -51,6 +51,8 @@ export default function RegisterPage() {
           utr_number: formData.utrNumber,
           volleyball_experience: formData.experience,
           photo: formData.photo,
+          email: formData.email,
+          password: formData.password,
         }),
       })
       const data = await res.json()
@@ -157,6 +159,28 @@ export default function RegisterPage() {
                            <User className="w-5 h-5 text-slate-500" />
                          </div>
                          <input required name="fullName" value={formData.fullName} onChange={handleInputChange} type="text" placeholder="Enter your full name" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
+                       </div>
+                     </div>
+
+                     {/* Email */}
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address</label>
+                       <div className="relative">
+                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                           <Mail className="w-5 h-5 text-slate-500" />
+                         </div>
+                         <input required name="email" value={formData.email} onChange={handleInputChange} type="email" placeholder="you@domain.com" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
+                       </div>
+                     </div>
+
+                     {/* Password */}
+                     <div>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+                       <div className="relative">
+                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                           <Lock className="w-5 h-5 text-slate-500" />
+                         </div>
+                         <input required name="password" value={formData.password} onChange={handleInputChange} type="password" placeholder="Min 6 characters" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
                        </div>
                      </div>
 
@@ -278,9 +302,25 @@ export default function RegisterPage() {
                      type="button"
                      className="w-full mt-8 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
                      onClick={() => {
-                       if(formData.fullName && formData.age && formData.phoneNumber && formData.wing && formData.flatNumber && formData.jerseyName && formData.jerseySize && formData.jerseyNumber && formData.photo) setStep(2)
-                       else alert('Please fill all required fields, including uploading a player photo.')
-                     }}
+                        if (
+                          formData.fullName && formData.age && formData.phoneNumber &&
+                          formData.wing && formData.flatNumber && formData.jerseyName &&
+                          formData.jerseySize && formData.jerseyNumber && formData.photo &&
+                          formData.email && formData.password
+                        ) {
+                          if (!formData.email.includes('@')) {
+                            alert('Please enter a valid email address.')
+                            return
+                          }
+                          if (formData.password.length < 6) {
+                            alert('Password must be at least 6 characters long.')
+                            return
+                          }
+                          setStep(2)
+                        } else {
+                          alert('Please fill all required fields, including your email, password, and player photo.')
+                        }
+                      }}
                    >
                      Continue to Payment <ChevronRight className="w-5 h-5" />
                    </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trophy, Menu, X, Info, AlertTriangle } from "lucide-react";
@@ -17,6 +17,22 @@ const INITIAL_STANDINGS = [
 export default function PointsTablePage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [standings] = useState(INITIAL_STANDINGS);
+  const [playerSession, setPlayerSession] = useState<any>(null);
+
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/players/me');
+        if (res.ok) {
+          const data = await res.json();
+          setPlayerSession(data.player);
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    checkSession();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#0B1121] text-slate-200 overflow-x-hidden font-sans selection:bg-blue-500/30">
@@ -51,15 +67,44 @@ export default function PointsTablePage() {
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
               LIVE
             </div>
-            <Link href="/admin" className="text-sm font-bold text-slate-400 hover:text-white transition-colors hidden sm:block">
-              ADMIN
-            </Link>
-            <Link
-              href="/register"
-              className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-sm font-bold text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:scale-105 hidden sm:block"
-            >
-              REGISTER
-            </Link>
+            
+            {playerSession ? (
+              <div className="hidden sm:flex items-center gap-4">
+                <Link href="/players/profile" className="text-sm font-bold text-blue-400 hover:text-white transition-colors">
+                  MY PROFILE
+                </Link>
+                <button
+                  onClick={async () => {
+                    const res = await fetch('/api/players/logout', { method: 'POST' });
+                    if (res.ok) {
+                      setPlayerSession(null);
+                      window.location.reload();
+                    }
+                  }}
+                  className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-red-500/30 text-slate-300 hover:text-red-400 text-sm font-bold transition-all"
+                >
+                  LOGOUT
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link href="/admin" className="text-sm font-bold text-slate-400 hover:text-white transition-colors hidden sm:block">
+                  ADMIN
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-sm font-bold text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:scale-105 hidden sm:block"
+                >
+                  REGISTER
+                </Link>
+                <Link
+                  href="/players/login"
+                  className="px-5 py-2 rounded-full bg-slate-800 border border-white/10 hover:border-white/20 text-xs sm:text-sm font-bold text-white transition-all hover:scale-105 hidden sm:block"
+                >
+                  LOGIN
+                </Link>
+              </>
+            )}
 
             {/* Mobile Menu Button */}
             <button
@@ -109,22 +154,54 @@ export default function PointsTablePage() {
                 >
                   POINTS TABLE
                 </Link>
-                <div className="border-t border-white/5 pt-3 flex flex-col gap-3">
-                  <Link
-                    href="/admin"
-                    className="block py-2 hover:text-white transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    ADMIN
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="inline-block px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-center text-sm text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    REGISTER AS PLAYER
-                  </Link>
-                </div>
+                {playerSession ? (
+                  <>
+                    <Link
+                      href="/players/profile"
+                      className="block py-2 text-blue-400 hover:text-white transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      MY PROFILE
+                    </Link>
+                    <button
+                      onClick={async () => {
+                        const res = await fetch('/api/players/logout', { method: 'POST' });
+                        if (res.ok) {
+                          setPlayerSession(null);
+                          setIsMobileMenuOpen(false);
+                          window.location.reload();
+                        }
+                      }}
+                      className="w-full text-left py-2 text-red-400 hover:text-red-350 transition-colors"
+                    >
+                      LOGOUT
+                    </button>
+                  </>
+                ) : (
+                  <div className="border-t border-white/5 pt-3 flex flex-col gap-3">
+                    <Link
+                      href="/admin"
+                      className="block py-2 hover:text-white transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      ADMIN
+                    </Link>
+                    <Link
+                      href="/players/login"
+                      className="block py-2 hover:text-white transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      PLAYER LOGIN
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="inline-block px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-center text-sm text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      REGISTER AS PLAYER
+                    </Link>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
