@@ -9,6 +9,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name and phone are required' }, { status: 400 })
     }
 
+    if (!body.photo || body.photo === 'placeholder' || body.photo.trim() === '') {
+      return NextResponse.json({ error: 'Player photo is required' }, { status: 400 })
+    }
+
     let photoUrl = 'placeholder'
     if (body.photo) {
       try {

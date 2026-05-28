@@ -180,7 +180,7 @@ export function AuctionStagePanel({
                   {currentPlayer.full_name}
                 </h2>
                 <p className="text-sm text-slate-400 mb-4">
-                  {currentPlayer.playing_position || "Player"} · Base ₹{currentPlayer.base_price?.toLocaleString()}
+                  {currentPlayer.playing_position || "Player"} · Base {currentPlayer.base_price?.toLocaleString() ?? 0} pts
                 </p>
                 {(playerFranchise || leadingTeam) && (
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
@@ -209,7 +209,7 @@ export function AuctionStagePanel({
                   isActive ? "animate-pulse" : ""
                 }`}
               >
-                ₹{(auctionState.current_bid ?? 0).toLocaleString()}
+                {(auctionState.current_bid ?? 0).toLocaleString()}
               </motion.p>
               <p className="text-sm font-bold text-white mt-3">
                 Leading: <span className="text-emerald-400">{leadingTeam?.name || "—"}</span>
@@ -244,17 +244,14 @@ export function AuctionStagePanel({
                 </button>
               </div>
 
-              <div className="grid grid-cols-4 gap-2">
-                {[100, 500, 1000, 5000].map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => onIncrement(n)}
-                    className="py-3 rounded-xl bg-slate-800/80 border border-white/10 font-mono font-bold text-white hover:border-blue-500/50 hover:bg-blue-600/20 active:scale-95 transition-all"
-                  >
-                    +{n}
-                  </button>
-                ))}
+              <div className="w-full">
+                <button
+                  type="button"
+                  onClick={() => onIncrement(1000)}
+                  className="w-full py-3.5 rounded-xl bg-slate-800/80 border border-white/10 font-mono font-bold text-white hover:border-blue-500/50 hover:bg-blue-600/20 active:scale-95 transition-all text-center"
+                >
+                  +1000 Points
+                </button>
               </div>
 
               <div className="flex gap-2">

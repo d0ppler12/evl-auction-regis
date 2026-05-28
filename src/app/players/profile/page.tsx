@@ -157,7 +157,7 @@ export default function PlayerProfilePage() {
               <div className="w-full grid grid-cols-2 gap-4 border-t border-white/5 pt-5 mb-2 text-left">
                 <div className="bg-slate-900/60 border border-white/5 rounded-2xl p-4">
                   <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Base Price</span>
-                  <span className="text-base font-black text-white font-mono">₹{player.base_price || 100}</span>
+                  <span className="text-base font-black text-white font-mono">{player.base_price ?? 0} PTS</span>
                 </div>
                 <div className="bg-slate-900/60 border border-white/5 rounded-2xl p-4">
                   <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Jersey Size</span>
@@ -239,7 +239,7 @@ export default function PlayerProfilePage() {
                     </div>
                     <div className="text-right">
                       <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Opening Bid</span>
-                      <span className="text-2xl font-black text-blue-400 font-mono">₹{player.base_price || 100}</span>
+                      <span className="text-2xl font-black text-blue-400 font-mono">{player.base_price ?? 0} PTS</span>
                     </div>
                   </div>
                 </div>

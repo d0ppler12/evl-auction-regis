@@ -103,7 +103,7 @@ export async function POST(request: Request) {
         .from('auction_state')
         .update({
           current_player_id: body.player_id,
-          current_bid: player?.base_price || 0,
+          current_bid: player?.base_price ?? 0,
           current_bid_team_id: null,
           is_active: true,
           updated_at: new Date().toISOString(),
@@ -125,6 +125,10 @@ export async function POST(request: Request) {
       const teamId = body.team_id
       if (!teamId) {
         return NextResponse.json({ error: 'Team required' }, { status: 400 })
+      }
+
+      if (state.current_bid_team_id === teamId) {
+        return NextResponse.json({ error: 'This franchise already holds the highest bid' }, { status: 400 })
       }
 
       const { data, error } = await supabaseAdmin
@@ -256,7 +260,7 @@ export async function POST(request: Request) {
       const { data, error } = await supabaseAdmin
         .from('auction_state')
         .update({
-          current_bid: player?.base_price || 0,
+          current_bid: player?.base_price ?? 0,
           current_bid_team_id: null,
           is_active: true,
           updated_at: new Date().toISOString(),

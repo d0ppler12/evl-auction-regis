@@ -45,7 +45,10 @@ export async function POST(request: Request) {
     row.photo_url = row.photo_url || 'placeholder'
     if (row.age) row.age = parseInt(String(row.age))
     if (row.jersey_number) row.jersey_number = parseInt(String(row.jersey_number))
-    if (row.base_price) row.base_price = parseInt(String(row.base_price)) || 100
+    if (row.base_price !== undefined && row.base_price !== null) {
+      const parsed = parseInt(String(row.base_price))
+      row.base_price = Number.isNaN(parsed) ? 0 : parsed
+    }
 
     const { data, error } = await supabaseAdmin.from('players').insert(row).select().single()
     if (error) throw error

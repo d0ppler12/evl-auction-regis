@@ -157,8 +157,8 @@ export default function Home() {
           {/* Background image placeholder - Softened opacity */}
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1593786278855-87d21c0022d4?q=80&w=2000')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
           
-          <div className="relative z-20 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between">
-            <div className="max-w-2xl">
+          <div className="relative z-20 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="flex-1 max-w-2xl">
               <div className="inline-block px-4 py-1.5 rounded-full bg-accent/20 border border-accent/30 text-accent text-sm font-bold mb-6 tracking-wider">
                 SEASON 1 <span className="text-muted mx-2">•</span> BEGINS MAY 2024
               </div>
@@ -178,6 +178,22 @@ export default function Home() {
                 <button className="px-8 py-4 rounded-xl bg-gold hover:bg-yellow-400 text-background font-bold shadow-[0_0_30px_rgba(250,204,21,0.3)] transition-all flex items-center gap-2 hover:-translate-y-1">
                   <Play className="w-5 h-5 fill-current" /> WATCH LIVE
                 </button>
+              </div>
+            </div>
+
+            <div className="flex-1 w-full max-w-[400px] md:max-w-none flex justify-center items-center">
+              <div className="relative w-full aspect-square max-w-[320px] md:max-w-[420px] lg:max-w-[460px]">
+                {/* Glow behind image */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-accent/20 to-blue-500/20 rounded-full blur-3xl opacity-75 animate-pulse" />
+                
+                {/* 3D Floating transparent logo with hover animations */}
+                <div className="relative w-full h-full flex items-center justify-center group transition-all duration-500 hover:scale-[1.05] hover:drop-shadow-[0_0_35px_rgba(96,165,250,0.3)]">
+                  <img 
+                    src="/evl-hero.png" 
+                    alt="Eternia Volleyball League" 
+                    className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)] transform transition-transform duration-700 group-hover:rotate-[1deg]"
+                  />
+                </div>
               </div>
             </div>
           </div>

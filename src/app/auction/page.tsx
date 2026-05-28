@@ -10,8 +10,14 @@ export default function AuctionPage() {
   const [biddingTeam, setBiddingTeam] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
   const [isSold, setIsSold] = useState(false);
+  const [prevState, setPrevState] = useState<any>(null);
   
   useEffect(() => {
+    async function fetchPlayer(id: string) {
+      const { data } = await supabase.from('players').select('*').eq('id', id).single();
+      if (data) setCurrentPlayer(data);
+    }
+
     // 1. Fetch initial teams for purse display
     async function fetchInitialData() {
       const { data: teamsData } = await supabase.from('teams').select('*');
@@ -20,6 +26,7 @@ export default function AuctionPage() {
       const { data: stateData } = await supabase.from('auction_state').select('*').eq('id', 1).single();
       if (stateData) {
         setAuctionState(stateData);
+        setPrevState(stateData);
         if (stateData.current_player_id) fetchPlayer(stateData.current_player_id);
         if (stateData.current_bid_team_id && teamsData) {
            const team = teamsData.find(t => t.id === stateData.current_bid_team_id);
@@ -28,7 +35,7 @@ export default function AuctionPage() {
       } else {
         // Mock data
         setTeams([{ id: '1', name: 'Spikers Syndicate', purse_remaining: 85000 }, { id: '2', name: 'Net Ninjas', purse_remaining: 125000 }]);
-        setCurrentPlayer({ id: '1', full_name: 'Alice Smith', playing_position: 'Hitter', base_price: 5000, age: 24, wing_building: 'A Wing' });
+        setCurrentPlayer({ id: '1', full_name: 'Alice Smith', playing_position: 'Hitter', base_price: 0, age: 24, wing_building: 'A Wing' });
         setAuctionState({ current_bid: 15000, is_active: true });
         setBiddingTeam({ name: 'Spikers Syndicate' });
       }
@@ -41,22 +48,28 @@ export default function AuctionPage() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'auction_state' }, payload => {
         const newState = payload.new as any;
         setAuctionState(newState);
-        if (newState.current_player_id && (!currentPlayer || newState.current_player_id !== currentPlayer.id)) {
+        
+        if (newState.current_player_id) {
             fetchPlayer(newState.current_player_id);
+        } else {
+            setCurrentPlayer(null);
         }
         
         // Handle Sold State (is_active goes from true to false)
-        if (auctionState && auctionState.is_active && !newState.is_active && newState.current_bid_team_id) {
+        setPrevState((prev: any) => {
+          if (prev?.is_active && !newState.is_active && newState.current_bid_team_id) {
             setIsSold(true);
             setTimeout(() => setIsSold(false), 4000);
-        }
+          }
+          return newState;
+        });
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, [auctionState, currentPlayer]);
+  }, []);
 
   useEffect(() => {
       if (auctionState?.current_bid_team_id && teams.length > 0) {
@@ -67,10 +80,6 @@ export default function AuctionPage() {
       }
   }, [auctionState?.current_bid_team_id, teams]);
 
-  async function fetchPlayer(id: string) {
-    const { data } = await supabase.from('players').select('*').eq('id', id).single();
-    if (data) setCurrentPlayer(data);
-  }
 
   // Handle keyboard shortcut for fullscreen
   useEffect(() => {
@@ -193,7 +202,7 @@ export default function AuctionPage() {
               className="text-6xl md:text-8xl font-black font-mono mb-8 z-10 text-secondary neon-border-text"
               style={{ textShadow: '0 0 20px rgba(59,130,246,0.5)' }}
             >
-              ₹{auctionState?.current_bid?.toLocaleString() || '0'}
+              {auctionState?.current_bid?.toLocaleString() || '0'}
             </motion.div>
 
             <p className="text-sm text-muted-foreground uppercase tracking-widest mb-2 z-10">Bidding Team</p>
@@ -203,7 +212,7 @@ export default function AuctionPage() {
 
             <div className="w-full mt-8 pt-8 border-t border-white/10 flex justify-between items-center z-10">
               <span className="text-muted-foreground uppercase tracking-widest text-sm">Base Price</span>
-              <span className="text-2xl font-mono font-bold text-white">₹{currentPlayer?.base_price?.toLocaleString() || '0'}</span>
+              <span className="text-2xl font-mono font-bold text-white">{currentPlayer?.base_price?.toLocaleString() || '0'}</span>
             </div>
           </div>
 
@@ -211,12 +220,19 @@ export default function AuctionPage() {
           <div className="glass-card rounded-xl p-4 h-64 overflow-y-auto">
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 sticky top-0 bg-background/90 backdrop-blur pb-2">Teams Remaining Purse</h3>
             <div className="space-y-2">
-              {teams.map(team => (
-                <div key={team.id} className="flex justify-between items-center text-sm p-3 rounded bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                  <span className="font-semibold truncate max-w-[180px]">{team.name}</span>
-                  <span className="font-mono text-primary font-bold">₹{team.purse_remaining?.toLocaleString()}</span>
-                </div>
-              ))}
+              {teams.map(team => {
+                const isLeading = biddingTeam?.id === team.id || biddingTeam?.name === team.name;
+                const displayedPurse = isLeading ? (team.purse_remaining - (auctionState?.current_bid || 0)) : team.purse_remaining;
+                
+                return (
+                  <div key={team.id} className={`flex justify-between items-center text-sm p-3 rounded transition-colors ${
+                    isLeading ? 'bg-accent/10 border border-accent/30' : 'bg-white/5 border border-white/5 hover:bg-white/10'
+                  }`}>
+                    <span className="font-semibold truncate max-w-[180px]">{team.name}</span>
+                    <span className="font-mono text-primary font-bold">{displayedPurse.toLocaleString()}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

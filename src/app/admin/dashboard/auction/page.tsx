@@ -15,6 +15,15 @@ export default function AuctionControlRoom() {
   const [bidAmount, setBidAmount] = useState("");
   const [queueSearch, setQueueSearch] = useState("");
   const [banner, setBanner] = useState<"sold" | "unsold" | null>(null);
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    setTime(new Date().toLocaleTimeString());
+    const clockInterval = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(clockInterval);
+  }, []);
 
   const refresh = useCallback(async () => {
     try {
@@ -54,11 +63,17 @@ export default function AuctionControlRoom() {
 
   const handleIncrementBid = async (increment: number) => {
     if (!selectedTeamId) return alert("Select a bidding team from the right panel.");
+    if (auctionState?.current_bid_team_id === selectedTeamId) {
+      return alert("This franchise already holds the highest bid.");
+    }
     await auctionAction({ action: "bid", team_id: selectedTeamId, increment });
   };
 
   const handleCustomBid = async () => {
     if (!selectedTeamId || !bidAmount) return;
+    if (auctionState?.current_bid_team_id === selectedTeamId) {
+      return alert("This franchise already holds the highest bid.");
+    }
     await auctionAction({
       action: "bid",
       team_id: selectedTeamId,
@@ -109,7 +124,7 @@ export default function AuctionControlRoom() {
         <div className="text-right">
           <p className="text-[10px] text-slate-500 uppercase tracking-widest">Broadcast clock</p>
           <p className="text-lg font-mono font-bold text-slate-200 tabular-nums">
-            {new Date().toLocaleTimeString()}
+            {time}
           </p>
         </div>
       </header>
@@ -152,6 +167,7 @@ export default function AuctionControlRoom() {
             activeTeamId={auctionState.current_bid_team_id ?? null}
             selectedTeamId={selectedTeamId}
             onSelectTeam={setSelectedTeamId}
+            currentBid={auctionState.current_bid}
           />
         </div>
       </div>

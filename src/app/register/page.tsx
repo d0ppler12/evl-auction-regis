@@ -153,7 +153,7 @@ export default function RegisterPage() {
                      
                      {/* Full Name */}
                      <div className="lg:col-span-2">
-                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Full Name</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Full Name <span className="text-red-500 ml-0.5">*</span></label>
                        <div className="relative">
                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                            <User className="w-5 h-5 text-slate-500" />
@@ -164,7 +164,7 @@ export default function RegisterPage() {
 
                      {/* Email */}
                      <div>
-                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address <span className="text-red-500 ml-0.5">*</span></label>
                        <div className="relative">
                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                            <Mail className="w-5 h-5 text-slate-500" />
@@ -175,7 +175,7 @@ export default function RegisterPage() {
 
                      {/* Password */}
                      <div>
-                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Password <span className="text-red-500 ml-0.5">*</span></label>
                        <div className="relative">
                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                            <Lock className="w-5 h-5 text-slate-500" />
@@ -186,7 +186,7 @@ export default function RegisterPage() {
 
                      {/* Age */}
                      <div>
-                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Age</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Age <span className="text-red-500 ml-0.5">*</span></label>
                        <div className="relative">
                          <input required name="age" value={formData.age} onChange={handleInputChange} type="number" placeholder="Years" className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner" />
                        </div>
@@ -195,7 +195,7 @@ export default function RegisterPage() {
                      {/* Wing and Flat Number */}
                      <div className="flex gap-4">
                         <div className="w-1/2">
-                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Wing</label>
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Wing <span className="text-red-500 ml-0.5">*</span></label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <Building2 className="w-4 h-4 text-slate-500" />
@@ -210,7 +210,7 @@ export default function RegisterPage() {
                           </div>
                         </div>
                         <div className="w-1/2">
-                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Flat No.</label>
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Flat No. <span className="text-red-500 ml-0.5">*</span></label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <Hash className="w-4 h-4 text-slate-500" />
@@ -222,7 +222,7 @@ export default function RegisterPage() {
 
                      {/* Phone Number */}
                      <div className="lg:col-span-2">
-                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Phone Number</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Phone Number <span className="text-red-500 ml-0.5">*</span></label>
                        <div className="relative">
                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                            <Phone className="w-5 h-5 text-slate-500" />
@@ -233,7 +233,7 @@ export default function RegisterPage() {
 
                      {/* Jersey Name */}
                      <div>
-                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Jersey Name</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Jersey Name <span className="text-red-500 ml-0.5">*</span></label>
                        <div className="relative">
                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                            <Shirt className="w-5 h-5 text-slate-500" />
@@ -245,7 +245,7 @@ export default function RegisterPage() {
                      {/* Jersey Size & Number */}
                      <div className="flex gap-4">
                         <div className="w-1/2">
-                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Size</label>
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Size <span className="text-red-500 ml-0.5">*</span></label>
                           <select required name="jerseySize" value={formData.jerseySize} onChange={handleInputChange} className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all appearance-none cursor-pointer">
                             <option value="" disabled className="text-gray-500">Size</option>
                             <option value="S">S</option>
@@ -255,7 +255,7 @@ export default function RegisterPage() {
                           </select>
                         </div>
                         <div className="w-1/2">
-                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">No.</label>
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">No. <span className="text-red-500 ml-0.5">*</span></label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <Hash className="w-4 h-4 text-slate-500" />
@@ -267,7 +267,7 @@ export default function RegisterPage() {
 
                      {/* Photo Upload */}
                      <div className="lg:col-span-2 pt-2">
-                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Player Photo</label>
+                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Player Photo <span className="text-red-500 ml-0.5">*</span></label>
                        
                        <label htmlFor="photo-upload" className={`flex items-center gap-6 p-4 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${photoPreview ? 'border-blue-500/50 bg-blue-500/5' : 'border-slate-700 hover:border-slate-500 bg-slate-800/30'}`}>
                           <div className="relative w-20 h-20 shrink-0">

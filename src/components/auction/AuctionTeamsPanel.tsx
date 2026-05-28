@@ -15,6 +15,7 @@ interface AuctionTeamsPanelProps {
   activeTeamId: string | null;
   selectedTeamId: string;
   onSelectTeam: (id: string) => void;
+  currentBid?: number;
 }
 
 export function AuctionTeamsPanel({
@@ -22,6 +23,7 @@ export function AuctionTeamsPanel({
   activeTeamId,
   selectedTeamId,
   onSelectTeam,
+  currentBid,
 }: AuctionTeamsPanelProps) {
   return (
     <div className="flex flex-col h-full min-h-[320px] lg:min-h-[calc(100vh-10rem)] rounded-2xl border border-blue-500/20 bg-gradient-to-b from-[#0f1a2e]/90 to-[#0b1121]/95 overflow-hidden shadow-[0_0_40px_rgba(37,99,235,0.08)]">
@@ -36,6 +38,7 @@ export function AuctionTeamsPanel({
           teams.map((t) => {
             const isLeading = activeTeamId === t.id;
             const isSelected = selectedTeamId === t.id;
+            const displayedPurse = isLeading ? ((t.purse_remaining ?? 0) - (currentBid || 0)) : (t.purse_remaining ?? 0);
             return (
               <motion.button
                 key={t.id}
@@ -65,7 +68,7 @@ export function AuctionTeamsPanel({
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-white text-sm truncate">{t.name}</p>
                     <p className="text-xs font-mono text-emerald-400/90">
-                      ₹{(t.purse_remaining ?? 0).toLocaleString()} left
+                      {displayedPurse.toLocaleString()} pts left
                     </p>
                   </div>
                   {isLeading && (

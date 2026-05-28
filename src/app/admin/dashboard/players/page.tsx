@@ -13,7 +13,7 @@ const emptyForm = {
   jersey_size: "M",
   jersey_number: "",
   playing_position: "",
-  base_price: "100",
+  base_price: "0",
   status: "approved",
 };
 
@@ -57,7 +57,7 @@ export default function PlayerManagement() {
       jersey_size: p.jersey_size || "M",
       jersey_number: String(p.jersey_number || ""),
       playing_position: p.playing_position || "",
-      base_price: String(p.base_price || 100),
+      base_price: String(p.base_price ?? 0),
       status: p.status || "approved",
     });
     setShowForm(true);
@@ -71,7 +71,7 @@ export default function PlayerManagement() {
         ...form,
         age: parseInt(form.age) || 0,
         jersey_number: form.jersey_number ? parseInt(form.jersey_number) : null,
-        base_price: parseInt(form.base_price) || 100,
+        base_price: parseInt(form.base_price) ?? 0,
       };
       if (editingId) {
         await adminFetch(`/api/admin/players/${editingId}`, { method: "PUT", body: JSON.stringify(payload) });
@@ -150,7 +150,7 @@ export default function PlayerManagement() {
                   <button onClick={() => handleDelete(p.id)} className="p-2 text-slate-400 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 uppercase">{p.status} · ₹{p.base_price}</p>
+              <p className="text-xs text-slate-500 uppercase">{p.status} · {p.base_price} pts</p>
             </div>
           ))}
         </div>

@@ -22,7 +22,7 @@ export function pickPlayerFields(body: Record<string, unknown>) {
   }
   if (row.base_price !== undefined) {
     const n = parseInt(String(row.base_price))
-    row.base_price = Number.isNaN(n) ? 100 : n
+    row.base_price = Number.isNaN(n) ? 0 : n
   }
   return row
 }

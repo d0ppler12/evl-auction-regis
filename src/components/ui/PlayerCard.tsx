@@ -67,7 +67,7 @@ export function PlayerCard({ player, index = 0, className, onClick }: PlayerCard
         <div className="w-full pt-4 border-t border-border space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-muted text-xs uppercase tracking-wider font-bold">Base</span>
-            <span className="font-mono font-bold text-heading">₹{player.base_price?.toLocaleString() || 0}</span>
+            <span className="font-mono font-bold text-heading">{player.base_price?.toLocaleString() ?? 0} pts</span>
           </div>
           
           {isSold && player.teams && (
@@ -81,7 +81,7 @@ export function PlayerCard({ player, index = 0, className, onClick }: PlayerCard
               <div className="flex justify-between items-center">
                 <span className="text-muted text-xs uppercase tracking-wider font-bold">Sold</span>
                 <span className="font-bold text-gold font-mono text-base">
-                  ₹{player.sold_price?.toLocaleString()}
+                  {player.sold_price?.toLocaleString()} pts
                 </span>
               </div>
             </>

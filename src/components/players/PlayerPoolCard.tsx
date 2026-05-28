@@ -100,12 +100,12 @@ export function PlayerPoolCard({ player, index = 0, onClick }: PlayerPoolCardPro
         <div className="grid grid-cols-2 gap-2 text-center">
           <div className="rounded-xl bg-black/30 border border-white/5 px-2 py-2.5 group-hover:border-blue-500/20 transition-colors">
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Base</p>
-            <p className="text-sm font-mono font-bold text-blue-300">₹{(player.base_price || 0).toLocaleString()}</p>
+            <p className="text-sm font-mono font-bold text-blue-300">{(player.base_price ?? 0).toLocaleString()} pts</p>
           </div>
           <div className="rounded-xl bg-black/30 border border-white/5 px-2 py-2.5 group-hover:border-blue-500/20 transition-colors">
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Bid</p>
             <p className="text-sm font-mono font-bold text-amber-300">
-              {player.currentBid != null ? `₹${player.currentBid.toLocaleString()}` : "—"}
+              {player.currentBid != null ? `${player.currentBid.toLocaleString()} pts` : "—"}
             </p>
           </div>
         </div>

@@ -16,7 +16,7 @@ CREATE TABLE public.players (
     previous_tournament_experience TEXT,
     photo_url TEXT,
     instagram_id TEXT,
-    base_price INTEGER DEFAULT 100,
+    base_price INTEGER DEFAULT 0,
     status TEXT DEFAULT 'pending_approval', -- 'pending_payment', 'pending_approval', 'approved', 'rejected'
     auction_status TEXT DEFAULT 'unsold', -- 'unsold', 'sold', 'in_auction'
     team_id UUID,

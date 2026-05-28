@@ -116,12 +116,12 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
                   <div className="flex flex-wrap gap-4 mt-6 justify-center sm:justify-start">
                     <div className="px-5 py-3 rounded-xl bg-black/40 border border-blue-500/20">
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Base Price</p>
-                      <p className="text-xl font-mono font-black text-blue-300">₹{(player.base_price || 0).toLocaleString()}</p>
+                      <p className="text-xl font-mono font-black text-blue-300">{(player.base_price ?? 0).toLocaleString()} PTS</p>
                     </div>
                     <div className="px-5 py-3 rounded-xl bg-black/40 border border-amber-500/20">
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Current Bid</p>
                       <p className="text-xl font-mono font-black text-amber-300">
-                        {player.currentBid != null ? `₹${player.currentBid.toLocaleString()}` : "—"}
+                        {player.currentBid != null ? `${player.currentBid.toLocaleString()} PTS` : "—"}
                       </p>
                     </div>
                   </div>

@@ -105,7 +105,7 @@ export function AuctionQueuePanel({
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-white text-sm truncate">{p.full_name}</p>
                     <p className="text-[10px] text-slate-400 font-mono">
-                      #{p.jersey_number ?? "—"} · ₹{p.base_price?.toLocaleString()}
+                      #{p.jersey_number ?? "—"} · {p.base_price?.toLocaleString() ?? 0} pts
                     </p>
                     <span className="text-[9px] uppercase text-slate-500">{p.auction_status || "unsold"}</span>
                   </div>
