@@ -268,7 +268,9 @@ export default function RegisterPage() {
                         Player Registration
                       </h3>
                       <p className="text-sm text-slate-400">
-                        If already registered,<br /> please proceed to LOGIN to view your profile —>
+                        If already registered,
+                        <br /> please proceed to LOGIN to view your profile
+                        &#10132;
                       </p>
                     </div>
                     <div>
@@ -384,7 +386,7 @@ export default function RegisterPage() {
                           value={formData.age}
                           onChange={handleInputChange}
                           type="number"
-                          placeholder="Years (10 - 90)"
+                          placeholder="15 and above"
                           className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner"
                         />
                       </div>
