@@ -15,6 +15,7 @@ import {
   Lock,
   Award,
   Users,
+  Link,
 } from "lucide-react";
 
 export default function RegisterPage() {
@@ -106,7 +107,9 @@ export default function RegisterPage() {
       !formData.gender ||
       !formData.experience
     ) {
-      alert("Please fill all required fields, select a gender, an experience level, and upload your profile photo.");
+      alert(
+        "Please fill all required fields, select a gender, an experience level, and upload your profile photo.",
+      );
       return;
     }
 
@@ -215,23 +218,23 @@ export default function RegisterPage() {
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-black text-white leading-[1.1] tracking-tighter mb-6 italic">
-              ENTER THE
+              YOUR GAME
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-200">
-                AUCTION.
+                BEGINS HERE.
               </span>
             </h1>
 
             <p className="text-lg lg:text-xl text-slate-300 font-medium mb-12 max-w-md">
-              Only the elite get drafted. Secure your spot in the player pool
-              and prove your worth on the court.
+              From the Futsal court to the EVL spotlight — register now and
+              enter the Monsoon Smash auction pool.
             </p>
 
             <div className="border-t border-white/10 pt-8">
               <div>
                 <div className="text-3xl font-black text-white mb-1">₹700</div>
                 <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-                  Registration Entry Fee
+                  Player Entry Fee
                 </div>
               </div>
             </div>
@@ -268,6 +271,14 @@ export default function RegisterPage() {
                         Fill in details to join the draft pool.
                       </p>
                     </div>
+                    <div>
+                      <button
+                        onClick={() => window.open("/players/login", "_SELF")}
+                        className="px-8 py-4 rounded-xl bg-gold hover:bg-yellow-400 text-background font-bold shadow-[0_0_30px_rgba(250,204,21,0.3)] transition-all flex items-center gap-2 hover:-translate-y-1"
+                      >
+                        LOGIN
+                      </button>
+                    </div>
                   </div>
 
                   {/* Form Grid */}
@@ -296,7 +307,8 @@ export default function RegisterPage() {
                     {/* Email */}
                     <div>
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Email Address <span className="text-red-500 ml-0.5">*</span>
+                        Email Address{" "}
+                        <span className="text-red-500 ml-0.5">*</span>
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -381,7 +393,8 @@ export default function RegisterPage() {
                     {/* Prior Volleyball Play Experience */}
                     <div className="lg:col-span-2">
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Volleyball Experience <span className="text-red-500 ml-0.5">*</span>
+                        Volleyball Experience{" "}
+                        <span className="text-red-500 ml-0.5">*</span>
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -398,7 +411,9 @@ export default function RegisterPage() {
                             Select Experience Level
                           </option>
                           <option value="Played prior">Played prior</option>
-                          <option value="Playing for the first time">Playing for the first time</option>
+                          <option value="Playing for the first time">
+                            Playing for the first time
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -432,7 +447,8 @@ export default function RegisterPage() {
                       </div>
                       <div className="w-1/2">
                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                          Flat No. <span className="text-red-500 ml-0.5">*</span>
+                          Flat No.{" "}
+                          <span className="text-red-500 ml-0.5">*</span>
                         </label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -454,7 +470,8 @@ export default function RegisterPage() {
                     {/* Phone Number */}
                     <div className="lg:col-span-2">
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Phone Number <span className="text-red-500 ml-0.5">*</span>
+                        Phone Number{" "}
+                        <span className="text-red-500 ml-0.5">*</span>
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -475,7 +492,8 @@ export default function RegisterPage() {
                     {/* Jersey Name */}
                     <div>
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Jersey Name <span className="text-red-500 ml-0.5">*</span>
+                        Jersey Name{" "}
+                        <span className="text-red-500 ml-0.5">*</span>
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -539,7 +557,8 @@ export default function RegisterPage() {
                     {/* Photo Upload */}
                     <div className="lg:col-span-2 pt-2">
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Player Photo <span className="text-red-500 ml-0.5">*</span>
+                        Player Photo{" "}
+                        <span className="text-red-500 ml-0.5">*</span>
                       </label>
 
                       <label
@@ -569,7 +588,9 @@ export default function RegisterPage() {
 
                         <div className="flex-grow">
                           <h4 className="text-sm font-bold text-white mb-1">
-                            {photoPreview ? "Photo Selected & Compressed" : "Upload Photo"}
+                            {photoPreview
+                              ? "Photo Selected & Compressed"
+                              : "Upload Photo"}
                           </h4>
                           <p className="text-xs text-slate-400 mb-2">
                             {photoPreview
@@ -599,12 +620,20 @@ export default function RegisterPage() {
                         💵
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-white mb-1">Cash Payment Required</h4>
+                        <h4 className="text-sm font-bold text-white mb-1">
+                          CONFIRM YOUR ENTRY
+                        </h4>
                         <p className="text-xs text-slate-400 leading-relaxed">
-                          A registration entry fee of **₹700** must be paid directly in cash to the tournament organizers.
+                          Complete your ₹700 registration fee in cash through
+                          the EVL coordinators below:
+                          <br />
+                          Nikhil Naik <br />
+                          Parth Thakker <br />
+                          Tanish Gupta
                         </p>
                         <p className="text-xs text-emerald-400 font-bold mt-2">
-                          Your draft profile will be approved in the registry as soon as cash payment is confirmed by administrators.
+                          Player profiles will be approved after payment
+                          confirmation.
                         </p>
                       </div>
                     </div>
@@ -616,11 +645,12 @@ export default function RegisterPage() {
                     className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
-                      <span className="animate-pulse">Submitting Profile...</span>
+                      <span className="animate-pulse">
+                        Submitting Profile...
+                      </span>
                     ) : (
                       <>
-                        Submit Registration{" "}
-                        <CheckCircle2 className="w-5 h-5" />
+                        Submit Registration <CheckCircle2 className="w-5 h-5" />
                       </>
                     )}
                   </button>
@@ -641,10 +671,12 @@ export default function RegisterPage() {
 
                   <div>
                     <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-2">
-                      Roster Profile Saved
+                      REGISTRATION COMPLETE
                     </h3>
                     <p className="text-slate-400 text-sm max-w-xs mx-auto">
-                      Your registration is successfully saved. Please pay ₹700 in cash to the organizers for approval.
+                      Your player profile has been saved successfully. To
+                      confirm your eligibility, please pay the ₹700 entry fee in
+                      cash to the EVL coordinators.
                     </p>
                   </div>
 
@@ -664,10 +696,10 @@ export default function RegisterPage() {
                   </div>
 
                   <button
-                    onClick={() => window.open("/", "_self")}
+                    onClick={() => window.open("/players/login", "_self")}
                     className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                   >
-                    RETURN TO HOME
+                    RETURN TO PLAYER LOGIN
                   </button>
                 </motion.div>
               )}
