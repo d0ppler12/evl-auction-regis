@@ -268,7 +268,7 @@ export default function RegisterPage() {
                         Player Registration
                       </h3>
                       <p className="text-sm text-slate-400">
-                        Fill in details to join the draft pool.
+                        If already registered,<br /> please proceed to LOGIN to view your profile —>
                       </p>
                     </div>
                     <div>
