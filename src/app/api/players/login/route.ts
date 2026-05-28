@@ -8,23 +8,26 @@ export async function POST(request: Request) {
     const { email, password } = await request.json()
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+      return NextResponse.json({ error: 'Email/Phone and password are required' }, { status: 400 })
     }
 
+    const loginInput = email.trim()
+
+    // Query either email OR phone_number columns using Supabase OR filter
     const { data: player, error } = await supabaseAdmin
       .from('players')
       .select('*')
-      .eq('email', email)
+      .or(`email.eq."${loginInput}",phone_number.eq."${loginInput}"`)
       .limit(1)
       .maybeSingle()
 
     if (error || !player) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
+      return NextResponse.json({ error: 'Invalid email/phone or password' }, { status: 401 })
     }
 
     // Verify plaintext password as requested by the user
     if (player.password !== password) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
+      return NextResponse.json({ error: 'Invalid email/phone or password' }, { status: 401 })
     }
 
     // Check if account is approved

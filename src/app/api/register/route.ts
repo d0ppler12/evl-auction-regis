@@ -9,6 +9,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name and phone are required' }, { status: 400 })
     }
 
+    // Backend email format check
+    if (body.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(body.email)) {
+        return NextResponse.json({ error: 'Invalid email address format' }, { status: 400 })
+      }
+    }
+
+    // Backend phone format check (exactly 10 digits)
+    const phoneDigits = body.phone_number.replace(/\D/g, '')
+    if (phoneDigits.length < 10) {
+      return NextResponse.json({ error: 'Phone number must be at least 10 digits' }, { status: 400 })
+    }
+
     if (!body.photo || body.photo === 'placeholder' || body.photo.trim() === '') {
       return NextResponse.json({ error: 'Player photo is required' }, { status: 400 })
     }
@@ -56,6 +70,7 @@ export async function POST(request: Request) {
       }
     }
 
+    // Check unique email
     if (body.email) {
       const { data: existingPlayer } = await supabaseAdmin
         .from('players')
@@ -68,6 +83,17 @@ export async function POST(request: Request) {
       }
     }
 
+    // Check unique phone number to prevent duplicate registrations
+    const { data: existingPhone } = await supabaseAdmin
+      .from('players')
+      .select('id')
+      .eq('phone_number', body.phone_number)
+      .limit(1)
+
+    if (existingPhone && existingPhone.length > 0) {
+      return NextResponse.json({ error: 'Phone number is already registered' }, { status: 400 })
+    }
+
     const { data, error } = await supabaseAdmin
       .from('players')
       .insert({
@@ -78,12 +104,13 @@ export async function POST(request: Request) {
         jersey_name: body.jersey_name,
         jersey_size: body.jersey_size,
         jersey_number: body.jersey_number ? parseInt(body.jersey_number) : null,
-        utr_number: body.utr_number,
+        utr_number: 'CASH', // Cash payments only
         volleyball_experience: body.volleyball_experience || '',
         photo_url: photoUrl,
         status: 'pending',
         email: body.email || null,
         password: body.password || null,
+        gender: body.gender || 'Male',
       })
       .select()
       .single()

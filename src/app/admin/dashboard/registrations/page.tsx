@@ -49,7 +49,7 @@ export default function RegistrationsManagement() {
 
   const handleSaveEdit = async () => {
     if (!selectedPlayer) return;
-    const editable = ['full_name', 'age', 'phone_number', 'wing_building', 'jersey_name', 'jersey_size', 'jersey_number'] as const;
+    const editable = ['full_name', 'age', 'phone_number', 'wing_building', 'jersey_name', 'jersey_size', 'jersey_number', 'gender', 'volleyball_experience'] as const;
     const updates: Record<string, unknown> = {};
     for (const key of editable) {
       if (editData[key] !== undefined) updates[key] = editData[key];
@@ -151,9 +151,11 @@ export default function RegistrationsManagement() {
                     </span>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 mt-4 border-t border-white/5 pt-3">
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-3 text-xs text-slate-300 mt-4 border-t border-white/5 pt-3">
                     <div><span className="text-slate-500 block text-[10px]">AGE</span> {player.age || '—'}</div>
                     <div><span className="text-slate-500 block text-[10px]">BUILDING</span> {player.wing_building || '—'}</div>
+                    <div><span className="text-slate-500 block text-[10px]">GENDER</span> {player.gender || '—'}</div>
+                    <div><span className="text-slate-500 block text-[10px]">EXPERIENCE</span> {player.volleyball_experience === 'Playing for the first time' ? 'First time' : (player.volleyball_experience || '—')}</div>
                   </div>
                 </div>
               ))}
@@ -200,6 +202,22 @@ export default function RegistrationsManagement() {
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Wing / Building</label>
                   <input type="text" value={editData.wing_building || ''} onChange={e => setEditData({...editData, wing_building: e.target.value})} className="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Gender</label>
+                    <select value={editData.gender || 'Male'} onChange={e => setEditData({...editData, gender: e.target.value})} className="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none">
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Experience</label>
+                    <select value={editData.volleyball_experience || 'Played prior'} onChange={e => setEditData({...editData, volleyball_experience: e.target.value})} className="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-blue-500 outline-none">
+                      <option value="Played prior">Played prior</option>
+                      <option value="Playing for the first time">First time</option>
+                    </select>
+                  </div>
                 </div>
                 
                 <div className="border-t border-white/10 my-4 pt-4">

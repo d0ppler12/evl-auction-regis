@@ -150,23 +150,23 @@ export default function PlayerLoginPage() {
                {/* Login Form */}
                <form onSubmit={handleLogin} className="space-y-5">
                  
-                 {/* Email Input */}
-                 <div>
-                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address</label>
-                   <div className="relative">
-                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                       <Mail className="w-5 h-5 text-slate-500" />
-                     </div>
-                     <input 
-                       required 
-                       type="email" 
-                       value={email}
-                       onChange={(e) => setEmail(e.target.value)}
-                       placeholder="you@domain.com" 
-                       className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner text-sm" 
-                     />
-                   </div>
-                 </div>
+                  {/* Email/Phone Input */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address or Phone Number</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Mail className="w-5 h-5 text-slate-500" />
+                      </div>
+                      <input 
+                        required 
+                        type="text" 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@domain.com or 10-digit phone" 
+                        className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner text-sm" 
+                      />
+                    </div>
+                  </div>
 
                  {/* Password Input */}
                  <div>

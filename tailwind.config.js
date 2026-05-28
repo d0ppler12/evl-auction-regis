@@ -1,11 +1,10 @@
-const glob = require('glob');
-const path = require('path');
-
-const contentFiles = glob.sync('./src/**/*.{js,ts,jsx,tsx,mdx}', { cwd: __dirname, absolute: true });
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: contentFiles,
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
   theme: {
     extend: {
       colors: {

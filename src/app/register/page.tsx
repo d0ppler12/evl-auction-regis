@@ -13,10 +13,12 @@ import {
   Image as ImageIcon,
   Mail,
   Lock,
+  Award,
+  Users,
 } from "lucide-react";
 
 export default function RegisterPage() {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(1); // 1 = Registration form, 3 = Success page
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photoPreview, setPhotoPreview] = useState("");
   const [formData, setFormData] = useState({
@@ -28,11 +30,11 @@ export default function RegisterPage() {
     jerseyName: "",
     jerseySize: "",
     jerseyNumber: "",
-    experience: "",
-    utrNumber: "",
+    experience: "", // Maps to volleyball_experience: "Played prior" or "Playing for the first time"
     photo: "",
     email: "",
     password: "",
+    gender: "", // Maps to gender: "Male" or "Female"
   });
 
   const handleInputChange = (e: any) =>
@@ -42,22 +44,106 @@ export default function RegisterPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image size should be less than 5MB");
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Image file is too large. Please select a photo under 10MB");
       return;
     }
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result as string;
-      setPhotoPreview(base64String);
-      setFormData((prev) => ({ ...prev, photo: base64String }));
+      const img = new Image();
+      img.onload = () => {
+        // Create hidden canvas for client-side resizing and optimization
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          // Compress to JPEG at 0.8 quality
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.8);
+          setPhotoPreview(compressedBase64);
+          setFormData((prev) => ({ ...prev, photo: compressedBase64 }));
+        }
+      };
+      img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      !formData.fullName ||
+      !formData.age ||
+      !formData.phoneNumber ||
+      !formData.wing ||
+      !formData.flatNumber ||
+      !formData.jerseyName ||
+      !formData.jerseySize ||
+      !formData.jerseyNumber ||
+      !formData.photo ||
+      !formData.email ||
+      !formData.password ||
+      !formData.gender ||
+      !formData.experience
+    ) {
+      alert("Please fill all required fields, select a gender, an experience level, and upload your profile photo.");
+      return;
+    }
+
+    // Strong email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    // Strong password validation
+    if (formData.password.length < 6) {
+      alert("Password must be at least 6 characters long.");
+      return;
+    }
+
+    // Indian mobile phone validation (exactly 10 digits stripped)
+    const phoneDigits = formData.phoneNumber.replace(/\D/g, "");
+    if (phoneDigits.length !== 10) {
+      alert("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    // Valid age range validation
+    const ageNum = parseInt(formData.age);
+    if (isNaN(ageNum) || ageNum < 10 || ageNum > 90) {
+      alert("Please enter a valid age between 10 and 90.");
+      return;
+    }
+
+    // Valid jersey number validation
+    const jerseyNum = parseInt(formData.jerseyNumber);
+    if (isNaN(jerseyNum) || jerseyNum < 0 || jerseyNum > 999) {
+      alert("Please enter a valid jersey number between 0 and 999.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const res = await fetch("/api/register", {
@@ -71,11 +157,12 @@ export default function RegisterPage() {
           jersey_name: formData.jerseyName,
           jersey_size: formData.jerseySize,
           jersey_number: formData.jerseyNumber,
-          utr_number: formData.utrNumber,
+          utr_number: "CASH", // Strictly cash payments only
           volleyball_experience: formData.experience,
           photo: formData.photo,
           email: formData.email,
           password: formData.password,
+          gender: formData.gender,
         }),
       });
       const data = await res.json();
@@ -144,7 +231,7 @@ export default function RegisterPage() {
               <div>
                 <div className="text-3xl font-black text-white mb-1">₹700</div>
                 <div className="text-xs text-slate-400 font-bold uppercase tracking-wider">
-                  Entry Fee
+                  Registration Entry Fee
                 </div>
               </div>
             </div>
@@ -161,28 +248,25 @@ export default function RegisterPage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
 
             <AnimatePresence mode="wait">
-              {/* STEP 1: PLAYER INFO */}
+              {/* MAIN FORM */}
               {step === 1 && (
-                <motion.div
-                  key="step1"
+                <motion.form
+                  key="form"
+                  onSubmit={handleSubmit}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   className="relative z-10 space-y-6"
                 >
-                  {/* Header & Stepper */}
+                  {/* Header */}
                   <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-6">
                     <div>
                       <h3 className="text-2xl font-black text-white tracking-tight mb-1">
-                        Player Profile
+                        Player Registration
                       </h3>
                       <p className="text-sm text-slate-400">
-                        Fill in your athletic details.
+                        Fill in details to join the draft pool.
                       </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-1 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
-                      <div className="w-4 h-1 bg-slate-700 rounded-full" />
                     </div>
                   </div>
 
@@ -212,8 +296,7 @@ export default function RegisterPage() {
                     {/* Email */}
                     <div>
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Email Address{" "}
-                        <span className="text-red-500 ml-0.5">*</span>
+                        Email Address <span className="text-red-500 ml-0.5">*</span>
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -252,6 +335,31 @@ export default function RegisterPage() {
                       </div>
                     </div>
 
+                    {/* Gender Selection */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                        Gender <span className="text-red-500 ml-0.5">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Users className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <select
+                          required
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleInputChange}
+                          className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all appearance-none cursor-pointer"
+                        >
+                          <option value="" disabled className="text-gray-500">
+                            Select Gender
+                          </option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                        </select>
+                      </div>
+                    </div>
+
                     {/* Age */}
                     <div>
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
@@ -264,14 +372,39 @@ export default function RegisterPage() {
                           value={formData.age}
                           onChange={handleInputChange}
                           type="number"
-                          placeholder="Years"
+                          placeholder="Years (10 - 90)"
                           className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner"
                         />
                       </div>
                     </div>
 
+                    {/* Prior Volleyball Play Experience */}
+                    <div className="lg:col-span-2">
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                        Volleyball Experience <span className="text-red-500 ml-0.5">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Award className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <select
+                          required
+                          name="experience"
+                          value={formData.experience}
+                          onChange={handleInputChange}
+                          className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all appearance-none cursor-pointer"
+                        >
+                          <option value="" disabled className="text-gray-500">
+                            Select Experience Level
+                          </option>
+                          <option value="Played prior">Played prior</option>
+                          <option value="Playing for the first time">Playing for the first time</option>
+                        </select>
+                      </div>
+                    </div>
+
                     {/* Wing and Flat Number */}
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 lg:col-span-2">
                       <div className="w-1/2">
                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                           Wing <span className="text-red-500 ml-0.5">*</span>
@@ -299,8 +432,7 @@ export default function RegisterPage() {
                       </div>
                       <div className="w-1/2">
                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                          Flat No.{" "}
-                          <span className="text-red-500 ml-0.5">*</span>
+                          Flat No. <span className="text-red-500 ml-0.5">*</span>
                         </label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -322,8 +454,7 @@ export default function RegisterPage() {
                     {/* Phone Number */}
                     <div className="lg:col-span-2">
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Phone Number{" "}
-                        <span className="text-red-500 ml-0.5">*</span>
+                        Phone Number <span className="text-red-500 ml-0.5">*</span>
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -335,7 +466,7 @@ export default function RegisterPage() {
                           value={formData.phoneNumber}
                           onChange={handleInputChange}
                           type="tel"
-                          placeholder="+91 XXXXX XXXXX"
+                          placeholder="10-digit mobile number"
                           className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner"
                         />
                       </div>
@@ -344,8 +475,7 @@ export default function RegisterPage() {
                     {/* Jersey Name */}
                     <div>
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Jersey Name{" "}
-                        <span className="text-red-500 ml-0.5">*</span>
+                        Jersey Name <span className="text-red-500 ml-0.5">*</span>
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -409,8 +539,7 @@ export default function RegisterPage() {
                     {/* Photo Upload */}
                     <div className="lg:col-span-2 pt-2">
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Player Photo{" "}
-                        <span className="text-red-500 ml-0.5">*</span>
+                        Player Photo <span className="text-red-500 ml-0.5">*</span>
                       </label>
 
                       <label
@@ -440,15 +569,15 @@ export default function RegisterPage() {
 
                         <div className="flex-grow">
                           <h4 className="text-sm font-bold text-white mb-1">
-                            {photoPreview ? "Photo Selected" : "Upload Image"}
+                            {photoPreview ? "Photo Selected & Compressed" : "Upload Photo"}
                           </h4>
                           <p className="text-xs text-slate-400 mb-2">
                             {photoPreview
                               ? "Click to change photo"
-                              : "Drag & drop or click to browse"}
+                              : "Browse player profile photo"}
                           </p>
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2 py-1 rounded">
-                            <UploadCloud className="w-3 h-3" /> Max 5MB
+                            <UploadCloud className="w-3 h-3" /> Auto-Optimized
                           </span>
                         </div>
                       </label>
@@ -462,113 +591,35 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    className="w-full mt-8 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
-                    onClick={() => {
-                      if (
-                        formData.fullName &&
-                        formData.age &&
-                        formData.phoneNumber &&
-                        formData.wing &&
-                        formData.flatNumber &&
-                        formData.jerseyName &&
-                        formData.jerseySize &&
-                        formData.jerseyNumber &&
-                        formData.photo &&
-                        formData.email &&
-                        formData.password
-                      ) {
-                        if (!formData.email.includes("@")) {
-                          alert("Please enter a valid email address.");
-                          return;
-                        }
-                        if (formData.password.length < 6) {
-                          alert("Password must be at least 6 characters long.");
-                          return;
-                        }
-                        setStep(2);
-                      } else {
-                        alert(
-                          "Please fill all required fields, including your email, password, and player photo.",
-                        );
-                      }
-                    }}
-                  >
-                    Continue to Payment <ChevronRight className="w-5 h-5" />
-                  </button>
-                </motion.div>
-              )}
-
-              {/* STEP 2: PAYMENT */}
-              {step === 2 && (
-                <motion.form
-                  key="step2"
-                  onSubmit={handleSubmit}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="relative z-10 space-y-8 text-center py-4"
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="text-sm text-slate-400 font-bold hover:text-white transition-colors flex items-center gap-1"
-                    >
-                      ← Back
-                    </button>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-1 bg-blue-500/30 rounded-full" />
-                      <div className="w-8 h-1 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                  {/* Cash Details Alert */}
+                  <div className="bg-slate-800/40 border border-emerald-500/20 rounded-2xl p-6 text-left shadow-inner relative overflow-hidden mt-6">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-[20px] rounded-full pointer-events-none" />
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 shrink-0 font-black">
+                        💵
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-white mb-1">Cash Payment Required</h4>
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                          A registration entry fee of **₹700** must be paid directly in cash to the tournament organizers.
+                        </p>
+                        <p className="text-xs text-emerald-400 font-bold mt-2">
+                          Your draft profile will be approved in the registry as soon as cash payment is confirmed by administrators.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-400 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(16,185,129,0.3)] transform -rotate-6">
-                      <span className="text-3xl font-black text-white">₹</span>
-                    </div>
-                    <h3 className="text-5xl font-black text-white tracking-tighter mb-2">
-                      500
-                    </h3>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      Tournament Entry Fee
-                    </p>
-                  </div>
-
-                  <div className="w-56 h-56 bg-white mx-auto rounded-3xl flex items-center justify-center shadow-2xl p-4">
-                    <div className="w-full h-full border-4 border-dashed border-slate-200 rounded-xl flex items-center justify-center bg-slate-50">
-                      <p className="text-slate-400 font-bold font-mono text-sm">
-                        [ UPI QR CODE ]
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="text-left">
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                      Transaction UTR Number
-                    </label>
-                    <input
-                      required
-                      name="utrNumber"
-                      value={formData.utrNumber}
-                      onChange={handleInputChange}
-                      type="text"
-                      placeholder="Enter 12-digit UTR"
-                      className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:bg-slate-800 transition-all shadow-inner text-center font-mono tracking-widest text-lg"
-                    />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
-                      <span className="animate-pulse">Verifying...</span>
+                      <span className="animate-pulse">Submitting Profile...</span>
                     ) : (
                       <>
-                        Complete Registration{" "}
+                        Submit Registration{" "}
                         <CheckCircle2 className="w-5 h-5" />
                       </>
                     )}
@@ -576,10 +627,10 @@ export default function RegisterPage() {
                 </motion.form>
               )}
 
-              {/* STEP 3: SUCCESS */}
+              {/* SUCCESS PAGE */}
               {step === 3 && (
                 <motion.div
-                  key="step3"
+                  key="success"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="relative z-10 text-center py-12 space-y-6"
@@ -590,15 +641,14 @@ export default function RegisterPage() {
 
                   <div>
                     <h3 className="text-3xl font-black text-white uppercase tracking-tight mb-2">
-                      Draft Entry Saved
+                      Roster Profile Saved
                     </h3>
                     <p className="text-slate-400 text-sm max-w-xs mx-auto">
-                      Your registration is pending payment verification by the
-                      admins.
+                      Your registration is successfully saved. Please pay ₹700 in cash to the organizers for approval.
                     </p>
                   </div>
 
-                  <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 my-8 text-left">
+                  <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 my-8 text-left max-w-sm mx-auto">
                     <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">
                       Player
                     </p>
@@ -606,18 +656,18 @@ export default function RegisterPage() {
                       {formData.fullName}
                     </p>
                     <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-3 mb-1">
-                      UTR
+                      Payment Mode
                     </p>
-                    <p className="text-sm font-mono text-white">
-                      {formData.utrNumber}
+                    <p className="text-sm font-semibold text-emerald-400">
+                      Cash Payment (Pending Verification)
                     </p>
                   </div>
 
                   <button
                     onClick={() => window.open("/", "_self")}
-                    className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,211,102,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                   >
-                    GO TO HOME
+                    RETURN TO HOME
                   </button>
                 </motion.div>
               )}

@@ -7,11 +7,11 @@ import { Trophy, Menu, X, Info, AlertTriangle } from "lucide-react";
 
 // Mock Points Table Data (Zeroed out stats)
 const INITIAL_STANDINGS = [
-  { rank: 1, name: "Titans", color: "#2563EB", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
+  { rank: 1, name: "Stallions", color: "#3B82F6", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
   { rank: 2, name: "Spartans", color: "#F97316", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
-  { rank: 3, name: "Phoenix", color: "#EF4444", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
-  { rank: 4, name: "Legends", color: "#10B981", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
-  { rank: 5, name: "Warriors", color: "#8B5CF6", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
+  { rank: 3, name: "Thunderboltz", color: "#EAB308", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
+  { rank: 4, name: "Shivaay", color: "#A855F7", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
+  { rank: 5, name: "Panthers", color: "#EC4899", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
 ];
 
 export default function PointsTablePage() {
