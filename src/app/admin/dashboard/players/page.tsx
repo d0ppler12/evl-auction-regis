@@ -115,7 +115,14 @@ export default function PlayerManagement() {
             <input placeholder="Wing/Building" value={form.wing_building} onChange={(e) => setForm({ ...form, wing_building: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input placeholder="Jersey Name" value={form.jersey_name} onChange={(e) => setForm({ ...form, jersey_name: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <select value={form.jersey_size} onChange={(e) => setForm({ ...form, jersey_size: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white">
-              <option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="2XL">2XL</option>
+              <option value="3XL">3XL</option>
+              <option value="4XL">4XL</option>
+              <option value="5XL">5XL</option>
             </select>
             <input type="number" placeholder="Jersey Number" value={form.jersey_number} onChange={(e) => setForm({ ...form, jersey_number: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input placeholder="Position" value={form.playing_position} onChange={(e) => setForm({ ...form, playing_position: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />

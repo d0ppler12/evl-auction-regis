@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export default function RegisterPage() {
-  const [step, setStep] = useState(1); // 1 = Registration form, 3 = Success page
+  const [step, setStep] = useState(1); // 1 = Step 1, 2 = Step 2, 3 = Success page
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photoPreview, setPhotoPreview] = useState("");
   const [formData, setFormData] = useState({
@@ -89,18 +89,13 @@ export default function RegisterPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const validateStep1 = () => {
     if (
       !formData.fullName ||
       !formData.age ||
       !formData.phoneNumber ||
       !formData.wing ||
       !formData.flatNumber ||
-      !formData.jerseyName ||
-      !formData.jerseySize ||
-      !formData.jerseyNumber ||
       !formData.photo ||
       !formData.email ||
       !formData.password ||
@@ -108,35 +103,58 @@ export default function RegisterPage() {
       !formData.experience
     ) {
       alert(
-        "Please fill all required fields, select a gender, an experience level, and upload your profile photo.",
+        "Please fill all required fields in Step 1, select a gender, an experience level, and upload your profile photo.",
       );
-      return;
+      return false;
     }
 
     // Strong email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       alert("Please enter a valid email address.");
-      return;
+      return false;
     }
 
     // Strong password validation
     if (formData.password.length < 6) {
       alert("Password must be at least 6 characters long.");
-      return;
+      return false;
     }
 
     // Indian mobile phone validation (exactly 10 digits stripped)
     const phoneDigits = formData.phoneNumber.replace(/\D/g, "");
     if (phoneDigits.length !== 10) {
       alert("Please enter a valid 10-digit mobile number.");
-      return;
+      return false;
     }
 
     // Valid age range validation
     const ageNum = parseInt(formData.age);
     if (isNaN(ageNum) || ageNum < 10 || ageNum > 90) {
       alert("Please enter a valid age between 10 and 90.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleNextStep = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (validateStep1()) {
+      setStep(2);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateStep1()) {
+      setStep(1);
+      return;
+    }
+
+    if (!formData.jerseyName || !formData.jerseySize || !formData.jerseyNumber) {
+      alert("Please fill all jersey details in Step 2.");
       return;
     }
 
@@ -251,11 +269,10 @@ export default function RegisterPage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
 
             <AnimatePresence mode="wait">
-              {/* MAIN FORM */}
+              {/* STEP 1: PERSONAL & PROFILE DETAILS */}
               {step === 1 && (
-                <motion.form
-                  key="form"
-                  onSubmit={handleSubmit}
+                <motion.div
+                  key="step1"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -281,6 +298,15 @@ export default function RegisterPage() {
                         LOGIN
                       </button>
                     </div>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="h-1.5 flex-1 rounded-full bg-blue-500 transition-all duration-300" />
+                    <div className="h-1.5 flex-1 rounded-full bg-slate-700 transition-all duration-300" />
+                    <span className="text-xs font-bold text-slate-400 whitespace-nowrap ml-2">
+                      STEP 1 OF 2
+                    </span>
                   </div>
 
                   {/* Form Grid */}
@@ -491,71 +517,6 @@ export default function RegisterPage() {
                       </div>
                     </div>
 
-                    {/* Jersey Name */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Jersey Name{" "}
-                        <span className="text-red-500 ml-0.5">*</span>
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <Shirt className="w-5 h-5 text-slate-500" />
-                        </div>
-                        <input
-                          required
-                          name="jerseyName"
-                          value={formData.jerseyName}
-                          onChange={handleInputChange}
-                          type="text"
-                          placeholder="Name on back"
-                          className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Jersey Size & Number */}
-                    <div className="flex gap-4">
-                      <div className="w-1/2">
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                          Size <span className="text-red-500 ml-0.5">*</span>
-                        </label>
-                        <select
-                          required
-                          name="jerseySize"
-                          value={formData.jerseySize}
-                          onChange={handleInputChange}
-                          className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all appearance-none cursor-pointer"
-                        >
-                          <option value="" disabled className="text-gray-500">
-                            Size
-                          </option>
-                          <option value="S">S</option>
-                          <option value="M">M</option>
-                          <option value="L">L</option>
-                          <option value="XL">XL</option>
-                        </select>
-                      </div>
-                      <div className="w-1/2">
-                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                          No. <span className="text-red-500 ml-0.5">*</span>
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Hash className="w-4 h-4 text-slate-500" />
-                          </div>
-                          <input
-                            required
-                            name="jerseyNumber"
-                            value={formData.jerseyNumber}
-                            onChange={handleInputChange}
-                            type="number"
-                            placeholder="10"
-                            className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-9 pr-2 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
                     {/* Photo Upload */}
                     <div className="lg:col-span-2 pt-2">
                       <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
@@ -614,6 +575,160 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
+                  <button
+                    type="button"
+                    onClick={handleNextStep}
+                    className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
+                  >
+                    Continue to Jersey Details <ChevronRight className="w-5 h-5" />
+                  </button>
+                </motion.div>
+              )}
+
+              {/* STEP 2: JERSEY DETAILS & SIZE CHART */}
+              {step === 2 && (
+                <motion.form
+                  key="step2"
+                  onSubmit={handleSubmit}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="relative z-10 space-y-6"
+                >
+                  {/* Header */}
+                  <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-6">
+                    <div>
+                      <h3 className="text-2xl font-black text-white tracking-tight mb-1">
+                        Jersey Selection
+                      </h3>
+                      <p className="text-sm text-slate-400">
+                        Specify your custom jersey preferences.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="h-1.5 flex-1 rounded-full bg-blue-500 transition-all duration-300" />
+                    <div className="h-1.5 flex-1 rounded-full bg-blue-500 transition-all duration-300" />
+                    <span className="text-xs font-bold text-slate-400 whitespace-nowrap ml-2">
+                      STEP 2 OF 2
+                    </span>
+                  </div>
+
+                  {/* Form Grid */}
+                  <div className="grid grid-cols-1 gap-5">
+                    {/* Jersey Name */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                        Jersey Name <span className="text-red-500 ml-0.5">*</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Shirt className="w-5 h-5 text-slate-500" />
+                        </div>
+                        <input
+                          required
+                          name="jerseyName"
+                          value={formData.jerseyName}
+                          onChange={handleInputChange}
+                          type="text"
+                          placeholder="Name on back"
+                          className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Jersey Size & Number */}
+                    <div className="flex gap-4">
+                      <div className="w-1/2">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                          Size <span className="text-red-500 ml-0.5">*</span>
+                        </label>
+                        <select
+                          required
+                          name="jerseySize"
+                          value={formData.jerseySize}
+                          onChange={handleInputChange}
+                          className="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all appearance-none cursor-pointer"
+                        >
+                          <option value="" disabled className="text-gray-500">
+                            Size
+                          </option>
+                          <option value="S">S (Small)</option>
+                          <option value="M">M (Medium)</option>
+                          <option value="L">L (Large)</option>
+                          <option value="XL">XL</option>
+                          <option value="2XL">2 XL</option>
+                          <option value="3XL">3 XL</option>
+                          <option value="4XL">4 XL</option>
+                          <option value="5XL">5 XL</option>
+                        </select>
+                      </div>
+                      <div className="w-1/2">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                          No. <span className="text-red-500 ml-0.5">*</span>
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Hash className="w-4 h-4 text-slate-500" />
+                          </div>
+                          <input
+                            required
+                            name="jerseyNumber"
+                            value={formData.jerseyNumber}
+                            onChange={handleInputChange}
+                            type="number"
+                            placeholder="10"
+                            className="w-full bg-slate-800/50 border border-slate-700 rounded-xl pl-9 pr-2 py-3.5 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-slate-800 transition-all shadow-inner"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Jersey Size Chart Table */}
+                  <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-4 overflow-hidden">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Shirt className="w-4 h-4 text-blue-400" />
+                      <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Jersey Size Chart (Inches)
+                      </span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="border-b border-slate-700 text-slate-400 font-bold uppercase tracking-wider">
+                            <th className="py-2 px-3">Size</th>
+                            <th className="py-2 px-3 text-right">Chest</th>
+                            <th className="py-2 px-3 text-right">Length</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800 text-slate-300 font-medium">
+                          {[
+                            { size: "SMALL (S)", chest: "38\"", length: "26\"" },
+                            { size: "MEDIUM (M)", chest: "40\"", length: "27\"" },
+                            { size: "LARGE (L)", chest: "42\"", length: "28\"" },
+                            { size: "XL", chest: "44\"", length: "29\"" },
+                            { size: "2 XL (XXL)", chest: "46\"", length: "30\"" },
+                            { size: "3 XL (3XL)", chest: "48\"", length: "31\"" },
+                            { size: "4 XL (4XL)", chest: "50\"", length: "31\"" },
+                            { size: "5 XL (5XL)", chest: "54\"", length: "31\"" },
+                          ].map((row, idx) => (
+                            <tr key={idx} className="hover:bg-slate-800/30 transition-colors">
+                              <td className="py-2 px-3 font-bold text-white">{row.size}</td>
+                              <td className="py-2 px-3 text-right">{row.chest}</td>
+                              <td className="py-2 px-3 text-right">{row.length}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="mt-2 text-[10px] text-slate-500 italic text-center">
+                      * All measurements are in inches.
+                    </div>
+                  </div>
+
                   {/* Cash Details Alert */}
                   <div className="bg-slate-800/40 border border-emerald-500/20 rounded-2xl p-6 text-left shadow-inner relative overflow-hidden mt-6">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 blur-[20px] rounded-full pointer-events-none" />
@@ -641,21 +756,31 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
-                  >
-                    {isSubmitting ? (
-                      <span className="animate-pulse">
-                        Submitting Profile...
-                      </span>
-                    ) : (
-                      <>
-                        Submit Registration <CheckCircle2 className="w-5 h-5" />
-                      </>
-                    )}
-                  </button>
+                  {/* Action Buttons */}
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="w-1/3 bg-slate-800 border border-slate-700 hover:bg-slate-700 text-white font-bold py-4 rounded-xl transition-all"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-2/3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-black uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)] active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                      {isSubmitting ? (
+                        <span className="animate-pulse">
+                          Submitting Profile...
+                        </span>
+                      ) : (
+                        <>
+                          Submit Registration <CheckCircle2 className="w-5 h-5" />
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </motion.form>
               )}
 
