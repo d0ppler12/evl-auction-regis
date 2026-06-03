@@ -157,7 +157,11 @@ export default function PlayerManagement() {
                   <button onClick={() => handleDelete(p.id)} className="p-2 text-slate-400 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 uppercase">{p.status} · {p.base_price} pts</p>
+              {p.auction_status === 'sold' ? (
+                <p className="text-xs font-bold text-blue-400 uppercase">SOLD TO {p.teams?.name || 'TEAM'} · {p.sold_price?.toLocaleString()} pts</p>
+              ) : (
+                <p className="text-xs text-slate-500 uppercase">{p.status} · {p.base_price?.toLocaleString()} pts</p>
+              )}
             </div>
           ))}
         </div>

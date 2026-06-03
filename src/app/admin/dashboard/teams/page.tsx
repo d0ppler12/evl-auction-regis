@@ -109,6 +109,19 @@ export default function TeamsManagement() {
     }
   };
 
+  const handleReleasePlayer = async (teamId: string, playerId: string) => {
+    if (!confirm("Are you sure you want to release this player? Their sold price will be refunded to the team and they will return to the auction pool.")) return;
+    try {
+      await adminFetch(`/api/admin/auction`, {
+        method: "POST",
+        body: JSON.stringify({ action: "release_player", player_id: playerId, team_id: teamId }),
+      });
+      await loadTeams();
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -171,15 +184,44 @@ export default function TeamsManagement() {
                   <button onClick={() => handleDelete(team.id)} className="p-2 text-slate-400 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                 <div className="bg-slate-800 rounded-lg p-2">
                   <p className="text-[10px] text-slate-500 uppercase">Purse Left</p>
-                  <p className="font-mono font-bold text-emerald-400">₹{team.purse_remaining?.toLocaleString()}</p>
+                  <p className="font-mono font-bold text-emerald-400">{team.purse_remaining?.toLocaleString()} pts</p>
                 </div>
                 <div className="bg-slate-800 rounded-lg p-2">
                   <p className="text-[10px] text-slate-500 uppercase">Total</p>
-                  <p className="font-mono font-bold text-white">₹{team.total_purse?.toLocaleString()}</p>
+                  <p className="font-mono font-bold text-white">{team.total_purse?.toLocaleString()} pts</p>
                 </div>
+              </div>
+
+              {/* Roster Section */}
+              <div className="border-t border-white/10 pt-4">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Roster ({team.players?.length || 0})</p>
+                {team.players && team.players.length > 0 ? (
+                  <div className="space-y-2 max-h-[150px] overflow-y-auto pr-1">
+                    {team.players.map((p: any) => (
+                      <div key={p.id} className="flex justify-between items-center bg-slate-800/50 p-2 rounded-lg border border-white/5">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-200">{p.full_name}</span>
+                          <span className="text-[10px] text-slate-500 uppercase">{p.playing_position || 'Player'}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-mono font-bold text-blue-400">{p.sold_price?.toLocaleString()} pts</span>
+                          <button 
+                            onClick={() => handleReleasePlayer(team.id, p.id)}
+                            className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-md transition-colors"
+                            title="Release player back to auction"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500 italic text-center py-2">No players drafted yet</p>
+                )}
               </div>
             </div>
           ))}

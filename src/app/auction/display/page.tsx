@@ -48,12 +48,12 @@ export default function AuctionDisplayPage() {
       if (hasRealTeams) setTeams(t)
       if (p) setAllPlayers(p)
       
-      const { data: s } = await supabase.from('auction_state').select('*').eq('id', 1).single()
+      const { data: s } = await supabase.from('auction_state').select('*').eq('id', 1).maybeSingle()
       if (s) {
         setAuctionState(s)
         setPrevState(s)
         if (s.current_player_id) {
-          const { data: player } = await supabase.from('players').select('*').eq('id', s.current_player_id).single()
+          const { data: player } = await supabase.from('players').select('*').eq('id', s.current_player_id).maybeSingle()
           if (player) setCurrentPlayer(player)
         }
         if (s.current_bid_team_id && hasRealTeams) {
@@ -85,23 +85,19 @@ export default function AuctionDisplayPage() {
     init()
 
     const channel = supabase.channel('auction_display_channel')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'auction_state' }, async (payload) => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'auction_state' }, (payload) => {
         const ns = payload.new as any
         setAuctionState(ns)
         
-        // Re-fetch teams and players to update purses and squad sizes dynamically
-        const { data: updatedTeams } = await supabase.from('teams').select('*').order('name')
-        const { data: updatedPlayers } = await supabase.from('players').select('*')
-        
-        if (updatedTeams) setTeams(updatedTeams)
-        if (updatedPlayers) setAllPlayers(updatedPlayers)
-
-        if (ns.current_player_id) {
-          const { data: pl } = await supabase.from('players').select('*').eq('id', ns.current_player_id).single()
-          if (pl) setCurrentPlayer(pl)
-        } else {
-          setCurrentPlayer(null)
-        }
+        setAllPlayers((currentPlayers) => {
+          if (ns.current_player_id) {
+            const pl = currentPlayers.find((p) => p.id === ns.current_player_id);
+            if (pl) setCurrentPlayer((prevCP: any) => prevCP?.id === pl.id ? prevCP : pl);
+          } else {
+            setCurrentPlayer(null);
+          }
+          return currentPlayers;
+        });
 
         setPrevState((prev: any) => {
           if (prev?.is_active && !ns.is_active && ns.current_bid_team_id) {
@@ -111,13 +107,25 @@ export default function AuctionDisplayPage() {
           return ns
         })
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'teams' }, async () => {
-        const { data: t } = await supabase.from('teams').select('*').order('name')
-        if (t) setTeams(t)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'teams' }, (payload) => {
+        setTeams((prev) => {
+          if (payload.eventType === 'INSERT') return [...prev, payload.new].sort((a, b) => a.name.localeCompare(b.name));
+          if (payload.eventType === 'DELETE') return prev.filter((t) => t.id !== payload.old.id);
+          return prev.map((t) => t.id === payload.new.id ? payload.new : t);
+        });
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'players' }, async () => {
-        const { data: p } = await supabase.from('players').select('*')
-        if (p) setAllPlayers(p)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'players' }, (payload) => {
+        setAllPlayers((prev) => {
+          if (payload.eventType === 'INSERT') return [...prev, payload.new];
+          if (payload.eventType === 'DELETE') return prev.filter((p) => p.id !== payload.old.id);
+          return prev.map((p) => p.id === payload.new.id ? payload.new : p);
+        });
+        setCurrentPlayer((prev: any) => {
+          if (prev && payload.eventType === 'UPDATE' && prev.id === payload.new.id) {
+            return payload.new;
+          }
+          return prev;
+        });
       })
       .subscribe((status) => {
         setConnected(status === 'SUBSCRIBED')

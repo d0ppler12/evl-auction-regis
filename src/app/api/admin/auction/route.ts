@@ -8,10 +8,24 @@ export async function GET() {
     const [playersRes, teamsRes, stateRes] = await Promise.all([
       supabaseAdmin.from('players').select('*'),
       supabaseAdmin.from('teams').select('*').order('name'),
-      supabaseAdmin.from('auction_state').select('*').eq('id', 1).single(),
+      supabaseAdmin.from('auction_state').select('*').eq('id', 1).maybeSingle(),
     ])
     if (playersRes.error) throw playersRes.error
     if (teamsRes.error) throw teamsRes.error
+
+    let stateResData = stateRes.data
+    
+    if (!stateResData) {
+      const { data: insertedState, error: insertError } = await supabaseAdmin
+        .from('auction_state')
+        .upsert({ id: 1, current_bid: 0, is_active: false })
+        .select()
+        .maybeSingle()
+      
+      if (!insertError) {
+        stateResData = insertedState
+      }
+    }
 
     const allPlayers = playersRes.data || []
     const approvedUnsoldPlayers = allPlayers.filter(p => p.status === 'approved' && p.auction_status !== 'sold')
@@ -69,7 +83,7 @@ export async function GET() {
       return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     })
 
-    const state = stateRes.data
+    const state = stateResData
     const currentPlayer = state?.current_player_id
       ? sortedPlayers.find((p) => p.id === state.current_player_id)
       : null
@@ -93,11 +107,13 @@ export async function POST(request: Request) {
     const { action } = body
 
     if (action === 'set_player') {
-      const { data: player } = await supabaseAdmin
+      const { data: player, error: pErr } = await supabaseAdmin
         .from('players')
         .select('base_price')
         .eq('id', body.player_id)
-        .single()
+        .maybeSingle()
+      
+      if (pErr) throw pErr
 
       const { data, error } = await supabaseAdmin
         .from('auction_state')
@@ -110,13 +126,14 @@ export async function POST(request: Request) {
         })
         .eq('id', 1)
         .select()
-        .single()
+        .maybeSingle()
       if (error) throw error
-      return NextResponse.json(data)
+      return NextResponse.json(data || {})
     }
 
     if (action === 'bid') {
-      const { data: state } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).single()
+      const { data: state, error: stateErr } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).maybeSingle()
+      if (stateErr) throw stateErr
       if (!state?.current_player_id) {
         return NextResponse.json({ error: 'No player selected' }, { status: 400 })
       }
@@ -140,7 +157,7 @@ export async function POST(request: Request) {
         })
         .eq('id', 1)
         .select()
-        .single()
+        .maybeSingle()
       if (error) throw error
 
       await supabaseAdmin.from('bids').insert({
@@ -149,20 +166,22 @@ export async function POST(request: Request) {
         amount,
       })
 
-      return NextResponse.json(data)
+      return NextResponse.json(data || {})
     }
 
     if (action === 'sold') {
-      const { data: state } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).single()
+      const { data: state, error: stateErr } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).maybeSingle()
+      if (stateErr) throw stateErr
       if (!state?.current_player_id || !state.current_bid_team_id) {
         return NextResponse.json({ error: 'No active bid' }, { status: 400 })
       }
 
-      const { data: team } = await supabaseAdmin
+      const { data: team, error: teamErr } = await supabaseAdmin
         .from('teams')
         .select('purse_remaining')
         .eq('id', state.current_bid_team_id)
-        .single()
+        .maybeSingle()
+      if (teamErr) throw teamErr
 
       const newPurse = (team?.purse_remaining || 0) - (state.current_bid || 0)
 
@@ -191,13 +210,14 @@ export async function POST(request: Request) {
         })
         .eq('id', 1)
         .select()
-        .single()
+        .maybeSingle()
       if (error) throw error
-      return NextResponse.json(data)
+      return NextResponse.json(data || {})
     }
 
     if (action === 'unsold') {
-      const { data: state } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).single()
+      const { data: state, error: stateErr } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).maybeSingle()
+      if (stateErr) throw stateErr
       if (!state?.current_player_id) {
         return NextResponse.json({ error: 'No player selected' }, { status: 400 })
       }
@@ -218,9 +238,9 @@ export async function POST(request: Request) {
         })
         .eq('id', 1)
         .select()
-        .single()
+        .maybeSingle()
       if (error) throw error
-      return NextResponse.json(data)
+      return NextResponse.json(data || {})
     }
 
     if (action === 'pause') {
@@ -234,7 +254,8 @@ export async function POST(request: Request) {
     }
 
     if (action === 'resume') {
-      const { data: state } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).single()
+      const { data: state, error: stateErr } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).maybeSingle()
+      if (stateErr) throw stateErr
       if (!state?.current_player_id) {
         return NextResponse.json({ error: 'Select a player first' }, { status: 400 })
       }
@@ -248,15 +269,17 @@ export async function POST(request: Request) {
     }
 
     if (action === 'reset_lot') {
-      const { data: state } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).single()
+      const { data: state, error: stateErr } = await supabaseAdmin.from('auction_state').select('*').eq('id', 1).maybeSingle()
+      if (stateErr) throw stateErr
       if (!state?.current_player_id) {
         return NextResponse.json({ error: 'No player on block' }, { status: 400 })
       }
-      const { data: player } = await supabaseAdmin
+      const { data: player, error: playerErr } = await supabaseAdmin
         .from('players')
         .select('base_price')
         .eq('id', state.current_player_id)
-        .single()
+        .maybeSingle()
+      if (playerErr) throw playerErr
       const { data, error } = await supabaseAdmin
         .from('auction_state')
         .update({
@@ -299,6 +322,66 @@ export async function POST(request: Request) {
           .insert(insertData)
         if (error) throw error
       }
+      return NextResponse.json({ success: true })
+    }
+
+    if (action === 'release_player') {
+      const playerId = body.player_id
+      const teamId = body.team_id
+
+      if (!playerId || !teamId) {
+        return NextResponse.json({ error: 'Player ID and Team ID required' }, { status: 400 })
+      }
+
+      // Get player's sold price
+      const { data: player, error: playerErr } = await supabaseAdmin
+        .from('players')
+        .select('sold_price, team_id')
+        .eq('id', playerId)
+        .maybeSingle()
+        
+      if (playerErr || !player) throw playerErr || new Error('Player not found')
+      if (player.team_id !== teamId) return NextResponse.json({ error: 'Player not in this team' }, { status: 400 })
+
+      const soldPrice = player.sold_price || 0
+
+      // Get team's purse remaining
+      const { data: team, error: teamErr } = await supabaseAdmin
+        .from('teams')
+        .select('purse_remaining')
+        .eq('id', teamId)
+        .maybeSingle()
+        
+      if (teamErr || !team) throw teamErr || new Error('Team not found')
+
+      // 1. Update Team Purse
+      await supabaseAdmin
+        .from('teams')
+        .update({ purse_remaining: (team.purse_remaining || 0) + soldPrice })
+        .eq('id', teamId)
+
+      // 2. Reset Player
+      await supabaseAdmin
+        .from('players')
+        .update({
+          team_id: null,
+          auction_status: 'unsold',
+          sold_price: null
+        })
+        .eq('id', playerId)
+
+      // 3. Delete Player from bids history
+      await supabaseAdmin
+        .from('bids')
+        .delete()
+        .eq('player_id', playerId)
+
+      // 4. Delete Player from auction_order to allow reshuffling
+      await supabaseAdmin
+        .from('auction_order')
+        .delete()
+        .eq('player_id', playerId)
+
       return NextResponse.json({ success: true })
     }
 

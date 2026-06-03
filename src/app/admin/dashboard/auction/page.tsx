@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/lib/supabase";
 import { adminFetch } from "@/lib/admin-fetch";
 import { AuctionQueuePanel } from "@/components/auction/AuctionQueuePanel";
 import { AuctionStagePanel } from "@/components/auction/AuctionStagePanel";
@@ -32,9 +33,7 @@ export default function AuctionControlRoom() {
       setTeams(data.teams || []);
       setAuctionState(data.auctionState || { current_bid: 0, is_active: false });
       setCurrentPlayer(data.currentPlayer || null);
-      if (data.auctionState?.current_bid_team_id) {
-        setSelectedTeamId(data.auctionState.current_bid_team_id);
-      }
+      // Removed the forced overriding of selectedTeamId here so you can select a new team without it reverting on the next poll.
     } catch {
       /* ignore */
     }
@@ -42,8 +41,34 @@ export default function AuctionControlRoom() {
 
   useEffect(() => {
     refresh();
-    const interval = setInterval(refresh, 2500);
-    return () => clearInterval(interval);
+    
+    const channel = supabase.channel('admin_auction_room')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'auction_state' }, (payload) => {
+        setAuctionState(payload.new);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'teams' }, (payload) => {
+        setTeams((prev) => {
+          if (payload.eventType === 'INSERT') return [...prev, payload.new].sort((a, b) => a.name.localeCompare(b.name));
+          if (payload.eventType === 'DELETE') return prev.filter((t) => t.id !== payload.old.id);
+          return prev.map((t) => t.id === payload.new.id ? payload.new : t);
+        });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'players' }, (payload) => {
+        setPlayers((prev) => {
+          if (payload.eventType === 'INSERT') return [...prev, payload.new];
+          if (payload.eventType === 'DELETE') return prev.filter((p) => p.id !== payload.old.id);
+          return prev.map((p) => p.id === payload.new.id ? payload.new : p);
+        });
+        setCurrentPlayer((prev: any) => {
+          if (prev && payload.eventType === 'UPDATE' && prev.id === payload.new.id) {
+            return payload.new;
+          }
+          return prev;
+        });
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [refresh]);
 
   const auctionAction = async (body: Record<string, unknown>) => {
@@ -51,7 +76,6 @@ export default function AuctionControlRoom() {
       method: "POST",
       body: JSON.stringify(body),
     });
-    await refresh();
   };
 
   const handleSetPlayer = async (playerId: string) => {
@@ -101,6 +125,7 @@ export default function AuctionControlRoom() {
   const handleShufflePool = async () => {
     if (!confirm("Shuffle the remaining player queue?")) return;
     await auctionAction({ action: "shuffle_pool" });
+    await refresh(); // Force refresh for auction_order changes
   };
 
   const livePlayerId = currentPlayer?.id ?? auctionState.current_player_id ?? null;

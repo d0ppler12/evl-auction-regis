@@ -7,60 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader } from "@/components/ui/Loader";
 import { Trophy, Menu, X, Radio } from "lucide-react";
 
-// Mock Fallback Teams
-const DEFAULT_TEAMS = [
-  {
-    id: "stallions-id",
-    name: "Stallions",
-    owner_name: "Tanish Gupta",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#3B82F6",
-    players: [],
-  },
-  {
-    id: "spartans-id",
-    name: "Spartans",
-    owner_name: "Parth Thakker",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#F97316",
-    players: [],
-  },
-  {
-    id: "thunderboltz-id",
-    name: "Thunderboltz",
-    owner_name: "Nikhil Naik",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#EAB308",
-    players: [],
-  },
-  {
-    id: "shivaay-id",
-    name: "Shivaay",
-    owner_name: "Karanjeet Singh",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#A855F7",
-    players: [],
-  },
-  {
-    id: "panthers-id",
-    name: "Panthers",
-    owner_name: "Yash Madhani",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#EC4899",
-    players: [],
-  },
-];
-
 export default function TeamsPage() {
   const [teams, setTeams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,16 +37,10 @@ export default function TeamsPage() {
           .order("name");
 
         if (error) throw error;
-
-        // If the database has teams, use them. Otherwise, fall back to our default 5 teams.
-        if (data && data.length > 0) {
-          setTeams(data);
-        } else {
-          setTeams(DEFAULT_TEAMS);
-        }
+        setTeams(data || []);
       } catch (err) {
         console.error("Error fetching teams from database:", err);
-        setTeams(DEFAULT_TEAMS);
+        setTeams([]);
       } finally {
         setLoading(false);
       }
@@ -293,7 +233,7 @@ export default function TeamsPage() {
             MEET THE TEAMS
           </h1>
           <p className="text-base md:text-lg text-slate-400 leading-relaxed">
-            The five official franchises competing for the championship. Explore team budgets, squad rosters, and franchise profiles.
+            Official EVL franchises from the live database. Explore team budgets, squad rosters, and franchise profiles.
           </p>
         </div>
 
@@ -365,7 +305,7 @@ export default function TeamsPage() {
                           Purse Remaining
                         </span>
                         <span className="text-lg font-black text-emerald-400 font-mono">
-                          ₹{(team.purse_remaining / 1000).toFixed(0)}k
+                          {team.purse_remaining?.toLocaleString()} pts
                         </span>
                       </div>
                       <div className="bg-slate-900/80 border border-white/5 rounded-2xl p-4 flex flex-col justify-center">
@@ -373,7 +313,7 @@ export default function TeamsPage() {
                           Total Budget
                         </span>
                         <span className="text-lg font-black text-white font-mono">
-                          ₹{(team.total_purse / 1000).toFixed(0)}k
+                          {team.total_purse?.toLocaleString()} pts
                         </span>
                       </div>
                     </div>
@@ -402,7 +342,7 @@ export default function TeamsPage() {
                                 </span>
                               </div>
                               <span className="text-sm font-bold text-blue-400 font-mono">
-                                ₹{(player.sold_price / 1000).toFixed(1)}k
+                                {player.sold_price?.toLocaleString()} pts
                               </span>
                             </div>
                           ))}
