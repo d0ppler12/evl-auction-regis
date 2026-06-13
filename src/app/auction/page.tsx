@@ -63,11 +63,30 @@ export default function AuctionPage() {
         setAllPlayers((prev) => {
           if (payload.eventType === 'INSERT') return [...prev, payload.new];
           if (payload.eventType === 'DELETE') return prev.filter((p) => p.id !== payload.old.id);
-          return prev.map((p) => p.id === payload.new.id ? payload.new : p);
+          return prev.map((p) => {
+            if (p.id === payload.new.id) {
+              const updated = { ...p, ...payload.new };
+              const toastFields = ['photo_url', 'volleyball_experience', 'previous_tournament_experience'];
+              toastFields.forEach((field) => {
+                if (p[field] && (payload.new[field] === null || payload.new[field] === undefined)) {
+                  updated[field] = p[field];
+                }
+              });
+              return updated;
+            }
+            return p;
+          });
         });
         setCurrentPlayer((prev: any) => {
           if (prev && payload.eventType === 'UPDATE' && prev.id === payload.new.id) {
-            return payload.new;
+            const updated = { ...prev, ...payload.new };
+            const toastFields = ['photo_url', 'volleyball_experience', 'previous_tournament_experience'];
+            toastFields.forEach((field) => {
+              if (prev[field] && (payload.new[field] === null || payload.new[field] === undefined)) {
+                updated[field] = prev[field];
+              }
+            });
+            return updated;
           }
           return prev;
         });
