@@ -331,7 +331,7 @@ export default function PlayersPage() {
         {/* Page Header */}
         <div className="text-center max-w-2xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-bold tracking-wider">
-            <Trophy className="w-4 h-4" /> EVL SEASON 1 REGISTRY
+            <Trophy className="w-4 h-4" /> EVL SEASON 3 REGISTRY
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white italic tracking-tighter uppercase leading-none">
             AUCTION POOL
