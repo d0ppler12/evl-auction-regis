@@ -39,8 +39,12 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
 
         <div className="p-6 border-b border-white/5 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="font-black text-white italic text-xs tracking-tighter">EVL</span>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img
+                src="/evl-hero.png"
+                alt="EVL Logo"
+                className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+              />
             </div>
             <span className="text-white font-bold tracking-tight text-lg">ADMIN</span>
           </div>
