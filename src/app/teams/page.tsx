@@ -7,60 +7,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader } from "@/components/ui/Loader";
 import { Trophy, Menu, X, Radio } from "lucide-react";
 
-// Mock Fallback Teams
-const DEFAULT_TEAMS = [
-  {
-    id: "stallions-id",
-    name: "Stallions",
-    owner_name: "Tanish Gupta",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#3B82F6",
-    players: [],
-  },
-  {
-    id: "spartans-id",
-    name: "Spartans",
-    owner_name: "Parth Thakker",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#F97316",
-    players: [],
-  },
-  {
-    id: "thunderboltz-id",
-    name: "Thunderboltz",
-    owner_name: "Nikhil Naik",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#EAB308",
-    players: [],
-  },
-  {
-    id: "shivaay-id",
-    name: "Shivaay",
-    owner_name: "Karanjeet Singh",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#A855F7",
-    players: [],
-  },
-  {
-    id: "panthers-id",
-    name: "Panthers",
-    owner_name: "Yash Madhani",
-    is_playing_owner: true,
-    total_purse: 100000,
-    purse_remaining: 100000,
-    color_theme: "#EC4899",
-    players: [],
-  },
-];
-
 export default function TeamsPage() {
   const [teams, setTeams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +16,7 @@ export default function TeamsPage() {
   useEffect(() => {
     async function checkSession() {
       try {
-        const res = await fetch('/api/players/me');
+        const res = await fetch("/api/players/me");
         if (res.ok) {
           const data = await res.json();
           setPlayerSession(data.player);
@@ -91,16 +37,10 @@ export default function TeamsPage() {
           .order("name");
 
         if (error) throw error;
-
-        // If the database has teams, use them. Otherwise, fall back to our default 5 teams.
-        if (data && data.length > 0) {
-          setTeams(data);
-        } else {
-          setTeams(DEFAULT_TEAMS);
-        }
+        setTeams(data || []);
       } catch (err) {
         console.error("Error fetching teams from database:", err);
-        setTeams(DEFAULT_TEAMS);
+        setTeams([]);
       } finally {
         setLoading(false);
       }
@@ -122,7 +62,9 @@ export default function TeamsPage() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="font-black text-white italic text-lg tracking-tighter">EVL</span>
+              <span className="font-black text-white italic text-lg tracking-tighter">
+                EVL
+              </span>
             </div>
             <span className="text-xl font-bold tracking-tight text-white hidden sm:block">
               ETERNIA <span className="text-blue-400">VOLLEYBALL</span>
@@ -130,10 +72,24 @@ export default function TeamsPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <Link href="/" className="hover:text-white transition-colors">HOME</Link>
-            <Link href="/teams" className="text-white">TEAMS</Link>
-            <Link href="/players" className="hover:text-white transition-colors">PLAYERS</Link>
-            <Link href="/points-table" className="hover:text-white transition-colors">POINTS TABLE</Link>
+            <Link href="/" className="hover:text-white transition-colors">
+              HOME
+            </Link>
+            <Link href="/teams" className="text-white">
+              TEAMS
+            </Link>
+            <Link
+              href="/players"
+              className="hover:text-white transition-colors"
+            >
+              PLAYERS
+            </Link>
+            <Link
+              href="/points-table"
+              className="hover:text-white transition-colors"
+            >
+              POINTS TABLE
+            </Link>
           </div>
 
           <div className="flex items-center gap-4">
@@ -141,15 +97,20 @@ export default function TeamsPage() {
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
               LIVE
             </div>
-            
+
             {playerSession ? (
               <div className="hidden sm:flex items-center gap-4">
-                <Link href="/players/profile" className="text-sm font-bold text-blue-400 hover:text-white transition-colors">
+                <Link
+                  href="/players/profile"
+                  className="text-sm font-bold text-blue-400 hover:text-white transition-colors"
+                >
                   MY PROFILE
                 </Link>
                 <button
                   onClick={async () => {
-                    const res = await fetch('/api/players/logout', { method: 'POST' });
+                    const res = await fetch("/api/players/logout", {
+                      method: "POST",
+                    });
                     if (res.ok) {
                       setPlayerSession(null);
                       window.location.reload();
@@ -162,9 +123,9 @@ export default function TeamsPage() {
               </div>
             ) : (
               <>
-                <Link href="/admin" className="text-sm font-bold text-slate-400 hover:text-white transition-colors hidden sm:block">
+                {/* <Link href="/admin" className="text-sm font-bold text-slate-400 hover:text-white transition-colors hidden sm:block">
                   ADMIN
-                </Link>
+                </Link> */}
                 <Link
                   href="/register"
                   className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-sm font-bold text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:scale-105 hidden sm:block"
@@ -185,7 +146,11 @@ export default function TeamsPage() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-lg border border-white/10 hover:bg-white/5 md:hidden text-white"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
@@ -239,7 +204,9 @@ export default function TeamsPage() {
                     </Link>
                     <button
                       onClick={async () => {
-                        const res = await fetch('/api/players/logout', { method: 'POST' });
+                        const res = await fetch("/api/players/logout", {
+                          method: "POST",
+                        });
                         if (res.ok) {
                           setPlayerSession(null);
                           setIsMobileMenuOpen(false);
@@ -293,7 +260,8 @@ export default function TeamsPage() {
             MEET THE TEAMS
           </h1>
           <p className="text-base md:text-lg text-slate-400 leading-relaxed">
-            The five official franchises competing for the championship. Explore team budgets, squad rosters, and franchise profiles.
+            Official EVL franchises from the live database. Explore team
+            budgets, squad rosters, and franchise profiles.
           </p>
         </div>
 
@@ -347,7 +315,10 @@ export default function TeamsPage() {
                           {team.name}
                         </h2>
                         <p className="text-xs font-bold text-slate-400 tracking-wider">
-                          OWNER: <span className="text-slate-200">{team.owner_name}</span>
+                          OWNER:{" "}
+                          <span className="text-slate-200">
+                            {team.owner_name}
+                          </span>
                         </p>
                       </div>
 
@@ -365,7 +336,7 @@ export default function TeamsPage() {
                           Purse Remaining
                         </span>
                         <span className="text-lg font-black text-emerald-400 font-mono">
-                          ₹{(team.purse_remaining / 1000).toFixed(0)}k
+                          {team.purse_remaining?.toLocaleString()} pts
                         </span>
                       </div>
                       <div className="bg-slate-900/80 border border-white/5 rounded-2xl p-4 flex flex-col justify-center">
@@ -373,7 +344,7 @@ export default function TeamsPage() {
                           Total Budget
                         </span>
                         <span className="text-lg font-black text-white font-mono">
-                          ₹{(team.total_purse / 1000).toFixed(0)}k
+                          {team.total_purse?.toLocaleString()} pts
                         </span>
                       </div>
                     </div>
@@ -402,7 +373,7 @@ export default function TeamsPage() {
                                 </span>
                               </div>
                               <span className="text-sm font-bold text-blue-400 font-mono">
-                                ₹{(player.sold_price / 1000).toFixed(1)}k
+                                {player.sold_price?.toLocaleString()} pts
                               </span>
                             </div>
                           ))}
@@ -410,7 +381,8 @@ export default function TeamsPage() {
                       ) : (
                         <div className="text-center py-6 px-4 bg-slate-900/30 border border-dashed border-white/10 rounded-2xl">
                           <p className="text-xs font-semibold text-slate-500">
-                            Draft pending. Players will appear here once purchased in the auction.
+                            Draft pending. Players will appear here once
+                            purchased in the auction.
                           </p>
                         </div>
                       )}

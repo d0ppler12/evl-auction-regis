@@ -7,11 +7,102 @@ import { Trophy, Menu, X, Info, AlertTriangle } from "lucide-react";
 
 // Mock Points Table Data (Zeroed out stats)
 const INITIAL_STANDINGS = [
-  { rank: 1, name: "Stallions", color: "#3B82F6", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
-  { rank: 2, name: "Spartans", color: "#F97316", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
-  { rank: 3, name: "Thunderboltz", color: "#EAB308", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
-  { rank: 4, name: "Shivaay", color: "#A855F7", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
-  { rank: 5, name: "Panthers", color: "#EC4899", played: 0, won: 0, lost: 0, setsWon: 0, setsLost: 0, setDiff: 0, points: 0 },
+  {
+    rank: 1,
+    name: "Stallions",
+    color: "#808080",
+    played: 0,
+    won: 0,
+    lost: 0,
+    setsWon: 0,
+    setsLost: 0,
+    setDiff: 0,
+    points: 0,
+  },
+  {
+    rank: 2,
+    name: "Spartans",
+    color: "#808080",
+    played: 0,
+    won: 0,
+    lost: 0,
+    setsWon: 0,
+    setsLost: 0,
+    setDiff: 0,
+    points: 0,
+  },
+  {
+    rank: 3,
+    name: "Thunderboltz",
+    color: "#808080",
+    played: 0,
+    won: 0,
+    lost: 0,
+    setsWon: 0,
+    setsLost: 0,
+    setDiff: 0,
+    points: 0,
+  },
+  {
+    rank: 4,
+    name: "Shivaay",
+    color: "#808080",
+    played: 0,
+    won: 0,
+    lost: 0,
+    setsWon: 0,
+    setsLost: 0,
+    setDiff: 0,
+    points: 0,
+  },
+  {
+    rank: 5,
+    name: "Panthers",
+    color: "#808080",
+    played: 0,
+    won: 0,
+    lost: 0,
+    setsWon: 0,
+    setsLost: 0,
+    setDiff: 0,
+    points: 0,
+  },
+  {
+    rank: 6,
+    name: "Loan Legends",
+    color: "#808080",
+    played: 0,
+    won: 0,
+    lost: 0,
+    setsWon: 0,
+    setsLost: 0,
+    setDiff: 0,
+    points: 0,
+  },
+  {
+    rank: 7,
+    name: "Mavericks",
+    color: "#808080",
+    played: 0,
+    won: 0,
+    lost: 0,
+    setsWon: 0,
+    setsLost: 0,
+    setDiff: 0,
+    points: 0,
+  },
+  {
+    rank: 8,
+    name: "Spectrum Spikers",
+    color: "#808080",
+    played: 0,
+    won: 0,
+    lost: 0,
+    setsWon: 0,
+    setsLost: 0,
+    setDiff: 0,
+    points: 0,
+  },
 ];
 
 export default function PointsTablePage() {
@@ -22,7 +113,7 @@ export default function PointsTablePage() {
   useEffect(() => {
     async function checkSession() {
       try {
-        const res = await fetch('/api/players/me');
+        const res = await fetch("/api/players/me");
         if (res.ok) {
           const data = await res.json();
           setPlayerSession(data.player);
@@ -48,7 +139,9 @@ export default function PointsTablePage() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="font-black text-white italic text-lg tracking-tighter">EVL</span>
+              <span className="font-black text-white italic text-lg tracking-tighter">
+                EVL
+              </span>
             </div>
             <span className="text-xl font-bold tracking-tight text-white hidden sm:block">
               ETERNIA <span className="text-blue-400">VOLLEYBALL</span>
@@ -56,10 +149,21 @@ export default function PointsTablePage() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <Link href="/" className="hover:text-white transition-colors">HOME</Link>
-            <Link href="/teams" className="hover:text-white transition-colors">TEAMS</Link>
-            <Link href="/players" className="hover:text-white transition-colors">PLAYERS</Link>
-            <Link href="/points-table" className="text-white">POINTS TABLE</Link>
+            <Link href="/" className="hover:text-white transition-colors">
+              HOME
+            </Link>
+            <Link href="/teams" className="hover:text-white transition-colors">
+              TEAMS
+            </Link>
+            <Link
+              href="/players"
+              className="hover:text-white transition-colors"
+            >
+              PLAYERS
+            </Link>
+            <Link href="/points-table" className="text-white">
+              POINTS TABLE
+            </Link>
           </div>
 
           <div className="flex items-center gap-4">
@@ -67,15 +171,20 @@ export default function PointsTablePage() {
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
               LIVE
             </div>
-            
+
             {playerSession ? (
               <div className="hidden sm:flex items-center gap-4">
-                <Link href="/players/profile" className="text-sm font-bold text-blue-400 hover:text-white transition-colors">
+                <Link
+                  href="/players/profile"
+                  className="text-sm font-bold text-blue-400 hover:text-white transition-colors"
+                >
                   MY PROFILE
                 </Link>
                 <button
                   onClick={async () => {
-                    const res = await fetch('/api/players/logout', { method: 'POST' });
+                    const res = await fetch("/api/players/logout", {
+                      method: "POST",
+                    });
                     if (res.ok) {
                       setPlayerSession(null);
                       window.location.reload();
@@ -88,9 +197,6 @@ export default function PointsTablePage() {
               </div>
             ) : (
               <>
-                <Link href="/admin" className="text-sm font-bold text-slate-400 hover:text-white transition-colors hidden sm:block">
-                  ADMIN
-                </Link>
                 <Link
                   href="/register"
                   className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-sm font-bold text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:scale-105 hidden sm:block"
@@ -111,7 +217,11 @@ export default function PointsTablePage() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-lg border border-white/10 hover:bg-white/5 md:hidden text-white"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
@@ -165,7 +275,9 @@ export default function PointsTablePage() {
                     </Link>
                     <button
                       onClick={async () => {
-                        const res = await fetch('/api/players/logout', { method: 'POST' });
+                        const res = await fetch("/api/players/logout", {
+                          method: "POST",
+                        });
                         if (res.ok) {
                           setPlayerSession(null);
                           setIsMobileMenuOpen(false);
@@ -179,13 +291,6 @@ export default function PointsTablePage() {
                   </>
                 ) : (
                   <div className="border-t border-white/5 pt-3 flex flex-col gap-3">
-                    <Link
-                      href="/admin"
-                      className="block py-2 hover:text-white transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      ADMIN
-                    </Link>
                     <Link
                       href="/players/login"
                       className="block py-2 hover:text-white transition-colors"
@@ -210,7 +315,6 @@ export default function PointsTablePage() {
 
       {/* Main Section */}
       <main className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 space-y-10">
-        
         {/* Banner: Season Hasn't Started Yet */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -220,7 +324,7 @@ export default function PointsTablePage() {
         >
           {/* Ambient Amber Glow inside Banner */}
           <div className="absolute top-1/2 left-0 -translate-y-1/2 w-48 h-48 bg-amber-500/10 blur-[80px] rounded-full pointer-events-none" />
-          
+
           <div className="w-14 h-14 bg-amber-500/15 border border-amber-500/30 rounded-2xl flex items-center justify-center text-amber-400 shrink-0">
             <AlertTriangle className="w-7 h-7" />
           </div>
@@ -229,7 +333,9 @@ export default function PointsTablePage() {
               SEASON STANDINGS PENDING
             </h3>
             <p className="text-sm text-slate-300 leading-relaxed font-medium">
-              The season hasn't started yet. Match schedules and points table statistics will update automatically here once the auction concludes and tournament play begins. Check back soon!
+              The season hasn't started yet. Match schedules and points table
+              statistics will update automatically here once the auction
+              concludes and tournament play begins. Check back soon!
             </p>
           </div>
         </motion.div>
@@ -243,7 +349,8 @@ export default function PointsTablePage() {
             POINTS TABLE
           </h1>
           <p className="text-sm md:text-base text-slate-400 leading-relaxed">
-            Track live team wins, losses, set differences, and overall points standing throughout the tournament.
+            Track live team wins, losses, set differences, and overall points
+            standing throughout the tournament.
           </p>
         </div>
 
@@ -256,7 +363,7 @@ export default function PointsTablePage() {
         >
           {/* Table Header Decorative line */}
           <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600" />
-          
+
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -269,7 +376,9 @@ export default function PointsTablePage() {
                   <th className="py-5 px-4 text-center w-24">Sets Won</th>
                   <th className="py-5 px-4 text-center w-24">Sets Lost</th>
                   <th className="py-5 px-4 text-center w-24">Set Diff</th>
-                  <th className="py-5 px-6 text-center w-24 bg-blue-500/5">Points</th>
+                  <th className="py-5 px-6 text-center w-24 bg-blue-500/5">
+                    Points
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 font-semibold text-sm">
@@ -313,13 +422,25 @@ export default function PointsTablePage() {
                       </td>
 
                       {/* Stats Columns */}
-                      <td className="py-5 px-4 text-center font-mono text-slate-400">{team.played}</td>
-                      <td className="py-5 px-4 text-center font-mono text-emerald-400">{team.won}</td>
-                      <td className="py-5 px-4 text-center font-mono text-rose-400">{team.lost}</td>
-                      <td className="py-5 px-4 text-center font-mono text-slate-400">{team.setsWon}</td>
-                      <td className="py-5 px-4 text-center font-mono text-slate-400">{team.setsLost}</td>
-                      <td className="py-5 px-4 text-center font-mono text-slate-400">{team.setDiff}</td>
-                      
+                      <td className="py-5 px-4 text-center font-mono text-slate-400">
+                        {team.played}
+                      </td>
+                      <td className="py-5 px-4 text-center font-mono text-emerald-400">
+                        {team.won}
+                      </td>
+                      <td className="py-5 px-4 text-center font-mono text-rose-400">
+                        {team.lost}
+                      </td>
+                      <td className="py-5 px-4 text-center font-mono text-slate-400">
+                        {team.setsWon}
+                      </td>
+                      <td className="py-5 px-4 text-center font-mono text-slate-400">
+                        {team.setsLost}
+                      </td>
+                      <td className="py-5 px-4 text-center font-mono text-slate-400">
+                        {team.setDiff}
+                      </td>
+
                       {/* Points Column */}
                       <td className="py-5 px-6 text-center font-mono text-base font-black text-blue-400 bg-blue-500/5">
                         {team.points}

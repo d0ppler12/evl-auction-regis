@@ -5,7 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 export async function GET() {
   try {
     requireAdmin()
-    const { data, error } = await supabaseAdmin.from('teams').select('*').order('created_at')
+    const { data, error } = await supabaseAdmin.from('teams').select('*, players(*)').order('created_at')
     if (error) throw error
     return NextResponse.json(data)
   } catch (e: any) {

@@ -105,24 +105,24 @@ export default function PlayerProfilePage() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-            {/* <Link href="/" className="hover:text-white transition-colors">
+            <Link href="/" className="hover:text-white transition-colors">
               HOME
             </Link>
             <Link href="/teams" className="hover:text-white transition-colors">
               TEAMS
-            </Link> */}
+            </Link>
             <Link
               href="/players"
               className="hover:text-white transition-colors"
             >
               PLAYER POOL
             </Link>
-            {/* <Link
+            <Link
               href="/points-table"
               className="hover:text-white transition-colors"
             >
               POINTS TABLE
-            </Link> */}
+            </Link>
           </div>
 
           <button

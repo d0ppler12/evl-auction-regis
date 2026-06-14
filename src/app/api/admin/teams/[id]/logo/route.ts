@@ -15,6 +15,12 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const path = `${params.id}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
 
+    try {
+      await supabaseAdmin.storage.createBucket('team-logos', { public: true })
+    } catch (bucketErr) {
+      // ignore bucket creation error
+    }
+
     const { error: uploadError } = await supabaseAdmin.storage
       .from('team-logos')
       .upload(path, buffer, { upsert: true, contentType: file.type })
