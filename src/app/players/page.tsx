@@ -6,8 +6,14 @@ import { Search, Trophy, Menu, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader } from "@/components/ui/Loader";
-import { PlayerPoolCard, type PlayerPoolItem } from "@/components/players/PlayerPoolCard";
-import { PlayerDetailModal, type PlayerDetail } from "@/components/players/PlayerDetailModal";
+import {
+  PlayerPoolCard,
+  type PlayerPoolItem,
+} from "@/components/players/PlayerPoolCard";
+import {
+  PlayerDetailModal,
+  type PlayerDetail,
+} from "@/components/players/PlayerDetailModal";
 
 type RawPlayer = PlayerDetail & {
   team_id?: string | null;
@@ -16,20 +22,27 @@ type RawPlayer = PlayerDetail & {
 export default function PlayersPage() {
   const [players, setPlayers] = useState<RawPlayer[]>([]);
   const [teams, setTeams] = useState<{ id: string; name: string }[]>([]);
-  const [auctionState, setAuctionState] = useState<{ current_player_id?: string; current_bid?: number } | null>(null);
-  const [teamMatchCounts, setTeamMatchCounts] = useState<Record<string, number>>({});
+  const [auctionState, setAuctionState] = useState<{
+    current_player_id?: string;
+    current_bid?: number;
+  } | null>(null);
+  const [teamMatchCounts, setTeamMatchCounts] = useState<
+    Record<string, number>
+  >({});
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
   const [teamFilter, setTeamFilter] = useState("all");
-  const [selectedPlayer, setSelectedPlayer] = useState<PlayerDetail | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerDetail | null>(
+    null,
+  );
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [playerSession, setPlayerSession] = useState<any>(null);
 
   useEffect(() => {
     async function checkSession() {
       try {
-        const res = await fetch('/api/players/me');
+        const res = await fetch("/api/players/me");
         if (res.ok) {
           const data = await res.json();
           setPlayerSession(data.player);
@@ -50,8 +63,15 @@ export default function PlayersPage() {
           .eq("status", "approved")
           .order("full_name"),
         supabase.from("teams").select("id, name").order("name"),
-        supabase.from("auction_state").select("current_player_id, current_bid").eq("id", 1).single(),
-        supabase.from("matches").select("team_a_id, team_b_id").eq("status", "completed"),
+        supabase
+          .from("auction_state")
+          .select("current_player_id, current_bid")
+          .eq("id", 1)
+          .single(),
+        supabase
+          .from("matches")
+          .select("team_a_id, team_b_id")
+          .eq("status", "completed"),
       ]);
 
       if (playersRes.data) setPlayers(playersRes.data as RawPlayer[]);
@@ -59,10 +79,11 @@ export default function PlayersPage() {
       if (auctionRes.data) setAuctionState(auctionRes.data);
 
       const counts: Record<string, number> = {};
-      if (!matchesRes.error) matchesRes.data?.forEach((m) => {
-        if (m.team_a_id) counts[m.team_a_id] = (counts[m.team_a_id] || 0) + 1;
-        if (m.team_b_id) counts[m.team_b_id] = (counts[m.team_b_id] || 0) + 1;
-      });
+      if (!matchesRes.error)
+        matchesRes.data?.forEach((m) => {
+          if (m.team_a_id) counts[m.team_a_id] = (counts[m.team_a_id] || 0) + 1;
+          if (m.team_b_id) counts[m.team_b_id] = (counts[m.team_b_id] || 0) + 1;
+        });
       setTeamMatchCounts(counts);
       setLoading(false);
     }
@@ -100,11 +121,16 @@ export default function PlayersPage() {
 
       let matchesStatus = true;
       if (filter === "sold") matchesStatus = p.auction_status === "sold";
-      else if (filter === "unsold") matchesStatus = p.auction_status === "unsold";
-      else if (filter === "available") matchesStatus = p.auction_status === "unsold" || p.auction_status === "in_auction";
+      else if (filter === "unsold")
+        matchesStatus = p.auction_status === "unsold";
+      else if (filter === "available")
+        matchesStatus =
+          p.auction_status === "unsold" || p.auction_status === "in_auction";
 
       const matchesTeam =
-        teamFilter === "all" || p.team_id === teamFilter || p.teams?.id === teamFilter;
+        teamFilter === "all" ||
+        p.team_id === teamFilter ||
+        p.teams?.id === teamFilter;
 
       return matchesSearch && matchesStatus && matchesTeam;
     });
@@ -124,7 +150,9 @@ export default function PlayersPage() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="font-black text-white italic text-lg tracking-tighter">EVL</span>
+              <span className="font-black text-white italic text-lg tracking-tighter">
+                EVL
+              </span>
             </div>
             <span className="text-xl font-bold tracking-tight text-white hidden sm:block">
               ETERNIA <span className="text-blue-400">VOLLEYBALL</span>
@@ -132,10 +160,21 @@ export default function PlayersPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <Link href="/" className="hover:text-white transition-colors">HOME</Link>
-            <Link href="/teams" className="hover:text-white transition-colors">TEAMS</Link>
-            <Link href="/players" className="text-white">PLAYERS</Link>
-            <Link href="/points-table" className="hover:text-white transition-colors">POINTS TABLE</Link>
+            <Link href="/" className="hover:text-white transition-colors">
+              HOME
+            </Link>
+            <Link href="/teams" className="hover:text-white transition-colors">
+              TEAMS
+            </Link>
+            <Link href="/players" className="text-white">
+              PLAYERS
+            </Link>
+            <Link
+              href="/points-table"
+              className="hover:text-white transition-colors"
+            >
+              POINTS TABLE
+            </Link>
           </div>
 
           <div className="flex items-center gap-4">
@@ -146,12 +185,17 @@ export default function PlayersPage() {
 
             {playerSession ? (
               <div className="hidden sm:flex items-center gap-4">
-                <Link href="/players/profile" className="text-sm font-bold text-blue-400 hover:text-white transition-colors">
+                <Link
+                  href="/players/profile"
+                  className="text-sm font-bold text-blue-400 hover:text-white transition-colors"
+                >
                   MY PROFILE
                 </Link>
                 <button
                   onClick={async () => {
-                    const res = await fetch('/api/players/logout', { method: 'POST' });
+                    const res = await fetch("/api/players/logout", {
+                      method: "POST",
+                    });
                     if (res.ok) {
                       setPlayerSession(null);
                       window.location.reload();
@@ -164,9 +208,6 @@ export default function PlayersPage() {
               </div>
             ) : (
               <>
-                <Link href="/admin" className="text-sm font-bold text-slate-400 hover:text-white transition-colors hidden sm:block">
-                  ADMIN
-                </Link>
                 <Link
                   href="/register"
                   className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-sm font-bold text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all hover:scale-105 hidden sm:block"
@@ -187,7 +228,11 @@ export default function PlayersPage() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-lg border border-white/10 hover:bg-white/5 md:hidden text-white"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
@@ -241,7 +286,9 @@ export default function PlayersPage() {
                     </Link>
                     <button
                       onClick={async () => {
-                        const res = await fetch('/api/players/logout', { method: 'POST' });
+                        const res = await fetch("/api/players/logout", {
+                          method: "POST",
+                        });
                         if (res.ok) {
                           setPlayerSession(null);
                           setIsMobileMenuOpen(false);
@@ -255,13 +302,6 @@ export default function PlayersPage() {
                   </>
                 ) : (
                   <div className="border-t border-white/5 pt-3 flex flex-col gap-3">
-                    <Link
-                      href="/admin"
-                      className="block py-2 hover:text-white transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      ADMIN
-                    </Link>
                     <Link
                       href="/players/login"
                       className="block py-2 hover:text-white transition-colors"
@@ -295,7 +335,8 @@ export default function PlayersPage() {
             AUCTION POOL
           </h1>
           <p className="text-base md:text-lg text-slate-400 leading-relaxed">
-            The official player draft registry. Premium roster cards for every approved EVL athlete.
+            The official player draft registry. Premium roster cards for every
+            approved EVL athlete.
           </p>
         </div>
 
@@ -345,9 +386,13 @@ export default function PlayersPage() {
         ) : filteredPlayers.length === 0 ? (
           <div className="bg-[#0f1a2e]/50 border border-white/5 rounded-3xl p-16 sm:p-20 text-center backdrop-blur-sm">
             <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center">
-              <span className="text-3xl font-black text-blue-500/50 font-display">EVL</span>
+              <span className="text-3xl font-black text-blue-500/50 font-display">
+                EVL
+              </span>
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No players available in the EVL auction pool.</h3>
+            <h3 className="text-xl font-bold text-white mb-2">
+              No players available in the EVL auction pool.
+            </h3>
             <p className="text-slate-400 text-sm max-w-sm mx-auto">
               {players.length === 0
                 ? "Approved players will appear here once registrations are confirmed."
@@ -368,7 +413,10 @@ export default function PlayersPage() {
         )}
       </main>
 
-      <PlayerDetailModal player={selectedPlayer} onClose={() => setSelectedPlayer(null)} />
+      <PlayerDetailModal
+        player={selectedPlayer}
+        onClose={() => setSelectedPlayer(null)}
+      />
     </div>
   );
 }

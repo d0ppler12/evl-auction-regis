@@ -1,26 +1,26 @@
 /** @type {import('next').NextConfig} */
-// const nextConfig = {
-//   images: {
-//     remotePatterns: [
-//       {
-//         protocol: 'https',
-//         hostname: '**',
-//       },
-//     ],
-//   },
-// };
-
-// export default nextConfig;
 const nextConfig = {
-  async redirects() {
-    return [
+  images: {
+    remotePatterns: [
       {
-        source: "/",
-        destination: "/register",
-        permanent: false,
+        protocol: "https",
+        hostname: "**",
       },
-    ];
+    ],
   },
 };
 
 export default nextConfig;
+// const nextConfig = {
+//   async redirects() {
+//     return [
+//       {
+//         source: "/",
+//         destination: "/register",
+//         permanent: false,
+//       },
+//     ];
+//   },
+// };
+
+// export default nextConfig;

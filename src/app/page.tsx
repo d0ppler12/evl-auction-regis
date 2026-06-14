@@ -13,19 +13,89 @@ import {
 
 // Fake Data for UI
 const topTeams = [
-  { id: 1, name: "STALLIONS", captain: "Tanish Gupta", winRate: "0%", logo: "ST" },
-  { id: 2, name: "SPARTANS", captain: "Parth Thakker", winRate: "0%", logo: "SP" },
-  { id: 3, name: "THUNDERBOLTZ", captain: "Nikhil Naik", winRate: "0%", logo: "TH" },
-  { id: 4, name: "SHIVAAY", captain: "Karanjeet Singh", winRate: "0%", logo: "SH" },
-  { id: 5, name: "PANTHERS", captain: "Yash Madhani", winRate: "0%", logo: "PA" },
+  {
+    id: 1,
+    name: "STALLIONS",
+    captain: "Tanish Gupta",
+    winRate: "0%",
+    logo: "ST",
+  },
+  {
+    id: 2,
+    name: "SPARTANS",
+    captain: "Parth Thakker",
+    winRate: "0%",
+    logo: "SP",
+  },
+  {
+    id: 3,
+    name: "THUNDERBOLTZ",
+    captain: "Nikhil Naik",
+    winRate: "0%",
+    logo: "TH",
+  },
+  {
+    id: 4,
+    name: "SHIVAAY",
+    captain: "Karanjeet Singh",
+    winRate: "0%",
+    logo: "SH",
+  },
+  {
+    id: 5,
+    name: "PANTHERS",
+    captain: "Yash Madhani",
+    winRate: "0%",
+    logo: "PA",
+  },
 ];
 
 const pointsTable = [
-  { pos: 1, team: "STALLIONS", p: 0, w: 0, l: 0, sw: 0, sl: 0, pts: 0, form: [] },
-  { pos: 2, team: "SPARTANS", p: 0, w: 0, l: 0, sw: 0, sl: 0, pts: 0, form: [] },
-  { pos: 3, team: "THUNDERBOLTZ", p: 0, w: 0, l: 0, sw: 0, sl: 0, pts: 0, form: [] },
+  {
+    pos: 1,
+    team: "STALLIONS",
+    p: 0,
+    w: 0,
+    l: 0,
+    sw: 0,
+    sl: 0,
+    pts: 0,
+    form: [],
+  },
+  {
+    pos: 2,
+    team: "SPARTANS",
+    p: 0,
+    w: 0,
+    l: 0,
+    sw: 0,
+    sl: 0,
+    pts: 0,
+    form: [],
+  },
+  {
+    pos: 3,
+    team: "THUNDERBOLTZ",
+    p: 0,
+    w: 0,
+    l: 0,
+    sw: 0,
+    sl: 0,
+    pts: 0,
+    form: [],
+  },
   { pos: 4, team: "SHIVAAY", p: 0, w: 0, l: 0, sw: 0, sl: 0, pts: 0, form: [] },
-  { pos: 5, team: "PANTHERS", p: 0, w: 0, l: 0, sw: 0, sl: 0, pts: 0, form: [] },
+  {
+    pos: 5,
+    team: "PANTHERS",
+    p: 0,
+    w: 0,
+    l: 0,
+    sw: 0,
+    sl: 0,
+    pts: 0,
+    form: [],
+  },
 ];
 
 // Dynamic matches are fetched from DB
@@ -160,12 +230,6 @@ export default function Home() {
             ) : (
               <>
                 <Link
-                  href="/admin"
-                  className="text-sm font-bold text-muted hover:text-primary transition-colors hidden sm:block"
-                >
-                  ADMIN
-                </Link>
-                <Link
                   href="/register"
                   className="px-6 py-2.5 rounded-full bg-accent hover:bg-blue-400 text-sm font-bold text-background shadow-[0_0_20px_rgba(96,165,250,0.4)] transition-all hover:scale-105"
                 >
@@ -193,8 +257,8 @@ export default function Home() {
           <div className="relative z-20 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-12">
             <div className="flex-1 max-w-2xl">
               <div className="inline-block px-4 py-1.5 rounded-full bg-accent/20 border border-accent/30 text-accent text-sm font-bold mb-6 tracking-wider">
-                SEASON 1 <span className="text-muted mx-2">•</span> BEGINS MAY
-                2024
+                SEASON 3 <span className="text-muted mx-2">•</span> BEGINS 25
+                JULY 2026
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-primary leading-[1.1] tracking-tighter mb-6 italic">
                 RISE.
@@ -206,7 +270,7 @@ export default function Home() {
                 DOMINATE.
               </h1>
               <p className="text-xl text-secondary font-medium mb-8 max-w-lg">
-                India's Next Generation Volleyball League.
+                Eternia's beloved Volleyball League.
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -248,7 +312,7 @@ export default function Home() {
           </div>
 
           {/* Live Match Bar Attached to Bottom of Hero */}
-          <div className="relative z-20 border-t border-white/5 bg-surface/40 backdrop-blur-md px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* <div className="relative z-20 border-t border-white/5 bg-surface/40 backdrop-blur-md px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4 w-full md:w-auto">
               <div className="flex items-center gap-2 text-red-500 font-bold bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
                 <Radio className="w-4 h-4 animate-pulse" /> LIVE NOW
@@ -295,7 +359,7 @@ export default function Home() {
             >
               WATCH LIVE <ChevronRight className="w-4 h-4" />
             </button>
-          </div>
+          </div> */}
         </section>
 
         {/* 2. DASHBOARD GRID */}
@@ -494,12 +558,10 @@ export default function Home() {
         </div>
 
         {/* 3. PLAYER SPOTLIGHT & LIVE CENTER */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          {/* Player Spotlight */}
+        {/* <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-          {/* Live Match Center */}
           <section className="xl:col-span-3 card-base p-6 flex flex-col relative overflow-hidden">
-            {/* Diagonal accent lines */}
+
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-gold/5 to-transparent -rotate-45 translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent/5 to-transparent -rotate-45 -translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
 
@@ -551,7 +613,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Set Scores */}
             <div className="grid grid-cols-5 gap-2 border-y border-white/5 py-4 mb-8 relative z-10 text-center">
               <div>
                 <div className="text-[10px] text-muted mb-1">SET 1</div>
@@ -645,7 +706,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-        </div>
+        </div> */}
 
         {/* 4. SCHEDULE & BOTTOM CTA */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 pb-12">
@@ -674,7 +735,7 @@ export default function Home() {
             <div className="space-y-3">
               {filteredMatches.length === 0 && (
                 <div className="text-center py-8 text-muted font-bold text-sm">
-                  No matches found for this status.
+                  COMING SOON
                 </div>
               )}
               {filteredMatches.map((match) => (
