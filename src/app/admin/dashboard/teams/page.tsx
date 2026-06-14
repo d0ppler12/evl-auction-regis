@@ -10,6 +10,7 @@ const emptyForm = {
   is_playing_owner: false,
   total_purse: "100000",
   color_theme: "",
+  logo_url: "",
 };
 
 export default function TeamsManagement() {
@@ -51,6 +52,7 @@ export default function TeamsManagement() {
       is_playing_owner: !!team.is_playing_owner,
       total_purse: String(team.total_purse || 100000),
       color_theme: team.color_theme || "",
+      logo_url: team.logo_url || "",
     });
     setLogoFile(null);
     setShowForm(true);
@@ -61,27 +63,23 @@ export default function TeamsManagement() {
     setSaving(true);
     try {
       let team: any;
+      const payload = {
+        name: form.name,
+        owner_name: form.owner_name,
+        is_playing_owner: form.is_playing_owner,
+        total_purse: parseInt(form.total_purse),
+        color_theme: form.color_theme || null,
+        logo_url: form.logo_url || null,
+      };
       if (editingId) {
         team = await adminFetch(`/api/admin/teams/${editingId}`, {
           method: "PUT",
-          body: JSON.stringify({
-            name: form.name,
-            owner_name: form.owner_name,
-            is_playing_owner: form.is_playing_owner,
-            total_purse: parseInt(form.total_purse),
-            color_theme: form.color_theme || null,
-          }),
+          body: JSON.stringify(payload),
         });
       } else {
         team = await adminFetch("/api/admin/teams", {
           method: "POST",
-          body: JSON.stringify({
-            name: form.name,
-            owner_name: form.owner_name,
-            is_playing_owner: form.is_playing_owner,
-            total_purse: parseInt(form.total_purse),
-            color_theme: form.color_theme || null,
-          }),
+          body: JSON.stringify(payload),
         });
       }
 
@@ -145,7 +143,18 @@ export default function TeamsManagement() {
             </label>
             <div className="col-span-full">
               <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Team Logo</label>
-              <input type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} className="text-sm text-slate-300" />
+              <div className="space-y-3">
+                <input 
+                  placeholder="Logo URL (e.g., https://example.com/logo.png)" 
+                  value={form.logo_url} 
+                  onChange={(e) => setForm({ ...form, logo_url: e.target.value })} 
+                  className="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" 
+                />
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Or upload logo file:</span>
+                  <input type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} className="text-sm text-slate-300" />
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex gap-3">

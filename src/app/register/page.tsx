@@ -225,10 +225,12 @@ export default function RegisterPage() {
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(37,99,235,0.4)]">
-                <span className="font-black text-white italic text-xl tracking-tighter">
-                  EVL
-                </span>
+              <div className="w-12 h-12 flex items-center justify-center">
+                <img
+                  src="/evl-hero.png"
+                  alt="EVL Logo"
+                  className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                />
               </div>
               <span className="text-blue-400 font-bold tracking-widest uppercase text-sm">
                 Monsoon Smash

@@ -92,11 +92,13 @@ export default function PlayerProfilePage() {
       <nav className="border-b border-white/5 bg-[#0B1121]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 cursor-pointer hover:scale-105 transition-all">
-                <span className="font-black text-white italic text-lg tracking-tighter">
-                  EVL
-                </span>
+            <Link href="/">
+              <div className="w-10 h-10 flex items-center justify-center cursor-pointer hover:scale-105 transition-all">
+                <img
+                  src="/evl-hero.png"
+                  alt="EVL Logo"
+                  className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                />
               </div>
             </Link>
             <span className="text-xl font-bold tracking-tight text-white hidden sm:block">
