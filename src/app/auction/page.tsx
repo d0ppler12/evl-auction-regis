@@ -9,7 +9,7 @@ export default function AuctionPage() {
   const [biddingTeam, setBiddingTeam] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
   const [allPlayers, setAllPlayers] = useState<any[]>([]);
-  const [isSold, setIsSold] = useState(false);
+  const [animationOverlay, setAnimationOverlay] = useState<'sold' | 'unsold' | null>(null);
   const prevStateRef = useRef<any>(null);
   const [bidHistory, setBidHistory] = useState<any[]>([]);
   
@@ -102,8 +102,11 @@ export default function AuctionPage() {
     const prev = prevStateRef.current;
 
     if (prev?.is_active && !auctionState.is_active && auctionState.current_bid_team_id) {
-      setIsSold(true);
-      setTimeout(() => setIsSold(false), 4000);
+      setAnimationOverlay('sold');
+      setTimeout(() => setAnimationOverlay(null), 1000);
+    } else if (prev?.is_active && !auctionState.is_active && !auctionState.current_bid_team_id) {
+      setAnimationOverlay('unsold');
+      setTimeout(() => setAnimationOverlay(null), 1000);
     }
 
     if (auctionState.current_player_id !== prev?.current_player_id) {
@@ -157,6 +160,8 @@ export default function AuctionPage() {
     );
   }
 
+  const isPlayerDone = currentPlayer?.auction_status === 'sold' || currentPlayer?.auction_status === 'unsold';
+
   return (
     <div className="min-h-screen md:h-screen bg-[#0a0e1a] text-white overflow-x-hidden md:overflow-hidden flex flex-col font-sans relative" style={{ backgroundImage: 'linear-gradient(135deg, #0a0e1a 0%, #000000 100%)' }}>
       
@@ -178,7 +183,7 @@ export default function AuctionPage() {
       {/* Main Container - 3 Column Grid */}
       <main className="z-10 flex-1 w-full max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 relative min-h-0 py-4 flex flex-col items-center">
         <AnimatePresence mode="wait">
-          {currentPlayer ? (
+          {currentPlayer && !isPlayerDone ? (
             <motion.div
               key={currentPlayer.id}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -211,10 +216,6 @@ export default function AuctionPage() {
                        <div>
                           <p className="text-[#f5c518] text-xs font-bold uppercase tracking-widest mb-1">Jersey No.</p>
                           <p className="text-2xl font-black text-white">{currentPlayer.jersey_number || '--'}</p>
-                       </div>
-                       <div>
-                          <p className="text-[#f5c518] text-xs font-bold uppercase tracking-widest mb-1">Position</p>
-                          <p className="text-xl font-black text-white uppercase">{currentPlayer.playing_position || 'PLAYER'}</p>
                        </div>
                        <div>
                           <p className="text-[#f5c518] text-xs font-bold uppercase tracking-widest mb-1">Age</p>
@@ -255,18 +256,6 @@ export default function AuctionPage() {
                           )}
                        </div>
                     </div>
-                    
-                    {isSold && (
-                      <motion.div 
-                        initial={{ scale: 4, opacity: 0, rotate: -15 }}
-                        animate={{ scale: 1, opacity: 1, rotate: -15 }}
-                        className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none"
-                      >
-                         <div className="text-6xl font-black text-red-500 border-8 border-red-500 px-8 py-2 rounded-xl backdrop-blur-md bg-black/80 uppercase tracking-widest shadow-[0_0_40px_rgba(239,68,68,0.8)]" style={{ textShadow: '0 0 20px rgba(239,68,68,0.8)' }}>
-                           SOLD
-                         </div>
-                      </motion.div>
-                    )}
                  </div>
 
                  {/* Bid Amount & Action Area */}
@@ -338,12 +327,109 @@ export default function AuctionPage() {
 
             </motion.div>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-center text-gray-600 font-black text-3xl sm:text-4xl tracking-widest uppercase py-24 w-full">
-              Awaiting Next Player
-            </div>
+            <motion.div
+              key="waiting"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 w-full"
+            />
           )}
         </AnimatePresence>
       </main>
+
+      {/* SOLD Overlay */}
+      <AnimatePresence>
+        {animationOverlay === 'sold' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0a0e1a]/90 backdrop-blur-sm pointer-events-none"
+          >
+            {/* CSS Confetti */}
+            <div className="absolute inset-0 overflow-hidden flex items-center justify-center">
+              {Array.from({ length: 100 }).map((_, i) => {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 30 + Math.random() * 80; // vw/vh
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                const color = ['#f5c518', '#00d4ff', '#ff0055', '#00ffaa', '#aa00ff', '#ffffff'][Math.floor(Math.random() * 6)];
+                const size = Math.random() * 10 + 5;
+                return (
+                  <div 
+                    key={i} 
+                    className="absolute rounded-full confetti-particle"
+                    style={{ 
+                      width: size, height: size, backgroundColor: color, boxShadow: `0 0 10px ${color}`,
+                      '--tx': `${tx}vw`, '--ty': `${ty}vh`, animationDelay: `${Math.random() * 0.2}s`
+                    } as any}
+                  />
+                );
+              })}
+            </div>
+            
+            <div className="flex flex-col items-center justify-center z-10">
+              <div
+                className="text-7xl md:text-[150px] font-black text-[#f5c518] uppercase tracking-widest drop-shadow-[0_0_50px_rgba(245,197,24,0.8)] leading-none mb-6 animate-sold-scale"
+                style={{ fontFamily: 'Impact, sans-serif' }}
+              >
+                SOLD!
+              </div>
+              
+              <div className="flex flex-col items-center gap-6 animate-fade-in-up" style={{ animationDelay: '0.2s', opacity: 0, animationFillMode: 'forwards' }}>
+                <div className="text-3xl md:text-5xl font-black text-[#00d4ff] uppercase tracking-widest drop-shadow-[0_0_20px_rgba(0,212,255,0.6)]">
+                  TO
+                </div>
+                
+                {biddingTeam && (
+                  <div
+                    className="flex items-center justify-center gap-4 bg-[#11111a] border-4 rounded-3xl px-12 py-6 overflow-hidden relative animate-sold-pulse"
+                    style={{ borderColor: biddingTeam.color_theme || '#f5c518', '--team-color': biddingTeam.color_theme || '#f5c518' } as any}
+                  >
+                    <div className="absolute inset-0 bg-white/10" />
+                    {biddingTeam.logo_url && <img src={biddingTeam.logo_url} className="h-16 object-contain z-10 drop-shadow-lg" alt="" />}
+                    <span className="text-5xl font-black text-white uppercase tracking-wider z-10 drop-shadow-md">{biddingTeam.name}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* UNSOLD Overlay */}
+        {animationOverlay === 'unsold' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[radial-gradient(circle_at_center,rgba(50,55,65,0.95)_0%,rgba(10,14,26,0.98)_100%)] backdrop-blur-md pointer-events-none"
+          >
+            <div className="absolute inset-0 shadow-[inset_0_0_150px_rgba(255,255,255,0.03)] pointer-events-none" />
+            
+            <div className="relative w-full max-w-4xl flex flex-col items-center justify-center">
+              <motion.div
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: 1, opacity: [0, 1, 0] }}
+                transition={{ duration: 1.2, times: [0, 0.5, 1], ease: "easeInOut" }}
+                className="absolute top-[45%] -translate-y-1/2 h-[2px] w-3/4 bg-gradient-to-r from-transparent via-slate-400 to-transparent z-0"
+              />
+              
+              <motion.div 
+                initial={{ opacity: 0, filter: "blur(10px)", scale: 0.95 }}
+                animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+                className="flex flex-col items-center justify-center z-10"
+              >
+                <div className="text-6xl md:text-8xl font-black text-slate-100 uppercase tracking-[0.4em] leading-none drop-shadow-2xl">
+                  UNSOLD
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Ticker */}
       <footer className="z-20 h-10 bg-black border-t-2 border-[#00d4ff] flex items-center overflow-hidden shrink-0 sticky bottom-0 w-full shadow-[0_-5px_20px_rgba(0,212,255,0.15)]">
@@ -389,7 +475,50 @@ export default function AuctionPage() {
           100% { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in-up {
-          animation: fade-in-up 0.3s ease-out forwards;
+          animation: fade-in-up 0.2s ease-out forwards;
+        }
+
+        /* Sold/Unsold Overlays */
+        @keyframes confetti-explode {
+          0% { transform: translate(0, 0) scale(0); opacity: 1; }
+          80% { opacity: 1; }
+          100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+        }
+        .confetti-particle {
+          animation: confetti-explode 1s ease-out forwards;
+        }
+        
+        @keyframes sold-scale {
+          0% { transform: scale(0); opacity: 0; }
+          60% { transform: scale(1.2); opacity: 1; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-sold-scale {
+          animation: sold-scale 0.3s ease-out forwards;
+        }
+        
+        @keyframes sold-pulse {
+          0% { transform: scale(1); box-shadow: 0 0 20px var(--team-color); }
+          25% { transform: scale(1.05); box-shadow: 0 0 60px var(--team-color); }
+          50% { transform: scale(1); box-shadow: 0 0 20px var(--team-color); }
+          75% { transform: scale(1.05); box-shadow: 0 0 60px var(--team-color); }
+          100% { transform: scale(1); box-shadow: 0 0 20px var(--team-color); }
+        }
+        .animate-sold-pulse {
+          animation: sold-pulse 0.5s ease-in-out infinite;
+          animation-delay: 0.3s;
+        }
+        
+        @keyframes unsold-shake {
+          0% { transform: translateX(-100px); opacity: 0; }
+          40% { transform: translateX(0); opacity: 1; }
+          55% { transform: translateX(-15px); }
+          70% { transform: translateX(15px); }
+          85% { transform: translateX(-15px); }
+          100% { transform: translateX(0); opacity: 1; }
+        }
+        .animate-unsold-shake {
+          animation: unsold-shake 0.4s ease-out forwards;
         }
         
         /* Subtly Animated Star/Particle Background */

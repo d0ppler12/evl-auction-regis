@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin'
 
 const PLAYER_FIELDS = [
   'full_name', 'age', 'phone_number', 'wing_building', 'jersey_name', 'jersey_size',
-  'jersey_number', 'utr_number', 'playing_position', 'volleyball_experience',
+  'jersey_number', 'utr_number', 'volleyball_experience',
   'previous_tournament_experience', 'photo_url', 'instagram_id', 'base_price', 'status',
   'auction_status', 'team_id', 'sold_price', 'gender',
 ]

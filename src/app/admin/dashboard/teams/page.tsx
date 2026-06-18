@@ -9,6 +9,7 @@ const emptyForm = {
   owner_name: "",
   is_playing_owner: false,
   total_purse: "100000",
+  purse_remaining: "100000",
   color_theme: "",
   logo_url: "",
 };
@@ -51,6 +52,7 @@ export default function TeamsManagement() {
       owner_name: team.owner_name || "",
       is_playing_owner: !!team.is_playing_owner,
       total_purse: String(team.total_purse || 100000),
+      purse_remaining: String(team.purse_remaining ?? team.total_purse ?? 100000),
       color_theme: team.color_theme || "",
       logo_url: team.logo_url || "",
     });
@@ -68,6 +70,7 @@ export default function TeamsManagement() {
         owner_name: form.owner_name,
         is_playing_owner: form.is_playing_owner,
         total_purse: parseInt(form.total_purse),
+        purse_remaining: parseInt(form.purse_remaining),
         color_theme: form.color_theme || null,
         logo_url: form.logo_url || null,
       };
@@ -136,6 +139,7 @@ export default function TeamsManagement() {
             <input placeholder="Team Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input placeholder="Owner Name" value={form.owner_name} onChange={(e) => setForm({ ...form, owner_name: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input type="number" placeholder="Total Purse" value={form.total_purse} onChange={(e) => setForm({ ...form, total_purse: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
+            <input type="number" placeholder="Purse Remaining" value={form.purse_remaining} onChange={(e) => setForm({ ...form, purse_remaining: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input placeholder="Color Theme (hex)" value={form.color_theme} onChange={(e) => setForm({ ...form, color_theme: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <label className="flex items-center gap-2 text-white text-sm col-span-full">
               <input type="checkbox" checked={form.is_playing_owner} onChange={(e) => setForm({ ...form, is_playing_owner: e.target.checked })} />
@@ -213,7 +217,7 @@ export default function TeamsManagement() {
                       <div key={p.id} className="flex justify-between items-center bg-slate-800/50 p-2 rounded-lg border border-white/5">
                         <div className="flex flex-col">
                           <span className="text-sm font-bold text-slate-200">{p.full_name}</span>
-                          <span className="text-[10px] text-slate-500 uppercase">{p.playing_position || 'Player'}</span>
+                          <span className="text-[10px] text-slate-500 uppercase">Player</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-mono font-bold text-blue-400">{p.sold_price?.toLocaleString()} pts</span>

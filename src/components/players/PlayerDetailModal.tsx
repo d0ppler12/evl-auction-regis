@@ -11,7 +11,6 @@ export type PlayerDetail = PlayerPoolItem & {
   jersey_size?: string;
   volleyball_experience?: string;
   previous_tournament_experience?: string;
-  playing_position?: string;
 };
 
 interface PlayerDetailModalProps {
@@ -173,7 +172,6 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
                       value: player.wing_building || "—",
                     },
                     { label: "Jersey Size", value: player.jersey_size || "—" },
-                    // { label: "Dominant Hand", value: player.playing_position || "—" },
                     // { label: "Experience", value: player.volleyball_experience || player.previous_tournament_experience || "—" },
                   ].map((item) => (
                     <div

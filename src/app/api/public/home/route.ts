@@ -15,7 +15,7 @@ export async function GET() {
         .order('match_date', { ascending: true }),
       supabaseAdmin
         .from('players')
-        .select('full_name, sold_price, playing_position, team:team_id(name)')
+        .select('full_name, sold_price, team:team_id(name)')
         .eq('auction_status', 'sold')
         .order('sold_price', { ascending: false })
         .limit(1),

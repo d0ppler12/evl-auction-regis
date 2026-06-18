@@ -12,7 +12,6 @@ const emptyForm = {
   jersey_name: "",
   jersey_size: "M",
   jersey_number: "",
-  playing_position: "",
   base_price: "0",
   status: "approved",
 };
@@ -56,7 +55,6 @@ export default function PlayerManagement() {
       jersey_name: p.jersey_name || "",
       jersey_size: p.jersey_size || "M",
       jersey_number: String(p.jersey_number || ""),
-      playing_position: p.playing_position || "",
       base_price: String(p.base_price ?? 0),
       status: p.status || "approved",
     });
@@ -125,7 +123,6 @@ export default function PlayerManagement() {
               <option value="5XL">5XL</option>
             </select>
             <input type="number" placeholder="Jersey Number" value={form.jersey_number} onChange={(e) => setForm({ ...form, jersey_number: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
-            <input placeholder="Position" value={form.playing_position} onChange={(e) => setForm({ ...form, playing_position: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input type="number" placeholder="Base Price" value={form.base_price} onChange={(e) => setForm({ ...form, base_price: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
           </div>
           <div className="flex gap-3">
@@ -150,7 +147,7 @@ export default function PlayerManagement() {
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <h3 className="font-bold text-white">{p.full_name}</h3>
-                  <p className="text-xs text-slate-400">{p.playing_position || "—"} · #{p.jersey_number || "—"}</p>
+                  <p className="text-xs text-slate-400">#{p.jersey_number || "—"}</p>
                 </div>
                 <div className="flex gap-1">
                   <button onClick={() => openEdit(p)} className="p-2 text-slate-400 hover:text-white"><Pencil className="w-4 h-4" /></button>

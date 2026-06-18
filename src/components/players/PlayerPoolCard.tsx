@@ -12,7 +12,6 @@ export type PlayerPoolItem = {
   base_price?: number;
   sold_price?: number | null;
   auction_status?: string;
-  playing_position?: string;
   teams?: { id: string; name: string; logo_url?: string; owner_name?: string } | null;
   currentBid?: number | null;
   matchesPlayed?: number;

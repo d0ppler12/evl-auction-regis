@@ -371,7 +371,7 @@ export default function TeamsPage() {
                                   {player.full_name}
                                 </span>
                                 <span className="text-[10px] text-slate-500 font-semibold uppercase">
-                                  {player.playing_position || "Player"}
+                                  Player
                                 </span>
                               </div>
                               <span className="text-sm font-bold text-blue-400 font-mono">
