@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin, unauthorizedResponse } from '@/lib/admin-auth'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import fs from 'fs'
+import path from 'path'
 
 export async function POST(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -12,23 +14,18 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     const ext = file.name.split('.').pop() || 'png'
-    const path = `${params.id}.${ext}`
+    const fileName = `${params.id}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
 
-    try {
-      await supabaseAdmin.storage.createBucket('team-logos', { public: true })
-    } catch (bucketErr) {
-      // ignore bucket creation error
+    // Save file locally to public/uploads/team-logos/
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'team-logos')
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true })
     }
+    const filePath = path.join(uploadDir, fileName)
+    fs.writeFileSync(filePath, buffer)
 
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from('team-logos')
-      .upload(path, buffer, { upsert: true, contentType: file.type })
-
-    if (uploadError) throw uploadError
-
-    const { data: urlData } = supabaseAdmin.storage.from('team-logos').getPublicUrl(path)
-    const logo_url = urlData.publicUrl
+    const logo_url = `/uploads/team-logos/${fileName}`
 
     const { data, error } = await supabaseAdmin
       .from('teams')
@@ -44,3 +41,4 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
 }
+
