@@ -11,92 +11,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
-// Fake Data for UI
-const topTeams = [
-  {
-    id: 1,
-    name: "STALLIONS",
-    captain: "Tanish Gupta",
-    winRate: "0%",
-    logo: "ST",
-  },
-  {
-    id: 2,
-    name: "SPARTANS",
-    captain: "Parth Thakker",
-    winRate: "0%",
-    logo: "SP",
-  },
-  {
-    id: 3,
-    name: "THUNDERBOLTZ",
-    captain: "Nikhil Naik",
-    winRate: "0%",
-    logo: "TH",
-  },
-  {
-    id: 4,
-    name: "SHIVAAY",
-    captain: "Karanjeet Singh",
-    winRate: "0%",
-    logo: "SH",
-  },
-  {
-    id: 5,
-    name: "PANTHERS",
-    captain: "Yash Madhani",
-    winRate: "0%",
-    logo: "PA",
-  },
-];
-
-const pointsTable = [
-  {
-    pos: 1,
-    team: "STALLIONS",
-    p: 0,
-    w: 0,
-    l: 0,
-    sw: 0,
-    sl: 0,
-    pts: 0,
-    form: [],
-  },
-  {
-    pos: 2,
-    team: "SPARTANS",
-    p: 0,
-    w: 0,
-    l: 0,
-    sw: 0,
-    sl: 0,
-    pts: 0,
-    form: [],
-  },
-  {
-    pos: 3,
-    team: "THUNDERBOLTZ",
-    p: 0,
-    w: 0,
-    l: 0,
-    sw: 0,
-    sl: 0,
-    pts: 0,
-    form: [],
-  },
-  { pos: 4, team: "SHIVAAY", p: 0, w: 0, l: 0, sw: 0, sl: 0, pts: 0, form: [] },
-  {
-    pos: 5,
-    team: "PANTHERS",
-    p: 0,
-    w: 0,
-    l: 0,
-    sw: 0,
-    sl: 0,
-    pts: 0,
-    form: [],
-  },
-];
+// Dynamic data is fetched from DB
 
 // Dynamic matches are fetched from DB
 
@@ -105,6 +20,8 @@ export default function Home() {
   const [liveMatch, setLiveMatch] = useState<any>(null);
   const [matches, setMatches] = useState<any[]>([]);
   const [playerSession, setPlayerSession] = useState<any>(null);
+  const [teams, setTeams] = useState<any[]>([]);
+  const [standings, setStandings] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchLiveMatch = async () => {
@@ -132,6 +49,20 @@ export default function Home() {
       }
     };
     fetchMatches();
+
+    const fetchHomeData = async () => {
+      try {
+        const res = await fetch("/api/public/home", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.teams)) setTeams(data.teams);
+          if (Array.isArray(data.standings)) setStandings(data.standings);
+        }
+      } catch (e) {
+        console.error("Failed to fetch home data", e);
+      }
+    };
+    fetchHomeData();
 
     const checkSession = async () => {
       try {
@@ -234,12 +165,12 @@ export default function Home() {
               </div>
             ) : (
               <>
-                <Link
+                {/* <Link
                   href="/register"
                   className="px-6 py-2.5 rounded-full bg-gradient-to-r from-accent to-blue-500 hover:from-blue-400 hover:to-blue-600 text-sm font-extrabold text-background shadow-[0_0_20px_rgba(96,165,250,0.3)] transition-all hover:scale-105"
                 >
                   REGISTER
-                </Link>
+                </Link> */}
                 <Link
                   href="/players/login"
                   className="px-5 py-2 rounded-full bg-slate-800 border border-white/10 hover:border-white/20 text-xs sm:text-sm font-bold text-white transition-all hover:scale-105"
@@ -279,10 +210,10 @@ export default function Home() {
 
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/register"
+                  href="/players"
                   className="px-8 py-4 rounded-xl bg-gradient-to-r from-accent to-blue-600 hover:from-blue-400 hover:to-blue-700 text-slate-950 font-extrabold shadow-[0_0_30px_rgba(96,165,250,0.3)] hover:shadow-[0_0_45px_rgba(96,165,250,0.5)] transition-all duration-300 hover:-translate-y-1 transform hover:scale-[1.02]"
                 >
-                  REGISTER AS PLAYER
+                  VIEW AUCTION POOL
                 </Link>
                 <button
                   onClick={() =>
@@ -334,35 +265,68 @@ export default function Home() {
                 </Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {topTeams.map((team) => (
-                  <div
-                    key={team.id}
-                    className="card-base card-hover p-5 flex flex-col items-center text-center cursor-pointer group hover:border-accent/40 bg-slate-900/30 rounded-2xl relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-accent/0 via-accent/40 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    <div className="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-slate-800/80 to-slate-900 rounded-2xl mb-4 flex items-center justify-center border border-white/5 shadow-inner group-hover:scale-105 group-hover:border-accent/30 group-hover:shadow-[0_0_20px_rgba(96,165,250,0.2)] transition-all duration-300">
-                      <span className="text-xl md:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 group-hover:from-white group-hover:to-accent transition-all">
-                        {team.logo}
-                      </span>
+                {teams.length === 0 ? (
+                  // Skeleton placeholders while loading
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="card-base p-5 flex flex-col items-center text-center bg-slate-900/30 rounded-2xl animate-pulse">
+                      <div className="w-14 h-14 md:w-16 md:h-16 bg-slate-800/60 rounded-2xl mb-4" />
+                      <div className="h-3 w-16 bg-slate-800/60 rounded mb-3" />
+                      <div className="w-full border-t border-white/5 pt-3 flex justify-between">
+                        <div className="h-3 w-10 bg-slate-800/60 rounded" />
+                        <div className="h-3 w-10 bg-slate-800/60 rounded" />
+                      </div>
                     </div>
-                    <span className="font-extrabold text-white text-xs md:text-sm tracking-wide mb-3 uppercase group-hover:text-accent transition-colors">
-                      {team.name}
-                    </span>
-                    <div className="w-full flex justify-between text-[10px] text-slate-500 uppercase font-bold border-t border-white/5 pt-3">
-                      <div className="flex flex-col items-start">
-                        <span className="text-slate-500 font-semibold">Captain</span>
-                        <span className="text-slate-300 font-extrabold mt-0.5">
-                          {team.captain.split(" ")[0]}
+                  ))
+                ) : (
+                  teams.slice(0, 5).map((team) => {
+                    const teamColor = team.color_theme || "#3b82f6";
+                    // Get win rate from standings
+                    const standing = standings.find((s: any) => s.team?.id === team.id);
+                    const played = standing?.played || 0;
+                    const wins = standing?.wins || 0;
+                    const winRate = played > 0 ? `${Math.round((wins / played) * 100)}%` : "0%";
+                    return (
+                      <Link
+                        key={team.id}
+                        href="/teams"
+                        className="card-base card-hover p-5 flex flex-col items-center text-center cursor-pointer group hover:border-accent/40 bg-slate-900/30 rounded-2xl relative overflow-hidden"
+                      >
+                        <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-accent/0 via-accent/40 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div
+                          className="w-14 h-14 md:w-16 md:h-16 rounded-2xl mb-4 flex items-center justify-center border overflow-hidden shadow-inner group-hover:scale-105 transition-all duration-300"
+                          style={{
+                            backgroundColor: `${teamColor}1A`,
+                            borderColor: `${teamColor}60`,
+                            boxShadow: `0 0 0 0 ${teamColor}33`,
+                          }}
+                        >
+                          {team.logo_url ? (
+                            <img src={team.logo_url} alt={team.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-xl md:text-2xl font-black text-white">
+                              {team.name?.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                        <span className="font-extrabold text-white text-xs md:text-sm tracking-wide mb-3 uppercase group-hover:text-accent transition-colors">
+                          {team.name}
                         </span>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <span className="text-slate-500 font-semibold">Win %</span>
-                        <span className="text-accent font-black mt-0.5">{team.winRate}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                        <div className="w-full flex justify-between text-[10px] text-slate-500 uppercase font-bold border-t border-white/5 pt-3">
+                          <div className="flex flex-col items-start">
+                            <span className="text-slate-500 font-semibold">Owner</span>
+                            <span className="text-slate-300 font-extrabold mt-0.5">
+                              {team.owner_name?.split(" ")[0] || "—"}
+                            </span>
+                          </div>
+                          <div className="flex flex-col items-end">
+                            <span className="text-slate-500 font-semibold">Win %</span>
+                            <span className="text-accent font-black mt-0.5">{winRate}</span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })
+                )}
               </div>
             </section>
 
@@ -401,7 +365,7 @@ export default function Home() {
                           {match.team_a?.name || "TBD"}
                         </span>
                       </div>
-                      
+
                       <div className="text-center w-1/3">
                         <div className="inline-block px-2.5 py-0.5 rounded bg-accent/15 border border-accent/20 text-[9px] text-accent font-extrabold uppercase mb-2 tracking-widest">
                           {match.match_date || "TBD"}
@@ -410,7 +374,7 @@ export default function Home() {
                           {match.match_time || "TBD"}
                         </div>
                       </div>
-                      
+
                       <div className="text-center w-1/3 flex flex-col items-center">
                         <div className="w-10 h-10 bg-slate-800 rounded-xl border border-white/5 flex items-center justify-center text-primary text-xs font-black mb-2 shadow-md group-hover:scale-105 group-hover:border-accent/30 group-hover:shadow-[0_0_15px_rgba(96,165,250,0.15)] transition-all duration-300 overflow-hidden">
                           {match.team_b?.logo_url ? (
@@ -428,7 +392,7 @@ export default function Home() {
                         </span>
                       </div>
                     </div>
-                    
+
                     <div className="text-center text-[10px] text-slate-400 font-bold flex items-center justify-center gap-1.5 border-t border-white/5 pt-3">
                       <MapPin className="w-3.5 h-3.5 text-accent" />{" "}
                       <span className="truncate">{match.venue || "Eternia Arena"}</span>
@@ -468,59 +432,54 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {pointsTable.map((row) => (
-                      <tr
-                        key={row.pos}
-                        className="border-b border-white/5 hover:bg-white/5 transition-colors group"
-                      >
-                        <td className="py-3.5 px-2">
-                          {row.pos === 1 ? (
-                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-yellow-500/10 border border-yellow-500/35 text-yellow-500 text-xs font-black">1</span>
-                          ) : row.pos === 2 ? (
-                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-300/10 border border-slate-300/35 text-slate-300 text-xs font-black">2</span>
-                          ) : row.pos === 3 ? (
-                            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-700/10 border border-amber-700/35 text-amber-500 text-xs font-black">3</span>
-                          ) : (
-                            <span className="text-slate-400 font-bold ml-1.5">{row.pos}</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-2 font-bold flex items-center gap-2">
-                          <div className="w-6 h-6 bg-slate-800 rounded-lg flex items-center justify-center text-[10px] border border-white/5 hidden sm:flex text-slate-300 group-hover:border-accent/30 transition-colors font-black">
-                            {row.team[0]}
-                          </div>
-                          <span className="truncate max-w-[80px] sm:max-w-none text-slate-200 group-hover:text-white transition-colors">
-                            {row.team}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">
-                          {row.p}
-                        </td>
-                        <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">
-                          {row.w}
-                        </td>
-                        <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">
-                          {row.l}
-                        </td>
-                        <td className="py-3.5 px-2 text-center font-black text-accent font-mono text-base">
-                          {row.pts}
-                        </td>
-                        <td className="py-3.5 px-2">
-                          <div className="flex gap-1 justify-end">
-                            {row.form.length === 0 ? (
-                              <span className="text-[10px] text-slate-500 font-medium italic">-</span>
-                            ) : (
-                              row.form.map((f, i) => (
-                                <span
-                                  key={i}
-                                  className={`w-2.5 h-2.5 rounded-full ${f === "W" ? "bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.3)]" : "bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.3)]"}`}
-                                  title={f}
-                                ></span>
-                              ))
-                            )}
-                          </div>
-                        </td>
+                    {standings.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="py-8 text-center text-slate-500 text-xs font-bold tracking-widest">NO STANDINGS DATA</td>
                       </tr>
-                    ))}
+                    ) : (
+                      standings.slice(0, 5).map((row: any, index: number) => {
+                        const team = row.team || {};
+                        return (
+                          <tr
+                            key={row.team_id || index}
+                            className="border-b border-white/5 hover:bg-white/5 transition-colors group"
+                          >
+                            <td className="py-3.5 px-2">
+                              {index === 0 ? (
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-yellow-500/10 border border-yellow-500/35 text-yellow-500 text-xs font-black">1</span>
+                              ) : index === 1 ? (
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-300/10 border border-slate-300/35 text-slate-300 text-xs font-black">2</span>
+                              ) : index === 2 ? (
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-700/10 border border-amber-700/35 text-amber-500 text-xs font-black">3</span>
+                              ) : (
+                                <span className="text-slate-400 font-bold ml-1.5">{index + 1}</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-2 font-bold">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-[10px] border border-white/5 hidden sm:flex text-slate-300 group-hover:border-accent/30 transition-colors font-black shrink-0">
+                                  {team.logo_url ? (
+                                    <img src={team.logo_url} alt="" className="w-full h-full object-cover" />
+                                  ) : (
+                                    (team.name || "?")[0]
+                                  )}
+                                </div>
+                                <span className="truncate max-w-[80px] sm:max-w-none text-slate-200 group-hover:text-white transition-colors">
+                                  {team.name || "Unknown"}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">{row.played || 0}</td>
+                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">{row.wins || 0}</td>
+                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">{row.losses || 0}</td>
+                            <td className="py-3.5 px-2 text-center font-black text-accent font-mono text-base">{row.points || 0}</td>
+                            <td className="py-3.5 px-2">
+                              <span className="text-[10px] text-slate-500 font-medium italic">-</span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -622,16 +581,16 @@ export default function Home() {
                 <Trophy className="w-8 h-8 text-slate-950" />
               </div>
               <h3 className="text-3xl font-black text-white italic mb-2 tracking-tight">
-                REGISTER NOW
+                REGISTRATIONS CLOSED
               </h3>
               <p className="text-accent text-xs font-black tracking-widest mb-8 uppercase">
-                BE PART OF EVL SEASON 3
+                CHECK PLAYER LIST OF EVL SEASON 3
               </p>
               <Link
-                href="/register"
+                href="/players"
                 className="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-black uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(250,204,21,0.25)] hover:shadow-[0_0_30px_rgba(250,204,21,0.45)] transition-all hover:scale-105 active:scale-95 text-sm"
               >
-                REGISTER AS PLAYER
+                VIEW AUCTION POOL
               </Link>
             </div>
           </section>

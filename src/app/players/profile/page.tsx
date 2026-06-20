@@ -230,8 +230,16 @@ export default function PlayerProfilePage() {
                 <div className="space-y-6">
                   <div className="p-5 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-yellow-500/20 border border-yellow-500/40 rounded-2xl flex items-center justify-center font-black text-xl text-yellow-400 shadow-md">
-                        {player.teams.name.charAt(0).toUpperCase()}
+                      <div className="w-14 h-14 bg-yellow-500/20 border border-yellow-500/40 rounded-2xl flex items-center justify-center font-black text-xl text-yellow-400 shadow-md overflow-hidden">
+                        {player.teams.logo_url ? (
+                          <img
+                            src={player.teams.logo_url}
+                            alt={player.teams.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          player.teams.name.charAt(0).toUpperCase()
+                        )}
                       </div>
                       <div>
                         <span className="inline-flex items-center text-[10px] font-black uppercase tracking-wider bg-yellow-500 text-slate-950 px-2 py-0.5 rounded mb-1">

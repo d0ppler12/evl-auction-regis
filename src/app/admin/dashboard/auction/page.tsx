@@ -129,16 +129,22 @@ export default function AuctionControlRoom() {
     if (!currentPlayer || !auctionState.current_bid_team_id) return alert("No active bid.");
     setBanner("sold");
     await auctionAction({ action: "sold" });
-    setTimeout(() => setBanner(null), 2200);
-    setCurrentPlayer(null);
+    setTimeout(async () => {
+      setBanner(null);
+      setCurrentPlayer(null);
+      await auctionAction({ action: "clear_block" });
+    }, 1000);
   };
 
   const handleMarkUnsold = async () => {
     if (!currentPlayer) return;
     setBanner("unsold");
     await auctionAction({ action: "unsold" });
-    setTimeout(() => setBanner(null), 2200);
-    setCurrentPlayer(null);
+    setTimeout(async () => {
+      setBanner(null);
+      setCurrentPlayer(null);
+      await auctionAction({ action: "clear_block" });
+    }, 1000);
   };
 
   const handleShufflePool = async () => {

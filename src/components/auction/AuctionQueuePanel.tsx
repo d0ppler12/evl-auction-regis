@@ -10,7 +10,6 @@ type Player = {
   jersey_number?: number | null;
   base_price?: number;
   auction_status?: string;
-  playing_position?: string;
 };
 
 interface AuctionQueuePanelProps {

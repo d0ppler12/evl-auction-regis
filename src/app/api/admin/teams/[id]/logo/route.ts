@@ -12,24 +12,27 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     const ext = file.name.split('.').pop() || 'png'
-    const path = `${params.id}.${ext}`
+    const fileName = `${params.id}.${ext}`
     const buffer = Buffer.from(await file.arrayBuffer())
 
-    try {
-      await supabaseAdmin.storage.createBucket('team-logos', { public: true })
-    } catch (bucketErr) {
-      // ignore bucket creation error
-    }
-
+    // Upload to Supabase Storage (bucket: team-logos, must be public)
     const { error: uploadError } = await supabaseAdmin.storage
       .from('team-logos')
-      .upload(path, buffer, { upsert: true, contentType: file.type })
+      .upload(fileName, buffer, {
+        contentType: file.type || 'image/png',
+        upsert: true,
+      })
 
     if (uploadError) throw uploadError
 
-    const { data: urlData } = supabaseAdmin.storage.from('team-logos').getPublicUrl(path)
+    // Get the public URL
+    const { data: urlData } = supabaseAdmin.storage
+      .from('team-logos')
+      .getPublicUrl(fileName)
+
     const logo_url = urlData.publicUrl
 
+    // Update the team record with the new public URL
     const { data, error } = await supabaseAdmin
       .from('teams')
       .update({ logo_url })

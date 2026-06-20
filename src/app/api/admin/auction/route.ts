@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { requireAdmin, unauthorizedResponse } from '@/lib/admin-auth'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     requireAdmin()
@@ -109,8 +111,9 @@ export async function POST(request: Request) {
     if (action === 'set_player') {
       const { data: player, error: pErr } = await supabaseAdmin
         .from('players')
-        .select('base_price')
+        .update({ auction_status: null, team_id: null, sold_price: null })
         .eq('id', body.player_id)
+        .select('base_price')
         .maybeSingle()
       
       if (pErr) throw pErr
@@ -122,6 +125,23 @@ export async function POST(request: Request) {
           current_bid: player?.base_price ?? 0,
           current_bid_team_id: null,
           is_active: true,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', 1)
+        .select()
+        .maybeSingle()
+      if (error) throw error
+      return NextResponse.json(data || {})
+    }
+
+    if (action === 'clear_block') {
+      const { data, error } = await supabaseAdmin
+        .from('auction_state')
+        .update({
+          current_player_id: null,
+          current_bid: 0,
+          current_bid_team_id: null,
+          is_active: false,
           updated_at: new Date().toISOString(),
         })
         .eq('id', 1)
@@ -203,9 +223,6 @@ export async function POST(request: Request) {
         .from('auction_state')
         .update({
           is_active: false,
-          current_player_id: null,
-          current_bid: 0,
-          current_bid_team_id: null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', 1)
@@ -231,9 +248,6 @@ export async function POST(request: Request) {
         .from('auction_state')
         .update({
           is_active: false,
-          current_player_id: null,
-          current_bid: 0,
-          current_bid_team_id: null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', 1)

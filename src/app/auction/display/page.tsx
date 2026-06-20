@@ -72,9 +72,8 @@ export default function AuctionDisplayPage() {
         ])
         setCurrentPlayer({
           id: '1',
-          full_name: 'Alice Smith',
-          playing_position: 'Hitter',
-          base_price: 0,
+          jersey_number: 10,
+          volleyball_experience: 'Pro',
           age: 24,
           wing_building: 'A Wing'
         })
@@ -291,7 +290,7 @@ export default function AuctionDisplayPage() {
                     {currentPlayer.full_name}
                   </h2>
                   <p className="text-xs font-bold text-[#00E5FF] tracking-[0.15em] uppercase">
-                    {currentPlayer.playing_position || 'PLAYER'} · {currentPlayer.wing_building || 'A Wing'}
+                    PLAYER · {currentPlayer.wing_building || 'A Wing'}
                   </p>
                 </div>
 

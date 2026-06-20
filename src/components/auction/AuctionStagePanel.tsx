@@ -12,7 +12,6 @@ type Player = {
   jersey_number?: number | null;
   base_price?: number;
   wing_building?: string;
-  playing_position?: string;
   team_id?: string | null;
 };
 
@@ -180,7 +179,7 @@ export function AuctionStagePanel({
                   {currentPlayer.full_name}
                 </h2>
                 <p className="text-sm text-slate-400 mb-4">
-                  {currentPlayer.playing_position || "Player"} · Base {currentPlayer.base_price?.toLocaleString() ?? 0} pts
+                  Player · Base {currentPlayer.base_price?.toLocaleString() ?? 0} pts
                 </p>
                 {(playerFranchise || leadingTeam) && (
                   <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">

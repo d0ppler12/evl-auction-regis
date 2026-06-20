@@ -303,14 +303,22 @@ export default function TeamsPage() {
                     {/* Header: Logo & Name */}
                     <div className="flex items-center gap-4 relative">
                       <div
-                        className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl text-white transition-transform duration-300 group-hover:scale-105"
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl text-white transition-transform duration-300 group-hover:scale-105 overflow-hidden"
                         style={{
                           backgroundColor: `${teamColor}1A`, // 10% opacity hex
                           border: `2px solid ${teamColor}`,
                           boxShadow: `0 0 15px ${teamColor}33`,
                         }}
                       >
-                        {team.name.charAt(0).toUpperCase()}
+                        {team.logo_url ? (
+                          <img
+                            src={team.logo_url}
+                            alt={team.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          team.name.charAt(0).toUpperCase()
+                        )}
                       </div>
                       <div>
                         <h2 className="text-2xl font-black text-white italic tracking-tight uppercase group-hover:text-blue-400 transition-colors">
@@ -371,7 +379,7 @@ export default function TeamsPage() {
                                   {player.full_name}
                                 </span>
                                 <span className="text-[10px] text-slate-500 font-semibold uppercase">
-                                  {player.playing_position || "Player"}
+                                  Player
                                 </span>
                               </div>
                               <span className="text-sm font-bold text-blue-400 font-mono">

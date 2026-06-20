@@ -59,7 +59,7 @@ export function PlayerCard({ player, index = 0, className, onClick }: PlayerCard
         {/* Role Badge */}
         <div className="px-3 py-1 bg-primary/20 rounded-lg border border-primary/30 mb-4">
           <p className="text-xs text-primary-light font-bold tracking-wide uppercase">
-            {player.playing_position}
+            Player
           </p>
         </div>
         
