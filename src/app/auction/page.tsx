@@ -171,13 +171,34 @@ export default function AuctionPage() {
       </div>
 
       {/* Header */}
-      <header className="z-20 w-full px-4 pt-4 pb-2 flex flex-row items-center justify-center md:justify-center relative shrink-0 gap-3 md:gap-4">
-        <div className="w-12 h-12 md:w-16 md:h-16 bg-[#000] border-2 border-[#00d4ff] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,0.5)] z-30 overflow-hidden shrink-0">
-          <img src="/evl-hero.png" alt="EVL" className="w-[120%] h-[120%] object-contain filter drop-shadow-[0_0_5px_rgba(0,212,255,0.8)]" />
+      <header className="z-20 w-full px-4 md:px-8 pt-4 pb-2 flex flex-row items-center justify-between relative shrink-0">
+        {/* Left: EVL Logo */}
+        <div className="flex-1 flex justify-start items-center">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-[#000] border-2 border-[#00d4ff] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,0.5)] z-30 overflow-hidden shrink-0">
+            <img src="/evl-hero.png" alt="EVL" className="w-[120%] h-[120%] object-contain filter drop-shadow-[0_0_5px_rgba(0,212,255,0.8)]" />
+          </div>
         </div>
-        <h1 className="text-3xl md:text-5xl font-black uppercase tracking-widest text-[#00d4ff] drop-shadow-[0_0_15px_rgba(0,212,255,0.6)] leading-tight text-center" style={{ fontFamily: 'Impact, sans-serif' }}>
-          EVL AUCTION 2026
-        </h1>
+
+        {/* Center: Title */}
+        <div className="flex-none flex justify-center px-2 md:px-4">
+          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-widest text-[#00d4ff] drop-shadow-[0_0_15px_rgba(0,212,255,0.6)] leading-tight text-center whitespace-nowrap" style={{ fontFamily: 'Impact, sans-serif' }}>
+            EVL AUCTION 2026
+          </h1>
+        </div>
+
+        {/* Right: Status Bug */}
+        <div className="flex-1 flex justify-end items-center">
+           {auctionState?.is_active ? (
+              <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/30 px-5 py-2 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                 <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_#ef4444]" />
+                 <span className="text-red-500 font-black text-sm uppercase tracking-[0.2em]">LIVE <span className="opacity-70 ml-1">00:24</span></span>
+              </div>
+           ) : (
+              <div className="flex items-center gap-3 bg-gray-500/10 border border-gray-500/30 px-5 py-2 rounded-full">
+                 <span className="text-gray-400 font-black text-sm uppercase tracking-[0.2em]">PAUSED</span>
+              </div>
+           )}
+        </div>
       </header>
 
       {/* Main Container - 3 Column Grid */}
@@ -198,57 +219,54 @@ export default function AuctionPage() {
                  {/* Glowing left border in team color or electric blue */}
                  <div className="absolute -left-2 top-0 bottom-0 w-1 rounded-full shadow-[0_0_10px_#00d4ff] z-10" style={{ backgroundColor: biddingTeam ? (biddingTeam.color_theme || '#00d4ff') : '#00d4ff' }} />
                  
-                 <div className="bg-[#11111a]/80 border border-[#00d4ff]/30 p-5 rounded-xl backdrop-blur-md relative overflow-hidden shadow-[0_0_15px_rgba(0,212,255,0.1)]">
+                 <div className="bg-[#11111a]/80 border border-[#00d4ff]/30 p-6 rounded-xl backdrop-blur-md relative overflow-hidden shadow-[0_0_15px_rgba(0,212,255,0.1)]">
                     {/* Watermark Jersey Number */}
                     <div className="absolute -right-4 -bottom-4 text-[150px] leading-none font-black text-white/[0.03] pointer-events-none select-none">
                        {currentPlayer.jersey_number || ''}
                     </div>
                     
-                    <h2 className="text-[#00d4ff] text-xs font-black uppercase tracking-[0.3em] border-b border-[#00d4ff]/30 pb-2 mb-3">
+                    <h2 className="text-[#00d4ff] text-xs font-black uppercase tracking-[0.3em] border-b border-[#00d4ff]/30 pb-2 mb-4">
                        Player Info
                     </h2>
                     
-                    <h1 className="text-3xl lg:text-4xl font-black text-white uppercase mb-2 leading-tight" style={{ fontFamily: 'Impact, sans-serif', textShadow: '0 0 15px rgba(0,212,255,0.6), 0 0 5px rgba(0,212,255,0.3)', letterSpacing: '0.08em' }}>
+                    <h1 className="text-3xl lg:text-5xl font-black text-white uppercase mb-4 leading-tight" style={{ fontFamily: 'Impact, sans-serif', textShadow: '0 0 15px rgba(0,212,255,0.6), 0 0 5px rgba(0,212,255,0.3)', letterSpacing: '0.05em' }}>
                        {currentPlayer.full_name}
                     </h1>
                     
-                    <div className="flex flex-col gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                        <div>
                           <p className="text-[#f5c518] text-xs font-bold uppercase tracking-widest mb-1">Jersey No.</p>
-                          <p className="text-2xl font-black text-white">{currentPlayer.jersey_number || '--'}</p>
+                          <p className="text-3xl font-black text-white">{currentPlayer.jersey_number || '--'}</p>
                        </div>
                        <div>
                           <p className="text-[#f5c518] text-xs font-bold uppercase tracking-widest mb-1">Age</p>
-                          <p className="text-xl font-black text-white">{currentPlayer.age || '--'}</p>
+                          <p className="text-3xl font-black text-white">{currentPlayer.age || '--'}</p>
+                       </div>
+                       <div className="col-span-2">
+                          <p className="text-[#f5c518] text-xs font-bold uppercase tracking-widest mb-1">Position / Role</p>
+                          <p className="text-2xl font-black text-white">{currentPlayer.playing_role || 'Player'}</p>
                        </div>
                     </div>
                  </div>
+
+                 {/* Volleyball Experience */}
+                 <div className="bg-[#11111a]/80 border border-[#00d4ff]/30 p-6 rounded-xl backdrop-blur-md shadow-[0_0_15px_rgba(0,212,255,0.1)] h-fit">
+                    <h2 className="text-[#00d4ff] text-xs font-black uppercase tracking-[0.3em] border-b border-[#00d4ff]/30 pb-2 mb-3">
+                       Volleyball Experience
+                    </h2>
+                    <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
+                       {currentPlayer.volleyball_experience || currentPlayer.previous_tournament_experience || "No prior tournament experience listed."}
+                    </p>
+                 </div>
               </div>
 
-              {/* CENTER COLUMN - PHOTO + BID PANEL */}
-              <div className="flex flex-col items-center justify-start gap-3 w-full max-w-[320px] shrink-0 mx-auto">
-                 
-                 {/* Top Slim Bar: Base Price & Status */}
-                 <div className="w-full bg-[#11111a]/80 border border-[#00d4ff]/30 rounded-full px-5 py-2 flex justify-between items-center backdrop-blur-sm shadow-[0_0_10px_rgba(0,212,255,0.15)]">
-                    <div className="flex items-center gap-2">
-                       <span className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Base Price</span>
-                       <span className="text-white font-mono font-black text-sm">{currentPlayer.base_price?.toLocaleString() || '0'}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                       <span className="text-gray-400 text-[9px] font-bold uppercase tracking-widest">Status</span>
-                       {auctionState?.is_active ? (
-                         <span className="text-red-500 font-black text-xs flex items-center gap-1.5"><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_#ef4444]" /> LIVE</span>
-                       ) : (
-                         <span className="text-gray-500 font-black text-xs">PAUSED</span>
-                       )}
-                    </div>
-                 </div>
-
-                 {/* Photo Hexagon */}
-                 <div className="relative mt-1 flex justify-center">
-                    <div className="w-[280px] h-[322px] bg-[#00d4ff] p-1.5 shadow-[0_0_30px_rgba(0,212,255,0.5)] transition-all duration-300" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}>
+              {/* CENTER COLUMN - PHOTO */}
+              <div className="flex flex-col items-center justify-start gap-3 w-full max-w-[350px] shrink-0 mx-auto">
+                 {/* Photo Hexagon (Made larger and isolated) */}
+                 <div className="relative flex justify-center">
+                    <div className="w-[320px] h-[368px] lg:w-[350px] lg:h-[402px] bg-[#00d4ff] p-1.5 shadow-[0_0_40px_rgba(0,212,255,0.4)] transition-all duration-300" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}>
                        <div className="w-full h-full bg-[#0a0e1a] overflow-hidden flex items-center justify-center relative" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}>
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#00d4ff]/20 to-transparent pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#00d4ff]/20 to-transparent pointer-events-none z-10" />
                           {currentPlayer.photo_url && currentPlayer.photo_url !== 'placeholder' ? (
                              <img src={currentPlayer.photo_url} alt="" className="w-full h-full object-cover object-top filter contrast-125 brightness-110" />
                           ) : (
@@ -257,72 +275,78 @@ export default function AuctionPage() {
                        </div>
                     </div>
                  </div>
+              </div>
 
-                 {/* Bid Amount & Action Area */}
-                 <div className="w-full flex flex-col items-center mt-1">
-                    <p className="text-[#00d4ff] text-[10px] font-black uppercase tracking-[0.3em] mb-0">Current Bid</p>
+              {/* RIGHT COLUMN - BIDDING */}
+              <div className="flex flex-col gap-4 w-full lg:max-w-md mr-auto">
+                 
+                 {/* Base Price Panel */}
+                 <div className="bg-[#11111a]/80 border border-[#00d4ff]/30 p-5 rounded-xl backdrop-blur-md flex justify-between items-center shadow-[0_0_15px_rgba(0,212,255,0.1)]">
+                    <span className="text-[#f5c518] text-sm font-bold uppercase tracking-widest">Base Price</span>
+                    <span className="text-white font-mono font-black text-2xl">₹ {currentPlayer.base_price?.toLocaleString() || '0'}</span>
+                 </div>
+
+                 {/* Current Bid Panel */}
+                 <div className="bg-[#11111a]/90 border-2 border-[#00d4ff] p-6 lg:p-8 rounded-xl backdrop-blur-md shadow-[0_0_30px_rgba(0,212,255,0.2)] flex flex-col items-center">
+                    <p className="text-[#00d4ff] text-sm font-black uppercase tracking-[0.4em] mb-2">Current Bid</p>
                     <motion.div 
                       key={auctionState?.current_bid}
                       initial={{ scale: 1.15, textShadow: '0 0 40px rgba(0,212,255,1)' }}
                       animate={{ scale: 1, textShadow: '0 0 20px rgba(0,212,255,0.6)' }}
-                      className="text-5xl font-mono font-black text-[#00d4ff] mb-2"
+                      className="text-6xl lg:text-7xl font-mono font-black text-white mb-8"
                     >
-                      {auctionState?.current_bid?.toLocaleString() || '0'}
+                      <span className="text-[#00d4ff] mr-2">₹</span>{auctionState?.current_bid?.toLocaleString() || '0'}
                     </motion.div>
 
-                    {/* Pulsing Button for Current Bidder */}
-                    <div className="w-full relative group">
-                      {biddingTeam ? (
-                        <div 
-                          className="w-full rounded-xl p-3 flex items-center justify-center gap-3 relative overflow-hidden transition-all duration-300 border border-white/20"
-                          style={{ 
-                            backgroundColor: biddingTeam.color_theme || '#00d4ff',
-                            boxShadow: `0 0 20px ${biddingTeam.color_theme || '#00d4ff'}99` 
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                          {biddingTeam.logo_url && <img src={biddingTeam.logo_url} className="h-7 object-contain z-10 drop-shadow-md" alt="" />}
-                          <p className="text-xl font-black text-white uppercase tracking-wider z-10 truncate drop-shadow-md">{biddingTeam.name}</p>
-                        </div>
-                      ) : (
-                        <div className="w-full bg-[#0a0e1a] border-2 border-[#00d4ff]/50 rounded-xl p-3 flex items-center justify-center shadow-[0_0_10px_rgba(0,212,255,0.1)] relative overflow-hidden">
-                          <div className="absolute inset-0 bg-[#00d4ff]/5 animate-pulse" />
-                          <p className="text-sm font-black text-[#00d4ff]/70 uppercase tracking-widest z-10">AWAITING BID...</p>
-                        </div>
-                      )}
-                    </div>
-                 </div>
-
-              </div>
-
-              {/* RIGHT COLUMN - STATS */}
-              <div className="flex flex-col gap-4 w-full lg:max-w-md mr-auto">
-                 <div className="bg-[#11111a]/80 border border-[#00d4ff]/30 p-5 rounded-xl backdrop-blur-md shadow-[0_0_15px_rgba(0,212,255,0.1)] h-fit">
-                    <h2 className="text-[#00d4ff] text-xs font-black uppercase tracking-[0.3em] border-b border-[#00d4ff]/30 pb-2 mb-2">
-                       Volleyball Experience
-                    </h2>
-                    <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
-                       {currentPlayer.volleyball_experience || currentPlayer.previous_tournament_experience || "No prior tournament experience listed."}
-                    </p>
-                 </div>
-
-                 {/* Bid History Mini Feed */}
-                 <div className="w-full bg-[#11111a]/60 border border-white/10 rounded-xl p-5 backdrop-blur-sm shadow-[0_0_15px_rgba(0,212,255,0.05)] h-fit">
-                    <p className="text-[#00d4ff] text-xs font-black uppercase tracking-[0.3em] border-b border-[#00d4ff]/30 pb-2 mb-2">Bid History</p>
-                    <div className="flex flex-col gap-2 h-[75px] overflow-hidden">
-                       {bidHistory.length > 0 ? bidHistory.filter((bid, idx, arr) => idx === 0 || bid.teamId !== arr[idx - 1].teamId).map((bid, idx) => {
-                          const team = teams.find(t => t.id === bid.teamId);
-                          return (
-                            <div key={idx} className="flex justify-between items-center text-sm animate-fade-in-up">
-                               <span className="text-gray-400 truncate w-40">{team?.name || 'Unknown Team'}</span>
-                               <span className="font-mono font-bold text-[#00d4ff]">{bid.amount.toLocaleString()}</span>
+                    <div className="w-full bg-[#0a0e1a]/80 rounded-xl p-5 flex flex-col items-center border border-white/10 relative overflow-hidden">
+                       <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em] mb-4">Leading Team</p>
+                       
+                       {biddingTeam ? (
+                         <div className="flex flex-col items-center w-full z-10">
+                            {biddingTeam.logo_url && <img src={biddingTeam.logo_url} className="h-20 object-contain drop-shadow-lg mb-3" alt="" />}
+                            <p className="text-3xl font-black text-white uppercase tracking-wider text-center drop-shadow-md" style={{ color: biddingTeam.color_theme || '#fff' }}>{biddingTeam.name}</p>
+                            
+                            <div className="w-full h-px bg-white/10 my-4" />
+                            
+                            <div className="flex justify-between items-center w-full px-2">
+                               <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">Remaining Purse</span>
+                               <span className="text-[#f5c518] font-mono font-black text-xl">₹ {(biddingTeam.purse_remaining - (auctionState?.current_bid || 0)).toLocaleString()}</span>
                             </div>
-                          );
-                       }) : (
-                          <div className="text-sm text-gray-600 italic">No bids yet</div>
+                         </div>
+                       ) : (
+                         <div className="flex flex-col items-center py-8 z-10">
+                            <span className="w-10 h-10 rounded-full border-2 border-dashed border-[#00d4ff]/50 animate-spin-slow mb-4" />
+                            <p className="text-sm font-black text-[#00d4ff]/70 uppercase tracking-widest">AWAITING BID...</p>
+                         </div>
+                       )}
+                       
+                       {biddingTeam && (
+                         <div className="absolute inset-0 opacity-10 animate-pulse" style={{ backgroundColor: biddingTeam.color_theme || '#00d4ff' }} />
                        )}
                     </div>
                  </div>
+
+                 {/* Bid History Mini Feed */}
+                 <div className="w-full bg-[#11111a]/60 border border-white/10 rounded-xl p-5 backdrop-blur-sm shadow-[0_0_15px_rgba(0,212,255,0.05)]">
+                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] border-b border-white/10 pb-2 mb-3">Recent Bids</p>
+                    <div className="flex flex-col gap-2 overflow-hidden h-[90px]">
+                       {bidHistory.length > 0 ? bidHistory.filter((bid, idx, arr) => idx === 0 || bid.teamId !== arr[idx - 1].teamId).slice(0, 3).map((bid, idx) => {
+                          const team = teams.find(t => t.id === bid.teamId);
+                          return (
+                            <div key={idx} className="flex justify-between items-center text-sm animate-fade-in-up opacity-80">
+                               <span className="text-gray-300 truncate w-40 flex items-center gap-2">
+                                 {team?.logo_url && <img src={team.logo_url} className="h-5 w-5 object-contain" alt="" />}
+                                 {team?.name || 'Unknown Team'}
+                               </span>
+                               <span className="font-mono font-bold text-gray-300">₹ {bid.amount.toLocaleString()}</span>
+                            </div>
+                          );
+                       }) : (
+                          <div className="text-sm text-gray-600 italic text-center py-2">No bids yet</div>
+                       )}
+                    </div>
+                 </div>
+
               </div>
 
             </motion.div>
@@ -332,8 +356,9 @@ export default function AuctionPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex-1 w-full"
-            />
+              className="flex-1 w-full flex items-center justify-center pointer-events-none"
+            >
+            </motion.div>
           )}
         </AnimatePresence>
       </main>
@@ -430,6 +455,19 @@ export default function AuctionPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Sponsor Strip */}
+      <div className="w-full bg-[#11111a] border-t border-[#00d4ff]/30 py-4 px-6 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-10 z-10 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.4)]">
+         <span className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-[0.3em] mb-2 md:mb-0">Sponsored by:</span>
+         
+         <div className="flex items-center gap-8 md:gap-16 bg-white/5 px-8 py-3 rounded-full border border-white/10 shadow-inner">
+            <img src="/wendys_logo.png" alt="Wendy's" className="h-[40px] md:h-[60px] w-auto object-contain" />
+            <div className="h-8 w-px bg-white/20" />
+            <img src="/enser_logo.png" alt="Enser" className="h-[35px] md:h-[45px] w-auto object-contain" />
+            <div className="h-8 w-px bg-white/20" />
+            <img src="/namhra_logo.png" alt="Namhra" className="h-[35px] md:h-[45px] w-auto object-contain" />
+         </div>
+      </div>
 
       {/* Bottom Ticker */}
       <footer className="z-20 h-10 bg-black border-t-2 border-[#00d4ff] flex items-center overflow-hidden shrink-0 sticky bottom-0 w-full shadow-[0_-5px_20px_rgba(0,212,255,0.15)]">
