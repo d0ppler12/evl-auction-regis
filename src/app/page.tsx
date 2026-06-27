@@ -106,12 +106,18 @@ export default function Home() {
               />
             </div>
             <span className="text-xl font-bold tracking-tight text-primary hidden sm:block">
-              ETERNIA <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-400 font-extrabold">VOLLEYBALL</span>
+              ETERNIA{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-400 font-extrabold">
+                VOLLEYBALL
+              </span>
             </span>
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <Link href="/" className="text-primary hover:text-accent transition-colors relative after:absolute after:bottom-[-26px] after:left-0 after:w-full after:h-0.5 after:bg-accent">
+            <Link
+              href="/"
+              className="text-primary hover:text-accent transition-colors relative after:absolute after:bottom-[-26px] after:left-0 after:w-full after:h-0.5 after:bg-accent"
+            >
               HOME
             </Link>
             <Link
@@ -131,6 +137,12 @@ export default function Home() {
               className="hover:text-primary transition-colors"
             >
               POINTS TABLE
+            </Link>
+            <Link
+              href="/auction"
+              className="hover:text-primary transition-colors"
+            >
+              AUCTION
             </Link>
           </div>
 
@@ -186,10 +198,9 @@ export default function Home() {
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* 1. HERO SECTION */}
         <section className="card-base relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl p-0">
-          
           {/* Dark cloudy thunder background */}
           <div className="absolute inset-0 bg-[url('/storm.png')] bg-cover bg-center z-0" />
-          
+
           {/* Darkening overlay so the clouds don't overpower the white logos - Reduced to keep Namhra visible */}
           <div className="absolute inset-0 bg-slate-950/30 z-0" />
 
@@ -204,26 +215,32 @@ export default function Home() {
               <div className="relative w-full max-w-[900px] -mt-6 mb-3 group">
                 {/* Subtle white glow targeted specifically at the bottom half for Enser/Namhra */}
                 <div className="absolute bottom-[5%] left-[15%] right-[15%] h-[30%] bg-white/10 blur-3xl rounded-[100px] z-0 pointer-events-none" />
-                
-                <img 
-                  src="/sponsors.png" 
-                  alt="EVL 3.0 Sponsors" 
+
+                <img
+                  src="/sponsors.png"
+                  alt="EVL 3.0 Sponsors"
                   className="relative z-10 w-full max-h-[450px] object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.15)] transition-all duration-500 group-hover:scale-[1.02] group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.25)]"
                 />
               </div>
-              
+
               <h1 className="text-2xl md:text-3xl lg:text-[34px] font-black leading-none tracking-tighter mb-4 italic uppercase flex flex-wrap gap-2 sm:gap-3 justify-center md:justify-start">
-                <span className="text-[#f59e0b] drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]">RISE.</span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d4ff] to-blue-500 drop-shadow-[0_0_15px_rgba(0,212,255,0.4)]">SPIKE.</span>
-                <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">DOMINATE.</span>
+                <span className="text-[#f59e0b] drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]">
+                  RISE.
+                </span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d4ff] to-blue-500 drop-shadow-[0_0_15px_rgba(0,212,255,0.4)]">
+                  SPIKE.
+                </span>
+                <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                  DOMINATE.
+                </span>
               </h1>
 
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <Link
-                  href="/players"
+                  href="/auction"
                   className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-accent to-blue-600 hover:from-blue-400 hover:to-blue-700 text-slate-950 text-base font-extrabold shadow-[0_0_30px_rgba(96,165,250,0.3)] hover:shadow-[0_0_45px_rgba(96,165,250,0.5)] transition-all duration-300 hover:-translate-y-1 transform hover:scale-[1.02]"
                 >
-                  VIEW AUCTION POOL
+                  VIEW AUCTION
                 </Link>
                 <button
                   onClick={() =>
@@ -275,68 +292,84 @@ export default function Home() {
                 </Link>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {teams.length === 0 ? (
-                  // Skeleton placeholders while loading
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="card-base p-5 flex flex-col items-center text-center bg-slate-900/30 rounded-2xl animate-pulse">
-                      <div className="w-14 h-14 md:w-16 md:h-16 bg-slate-800/60 rounded-2xl mb-4" />
-                      <div className="h-3 w-16 bg-slate-800/60 rounded mb-3" />
-                      <div className="w-full border-t border-white/5 pt-3 flex justify-between">
-                        <div className="h-3 w-10 bg-slate-800/60 rounded" />
-                        <div className="h-3 w-10 bg-slate-800/60 rounded" />
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  teams.slice(0, 5).map((team) => {
-                    const teamColor = team.color_theme || "#3b82f6";
-                    // Get win rate from standings
-                    const standing = standings.find((s: any) => s.team?.id === team.id);
-                    const played = standing?.played || 0;
-                    const wins = standing?.wins || 0;
-                    const winRate = played > 0 ? `${Math.round((wins / played) * 100)}%` : "0%";
-                    return (
-                      <Link
-                        key={team.id}
-                        href="/teams"
-                        className="card-base card-hover p-5 flex flex-col items-center text-center cursor-pointer group hover:border-accent/40 bg-slate-900/30 rounded-2xl relative overflow-hidden"
+                {teams.length === 0
+                  ? // Skeleton placeholders while loading
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="card-base p-5 flex flex-col items-center text-center bg-slate-900/30 rounded-2xl animate-pulse"
                       >
-                        <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-accent/0 via-accent/40 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div
-                          className="w-14 h-14 md:w-16 md:h-16 rounded-2xl mb-4 flex items-center justify-center border overflow-hidden shadow-inner group-hover:scale-105 transition-all duration-300"
-                          style={{
-                            backgroundColor: `${teamColor}1A`,
-                            borderColor: `${teamColor}60`,
-                            boxShadow: `0 0 0 0 ${teamColor}33`,
-                          }}
+                        <div className="w-14 h-14 md:w-16 md:h-16 bg-slate-800/60 rounded-2xl mb-4" />
+                        <div className="h-3 w-16 bg-slate-800/60 rounded mb-3" />
+                        <div className="w-full border-t border-white/5 pt-3 flex justify-between">
+                          <div className="h-3 w-10 bg-slate-800/60 rounded" />
+                          <div className="h-3 w-10 bg-slate-800/60 rounded" />
+                        </div>
+                      </div>
+                    ))
+                  : teams.slice(0, 5).map((team) => {
+                      const teamColor = team.color_theme || "#3b82f6";
+                      // Get win rate from standings
+                      const standing = standings.find(
+                        (s: any) => s.team?.id === team.id,
+                      );
+                      const played = standing?.played || 0;
+                      const wins = standing?.wins || 0;
+                      const winRate =
+                        played > 0
+                          ? `${Math.round((wins / played) * 100)}%`
+                          : "0%";
+                      return (
+                        <Link
+                          key={team.id}
+                          href="/teams"
+                          className="card-base card-hover p-5 flex flex-col items-center text-center cursor-pointer group hover:border-accent/40 bg-slate-900/30 rounded-2xl relative overflow-hidden"
                         >
-                          {team.logo_url ? (
-                            <img src={team.logo_url} alt={team.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-xl md:text-2xl font-black text-white">
-                              {team.name?.charAt(0)}
-                            </span>
-                          )}
-                        </div>
-                        <span className="font-extrabold text-white text-xs md:text-sm tracking-wide mb-3 uppercase group-hover:text-accent transition-colors">
-                          {team.name}
-                        </span>
-                        <div className="w-full flex justify-between text-[10px] text-slate-500 uppercase font-bold border-t border-white/5 pt-3">
-                          <div className="flex flex-col items-start">
-                            <span className="text-slate-500 font-semibold">Owner</span>
-                            <span className="text-slate-300 font-extrabold mt-0.5">
-                              {team.owner_name?.split(" ")[0] || "—"}
-                            </span>
+                          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-accent/0 via-accent/40 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <div
+                            className="w-14 h-14 md:w-16 md:h-16 rounded-2xl mb-4 flex items-center justify-center border overflow-hidden shadow-inner group-hover:scale-105 transition-all duration-300"
+                            style={{
+                              backgroundColor: `${teamColor}1A`,
+                              borderColor: `${teamColor}60`,
+                              boxShadow: `0 0 0 0 ${teamColor}33`,
+                            }}
+                          >
+                            {team.logo_url ? (
+                              <img
+                                src={team.logo_url}
+                                alt={team.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-xl md:text-2xl font-black text-white">
+                                {team.name?.charAt(0)}
+                              </span>
+                            )}
                           </div>
-                          <div className="flex flex-col items-end">
-                            <span className="text-slate-500 font-semibold">Win %</span>
-                            <span className="text-accent font-black mt-0.5">{winRate}</span>
+                          <span className="font-extrabold text-white text-xs md:text-sm tracking-wide mb-3 uppercase group-hover:text-accent transition-colors">
+                            {team.name}
+                          </span>
+                          <div className="w-full flex justify-between text-[10px] text-slate-500 uppercase font-bold border-t border-white/5 pt-3">
+                            <div className="flex flex-col items-start">
+                              <span className="text-slate-500 font-semibold">
+                                Owner
+                              </span>
+                              <span className="text-slate-300 font-extrabold mt-0.5">
+                                {team.owner_name?.split(" ")[0] || "—"}
+                              </span>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className="text-slate-500 font-semibold">
+                                Win %
+                              </span>
+                              <span className="text-accent font-black mt-0.5">
+                                {winRate}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    );
-                  })
-                )}
+                        </Link>
+                      );
+                    })}
               </div>
             </section>
 
@@ -368,7 +401,9 @@ export default function Home() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400">{match.team_a?.name?.[0] || "T"}</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400">
+                              {match.team_a?.name?.[0] || "T"}
+                            </span>
                           )}
                         </div>
                         <span className="text-[10px] font-black text-slate-300 uppercase tracking-wider truncate max-w-[80px]">
@@ -394,7 +429,9 @@ export default function Home() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400">{match.team_b?.name?.[0] || "T"}</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400">
+                              {match.team_b?.name?.[0] || "T"}
+                            </span>
                           )}
                         </div>
                         <span className="text-[10px] font-black text-slate-300 uppercase tracking-wider truncate max-w-[80px]">
@@ -405,7 +442,9 @@ export default function Home() {
 
                     <div className="text-center text-[10px] text-slate-400 font-bold flex items-center justify-center gap-1.5 border-t border-white/5 pt-3">
                       <MapPin className="w-3.5 h-3.5 text-accent" />{" "}
-                      <span className="truncate">{match.venue || "Eternia Arena"}</span>
+                      <span className="truncate">
+                        {match.venue || "Eternia Arena"}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -444,7 +483,12 @@ export default function Home() {
                   <tbody>
                     {standings.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="py-8 text-center text-slate-500 text-xs font-bold tracking-widest">NO STANDINGS DATA</td>
+                        <td
+                          colSpan={7}
+                          className="py-8 text-center text-slate-500 text-xs font-bold tracking-widest"
+                        >
+                          NO STANDINGS DATA
+                        </td>
                       </tr>
                     ) : (
                       standings.slice(0, 5).map((row: any, index: number) => {
@@ -456,20 +500,32 @@ export default function Home() {
                           >
                             <td className="py-3.5 px-2">
                               {index === 0 ? (
-                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-yellow-500/10 border border-yellow-500/35 text-yellow-500 text-xs font-black">1</span>
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-yellow-500/10 border border-yellow-500/35 text-yellow-500 text-xs font-black">
+                                  1
+                                </span>
                               ) : index === 1 ? (
-                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-300/10 border border-slate-300/35 text-slate-300 text-xs font-black">2</span>
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-slate-300/10 border border-slate-300/35 text-slate-300 text-xs font-black">
+                                  2
+                                </span>
                               ) : index === 2 ? (
-                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-700/10 border border-amber-700/35 text-amber-500 text-xs font-black">3</span>
+                                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-700/10 border border-amber-700/35 text-amber-500 text-xs font-black">
+                                  3
+                                </span>
                               ) : (
-                                <span className="text-slate-400 font-bold ml-1.5">{index + 1}</span>
+                                <span className="text-slate-400 font-bold ml-1.5">
+                                  {index + 1}
+                                </span>
                               )}
                             </td>
                             <td className="py-3.5 px-2 font-bold">
                               <div className="flex items-center gap-2">
                                 <div className="w-6 h-6 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-[10px] border border-white/5 hidden sm:flex text-slate-300 group-hover:border-accent/30 transition-colors font-black shrink-0">
                                   {team.logo_url ? (
-                                    <img src={team.logo_url} alt="" className="w-full h-full object-cover" />
+                                    <img
+                                      src={team.logo_url}
+                                      alt=""
+                                      className="w-full h-full object-cover"
+                                    />
                                   ) : (
                                     (team.name || "?")[0]
                                   )}
@@ -479,12 +535,22 @@ export default function Home() {
                                 </span>
                               </div>
                             </td>
-                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">{row.played || 0}</td>
-                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">{row.wins || 0}</td>
-                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">{row.losses || 0}</td>
-                            <td className="py-3.5 px-2 text-center font-black text-accent font-mono text-base">{row.points || 0}</td>
+                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">
+                              {row.played || 0}
+                            </td>
+                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">
+                              {row.wins || 0}
+                            </td>
+                            <td className="py-3.5 px-2 text-center font-bold text-slate-400 font-mono">
+                              {row.losses || 0}
+                            </td>
+                            <td className="py-3.5 px-2 text-center font-black text-accent font-mono text-base">
+                              {row.points || 0}
+                            </td>
                             <td className="py-3.5 px-2">
-                              <span className="text-[10px] text-slate-500 font-medium italic">-</span>
+                              <span className="text-[10px] text-slate-500 font-medium italic">
+                                -
+                              </span>
                             </td>
                           </tr>
                         );
@@ -555,7 +621,9 @@ export default function Home() {
                         match.team_a?.name?.[0] || "T"
                       )}
                     </div>
-                    <span className="text-[10px] text-accent font-black tracking-widest px-2.5 py-1 rounded bg-accent/10 border border-accent/20">VS</span>
+                    <span className="text-[10px] text-accent font-black tracking-widest px-2.5 py-1 rounded bg-accent/10 border border-accent/20">
+                      VS
+                    </span>
                     <div className="w-9 h-9 bg-slate-800 rounded-xl border border-white/5 flex items-center justify-center text-primary text-xs font-bold overflow-hidden shadow-inner group-hover:scale-105 transition-transform">
                       {match.team_b?.logo_url ? (
                         <img
@@ -600,7 +668,7 @@ export default function Home() {
                 href="/players"
                 className="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-black uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(250,204,21,0.25)] hover:shadow-[0_0_30px_rgba(250,204,21,0.45)] transition-all hover:scale-105 active:scale-95 text-sm"
               >
-                VIEW AUCTION POOL
+                VIEW PLAYERS POOL
               </Link>
             </div>
           </section>
