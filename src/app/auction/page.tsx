@@ -347,14 +347,6 @@ export default function AuctionPage() {
                         {currentPlayer.age || "--"}
                       </p>
                     </div>
-                    <div className="col-span-2">
-                      <p className="text-[#f5c518] text-xs font-bold uppercase tracking-widest mb-1">
-                        Position / Role
-                      </p>
-                      <p className="text-2xl font-black text-white">
-                        {currentPlayer.playing_role || "Player"}
-                      </p>
-                    </div>
                   </div>
                 </div>
 
@@ -370,7 +362,6 @@ export default function AuctionPage() {
                   </p>
                 </div>
               </div>
-
               {/* CENTER COLUMN - PHOTO */}
               <div className="flex flex-col items-center justify-start gap-3 w-full max-w-[350px] shrink-0 mx-auto">
                 {/* Photo Hexagon (Made larger and isolated) */}
@@ -406,7 +397,6 @@ export default function AuctionPage() {
                   </div>
                 </div>
               </div>
-
               {/* RIGHT COLUMN - BIDDING */}
               <div className="flex flex-col gap-4 w-full lg:max-w-md mr-auto">
                 {/* Base Price Panel */}
@@ -548,7 +538,9 @@ export default function AuctionPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex-1 w-full flex items-center justify-center pointer-events-none"
-            ></motion.div>
+            >
+              WAITING FOR NEXT PLAYER...
+            </motion.div>
           )}
         </AnimatePresence>
       </main>
@@ -821,7 +813,6 @@ export default function AuctionPage() {
         .animate-unsold-shake {
           animation: unsold-shake 0.4s ease-out forwards;
         }
-        
         /* Subtly Animated Star/Particle Background */
         .particles-bg {
           position: absolute;
