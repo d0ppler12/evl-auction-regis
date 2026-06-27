@@ -185,33 +185,43 @@ export default function Home() {
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* 1. HERO SECTION */}
-        <section className="card-base relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-xl shadow-2xl p-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-900/30 z-10" />
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1593786278855-87d21c0022d4?q=80&w=2000')] bg-cover bg-center opacity-15 mix-blend-overlay z-0" />
+        <section className="card-base relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl p-0">
+          
+          {/* Dark cloudy thunder background */}
+          <div className="absolute inset-0 bg-[url('/storm.png')] bg-cover bg-center z-0" />
+          
+          {/* Darkening overlay so the clouds don't overpower the white logos - Reduced to keep Namhra visible */}
+          <div className="absolute inset-0 bg-slate-950/30 z-0" />
 
-          <div className="relative z-20 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-12">
-            <div className="flex-1 max-w-2xl">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-accent/10 border border-accent/30 text-accent text-xs font-black mb-6 tracking-widest shadow-lg shadow-accent/5 backdrop-blur-md">
-                <span className="w-1.5 h-1.5 inline-block rounded-full bg-accent animate-ping mr-2"></span>
-                SEASON 3 <span className="text-slate-500 mx-1.5">•</span> BEGINS 25 JULY 2026
+          {/* Lightning Flash Effect (optional subtle addition) */}
+          <div className="absolute inset-0 bg-blue-300 mix-blend-overlay z-0 pointer-events-none animate-lightning" />
+
+          {/* Very subtle gradient overlay just to keep bottom text readable */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent z-10" />
+
+          <div className="relative z-20 p-4 pt-2 md:p-6 md:pt-4 lg:px-6 lg:pb-6 lg:pt-2 flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-8">
+            <div className="flex-[1.2] max-w-3xl flex flex-col items-center md:items-start text-center md:text-left">
+              <div className="relative w-full max-w-[900px] -mt-6 mb-3 group">
+                {/* Subtle white glow targeted specifically at the bottom half for Enser/Namhra */}
+                <div className="absolute bottom-[5%] left-[15%] right-[15%] h-[30%] bg-white/10 blur-3xl rounded-[100px] z-0 pointer-events-none" />
+                
+                <img 
+                  src="/sponsors.png" 
+                  alt="EVL 3.0 Sponsors" 
+                  className="relative z-10 w-full max-h-[450px] object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.15)] transition-all duration-500 group-hover:scale-[1.02] group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.25)]"
+                />
               </div>
-              <h1 className="text-5xl md:text-7xl font-black text-primary leading-[1.05] tracking-tighter mb-6 italic uppercase">
-                RISE.
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-400">
-                  SPIKE.
-                </span>
-                <br />
-                DOMINATE.
+              
+              <h1 className="text-2xl md:text-3xl lg:text-[34px] font-black leading-none tracking-tighter mb-4 italic uppercase flex flex-wrap gap-2 sm:gap-3 justify-center md:justify-start">
+                <span className="text-[#f59e0b] drop-shadow-[0_0_15px_rgba(245,158,11,0.4)]">RISE.</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00d4ff] to-blue-500 drop-shadow-[0_0_15px_rgba(0,212,255,0.4)]">SPIKE.</span>
+                <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">DOMINATE.</span>
               </h1>
-              <p className="text-lg md:text-xl text-slate-300 font-medium mb-8 max-w-lg leading-relaxed">
-                Eternia's premier competitive volleyball league. Elevate your game, represent your team, and spike your way to glory.
-              </p>
 
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <Link
                   href="/players"
-                  className="px-8 py-4 rounded-xl bg-gradient-to-r from-accent to-blue-600 hover:from-blue-400 hover:to-blue-700 text-slate-950 font-extrabold shadow-[0_0_30px_rgba(96,165,250,0.3)] hover:shadow-[0_0_45px_rgba(96,165,250,0.5)] transition-all duration-300 hover:-translate-y-1 transform hover:scale-[1.02]"
+                  className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-accent to-blue-600 hover:from-blue-400 hover:to-blue-700 text-slate-950 text-base font-extrabold shadow-[0_0_30px_rgba(96,165,250,0.3)] hover:shadow-[0_0_45px_rgba(96,165,250,0.5)] transition-all duration-300 hover:-translate-y-1 transform hover:scale-[1.02]"
                 >
                   VIEW AUCTION POOL
                 </Link>
@@ -222,7 +232,7 @@ export default function Home() {
                       "_blank",
                     )
                   }
-                  className="px-8 py-4 rounded-xl bg-slate-950/80 hover:bg-slate-900 text-gold hover:text-yellow-300 font-bold border border-gold/30 hover:border-gold/60 shadow-[0_0_20px_rgba(250,204,21,0.1)] hover:shadow-[0_0_35px_rgba(250,204,21,0.25)] transition-all duration-300 flex items-center gap-2 hover:-translate-y-1 transform hover:scale-[1.02]"
+                  className="px-8 py-3.5 rounded-xl bg-slate-950/80 hover:bg-slate-900 text-gold hover:text-yellow-300 text-base font-bold border border-gold/30 hover:border-gold/60 shadow-[0_0_20px_rgba(250,204,21,0.1)] hover:shadow-[0_0_35px_rgba(250,204,21,0.25)] transition-all duration-300 flex items-center gap-2 hover:-translate-y-1 transform hover:scale-[1.02]"
                 >
                   <Play className="w-5 h-5 fill-current" /> WATCH LIVE
                 </button>
@@ -230,7 +240,7 @@ export default function Home() {
             </div>
 
             <div className="flex-1 w-full max-w-[400px] md:max-w-none flex justify-center items-center">
-              <div className="relative w-full aspect-square max-w-[320px] md:max-w-[420px] lg:max-w-[460px]">
+              <div className="relative w-full aspect-square max-w-[380px] md:max-w-[480px] lg:max-w-[520px] drop-shadow-[0_0_40px_rgba(0,0,0,0.7)]">
                 {/* Glow behind image */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-accent/20 to-indigo-500/10 rounded-full blur-3xl opacity-75 animate-pulse" />
 

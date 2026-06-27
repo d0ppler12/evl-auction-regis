@@ -86,3 +86,15 @@
     transform: translateY(-12px) rotate(1deg);
   }
 }
+
+@keyframes lightning {
+  0%, 90%, 98% { opacity: 0; }
+  92%, 96% { opacity: 0.6; }
+  94%, 99% { opacity: 0.2; }
+}
+
+@layer utilities {
+  .animate-lightning {
+    animation: lightning 8s infinite;
+  }
+}
