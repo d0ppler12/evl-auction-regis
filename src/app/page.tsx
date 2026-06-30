@@ -138,12 +138,6 @@ export default function Home() {
             >
               POINTS TABLE
             </Link>
-            <Link
-              href="/auction"
-              className="hover:text-primary transition-colors"
-            >
-              AUCTION
-            </Link>
           </div>
 
           <div className="flex items-center gap-4">
@@ -237,10 +231,10 @@ export default function Home() {
 
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <Link
-                  href="/auction"
+                  href="/teams"
                   className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-accent to-blue-600 hover:from-blue-400 hover:to-blue-700 text-slate-950 text-base font-extrabold shadow-[0_0_30px_rgba(96,165,250,0.3)] hover:shadow-[0_0_45px_rgba(96,165,250,0.5)] transition-all duration-300 hover:-translate-y-1 transform hover:scale-[1.02]"
                 >
-                  VIEW AUCTION
+                  VIEW TEAMS
                 </Link>
                 <button
                   onClick={() =>
