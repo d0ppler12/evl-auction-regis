@@ -339,26 +339,6 @@ export default function TeamsPage() {
                       )}
                     </div>
 
-                    {/* Purse Budgets */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-slate-900/80 border border-white/5 rounded-2xl p-4 flex flex-col justify-center">
-                        <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">
-                          Purse Remaining
-                        </span>
-                        <span className="text-lg font-black text-emerald-400 font-mono">
-                          {team.purse_remaining?.toLocaleString()} pts
-                        </span>
-                      </div>
-                      <div className="bg-slate-900/80 border border-white/5 rounded-2xl p-4 flex flex-col justify-center">
-                        <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">
-                          Total Budget
-                        </span>
-                        <span className="text-lg font-black text-white font-mono">
-                          {team.total_purse?.toLocaleString()} pts
-                        </span>
-                      </div>
-                    </div>
-
                     {/* Squad Roster */}
                     <div className="border-t border-white/10 pt-5 space-y-4">
                       <div className="flex justify-between items-center">
