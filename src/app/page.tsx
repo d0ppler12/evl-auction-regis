@@ -82,7 +82,7 @@ export default function Home() {
   }, []);
 
   const filteredMatches = matches.filter((m) => m.status === scheduleTab);
-
+  const filteredMatches1 = matches.filter((m) => m.status === "live");
   return (
     <div className="min-h-screen overflow-x-hidden font-sans selection:bg-accent/30 relative">
       {/* Cyber Grid Background Overlay */}
@@ -280,14 +280,16 @@ export default function Home() {
             <section className="card-base p-6 border border-white/5 bg-slate-900/30 rounded-2xl relative overflow-hidden">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-black tracking-tight text-white uppercase italic">
-                  UPCOMING CLASHES
+                  LIVE MATCHES
                 </h2>
-                <button className="text-xs font-black text-accent hover:text-blue-300 uppercase tracking-widest flex items-center gap-0.5">
-                  View All <ChevronRight className="w-4 h-4" />
-                </button>
+                <Link href="/fixtures">
+                  <button className="text-xs font-black text-accent hover:text-blue-300 uppercase tracking-widest flex items-center gap-0.5">
+                    View All <ChevronRight className="w-4 h-4" />
+                  </button>
+                </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {filteredMatches.slice(0, 3).map((match) => (
+                {filteredMatches1.slice(0, 3).map((match) => (
                   <div
                     key={match.id}
                     className="card-base card-hover p-5 cursor-pointer group hover:border-accent/40 bg-slate-900/30 rounded-2xl relative overflow-hidden"
@@ -473,9 +475,11 @@ export default function Home() {
               <h2 className="text-lg font-black tracking-tight text-white uppercase italic">
                 UPCOMING SCHEDULE
               </h2>
-              <button className="text-xs font-black text-accent hover:text-blue-300 uppercase tracking-widest hidden sm:block">
-                View Full
-              </button>
+              <Link href="/fixtures">
+                <button className="text-xs font-black text-accent hover:text-blue-300 uppercase tracking-widest hidden sm:block">
+                  View Full
+                </button>
+              </Link>
             </div>
 
             <div className="flex gap-2 border-b border-white/5 mb-6 pb-3">
