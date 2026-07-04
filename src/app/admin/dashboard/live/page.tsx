@@ -128,7 +128,7 @@ export default function LiveMatchController() {
               </div>
             )}
             
-            <div className="flex justify-center mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
               <div className="flex items-center gap-4 bg-slate-800 rounded-full px-6 py-2 border border-white/5">
                 <button 
                   onClick={() => updateMatch({ current_set: Math.max(1, (activeMatch.current_set || 1) - 1) })}
@@ -144,6 +144,30 @@ export default function LiveMatchController() {
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
+
+              {activeMatch.status !== 'live' ? (
+                <button 
+                  onClick={() => {
+                    if(confirm("Start broadcasting this match as LIVE?")) {
+                      updateMatch({ status: 'live' });
+                    }
+                  }}
+                  className="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-widest rounded-full shadow-[0_0_15px_rgba(220,38,38,0.5)] transition-all animate-pulse flex items-center gap-2"
+                >
+                  <Radio className="w-4 h-4" /> Go Live
+                </button>
+              ) : (
+                <button 
+                  onClick={() => {
+                    if(confirm("End this match and mark as completed?")) {
+                      updateMatch({ status: 'completed' });
+                    }
+                  }}
+                  className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-bold uppercase tracking-wider rounded-full transition-all flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-4 h-4" /> End Match
+                </button>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-12">

@@ -42,7 +42,7 @@ export default function AuctionControlRoom() {
   useEffect(() => {
     refresh();
     
-    const channel = supabase.channel('admin_auction_room')
+    const channel = supabase.channel('evl_auction_sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'auction_state' }, (payload) => {
         setAuctionState(payload.new);
       })

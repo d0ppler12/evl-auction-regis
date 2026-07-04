@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Navbar from "@/components/navbar";
 import {
   User,
   Mail,
@@ -89,52 +90,7 @@ export default function PlayerProfilePage() {
       </div>
 
       {/* Profile Navbar */}
-      <nav className="border-b border-white/5 bg-[#0B1121]/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/">
-              <div className="w-10 h-10 flex items-center justify-center cursor-pointer hover:scale-105 transition-all">
-                <img
-                  src="/evl-hero.png"
-                  alt="EVL Logo"
-                  className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                />
-              </div>
-            </Link>
-            <span className="text-xl font-bold tracking-tight text-white hidden sm:block">
-              PLAYER <span className="text-blue-400">DASHBOARD</span>
-            </span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <Link href="/" className="hover:text-white transition-colors">
-              HOME
-            </Link>
-            <Link href="/teams" className="hover:text-white transition-colors">
-              TEAMS
-            </Link>
-            <Link
-              href="/players"
-              className="hover:text-white transition-colors"
-            >
-              PLAYER POOL
-            </Link>
-            <Link
-              href="/points-table"
-              className="hover:text-white transition-colors"
-            >
-              POINTS TABLE
-            </Link>
-          </div>
-
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-red-400 bg-white/5 border border-white/10 hover:border-red-500/30 rounded-full transition-all"
-          >
-            <LogOut className="w-4 h-4" /> Logout
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Main Content Space */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-8">

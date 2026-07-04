@@ -13,6 +13,8 @@ const emptyForm = {
   status: "scheduled",
   sets_team_a: "0",
   sets_team_b: "0",
+  match_type: "league",
+  bracket_round: "",
 };
 
 export default function MatchManagement() {
@@ -60,6 +62,8 @@ export default function MatchManagement() {
       status: match.status || "scheduled",
       sets_team_a: String(match.sets_team_a || 0),
       sets_team_b: String(match.sets_team_b || 0),
+      match_type: match.match_type || "league",
+      bracket_round: match.bracket_round || "",
     });
     setShowForm(true);
   };
@@ -72,6 +76,8 @@ export default function MatchManagement() {
         ...form,
         sets_team_a: parseInt(form.sets_team_a),
         sets_team_b: parseInt(form.sets_team_b),
+        match_type: form.match_type,
+        bracket_round: form.bracket_round || null,
       };
       if (editingId) {
         await adminFetch(`/api/admin/matches/${editingId}`, { method: "PUT", body: JSON.stringify(payload) });
@@ -124,6 +130,18 @@ export default function MatchManagement() {
               <option value="live">Live</option>
               <option value="completed">Completed</option>
             </select>
+            <select value={form.match_type} onChange={(e) => setForm({ ...form, match_type: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white">
+              <option value="league">League Match</option>
+              <option value="knockout">Knockout Match</option>
+            </select>
+            {form.match_type === 'knockout' && (
+              <select value={form.bracket_round} onChange={(e) => setForm({ ...form, bracket_round: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white">
+                <option value="">Select Round</option>
+                <option value="quarter_final">Quarter Final</option>
+                <option value="semi_final">Semi Final</option>
+                <option value="final">Final</option>
+              </select>
+            )}
             <input type="number" placeholder="Sets Team A" value={form.sets_team_a} onChange={(e) => setForm({ ...form, sets_team_a: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input type="number" placeholder="Sets Team B" value={form.sets_team_b} onChange={(e) => setForm({ ...form, sets_team_b: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
           </div>
@@ -148,7 +166,15 @@ export default function MatchManagement() {
             <div key={m.id} className="bg-slate-900/50 border border-white/5 rounded-2xl p-5 flex justify-between items-center">
               <div>
                 <p className="font-bold text-white">{m.team_a?.name || "TBD"} vs {m.team_b?.name || "TBD"}</p>
-                <p className="text-sm text-slate-400">{m.match_date} {m.match_time} · {m.venue} · {m.status}</p>
+                <div className="flex gap-2 items-center mt-1">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${m.match_type === 'knockout' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'}`}>
+                    {m.match_type === 'knockout' ? (m.bracket_round?.replace('_', ' ') || 'Knockout') : 'League'}
+                  </span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${m.status === 'live' ? 'bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse' : 'bg-slate-800 text-slate-400 border border-white/10'}`}>
+                    {m.status}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-2">{m.match_date} {m.match_time} · {m.venue}</p>
                 {(m.status === "completed" || m.status === "live") && (
                   <p className="text-lg font-mono text-emerald-400 mt-1">{m.sets_team_a} - {m.sets_team_b}</p>
                 )}

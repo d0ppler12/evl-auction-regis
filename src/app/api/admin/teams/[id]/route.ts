@@ -14,6 +14,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     if (body.purse_remaining !== undefined) updates.purse_remaining = parseInt(body.purse_remaining)
     if (body.color_theme !== undefined) updates.color_theme = body.color_theme
     if (body.logo_url !== undefined) updates.logo_url = body.logo_url
+    if (body.group_name !== undefined) updates.group_name = body.group_name
 
     const { data, error } = await supabaseAdmin
       .from('teams')

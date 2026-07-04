@@ -29,6 +29,7 @@ export async function POST(request: Request) {
         purse_remaining: totalPurse,
         color_theme: body.color_theme || null,
         logo_url: body.logo_url || null,
+        group_name: body.group_name || 'A',
       })
       .select()
       .single()

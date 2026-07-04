@@ -47,7 +47,7 @@ export default function AuctionPage() {
     init();
 
     const channel = supabase
-      .channel("auction_display_premium")
+      .channel("evl_auction_sync")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "auction_state" },
@@ -68,78 +68,6 @@ export default function AuctionPage() {
               setCurrentPlayer(null);
             }
             return currentPlayers;
-          });
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "teams" },
-        (payload) => {
-          setTeams((prev) => {
-            if (payload.eventType === "INSERT")
-              return [...prev, payload.new].sort((a, b) =>
-                a.name.localeCompare(b.name),
-              );
-            if (payload.eventType === "DELETE")
-              return prev.filter((t) => t.id !== payload.old.id);
-            return prev.map((t) => (t.id === payload.new.id ? payload.new : t));
-          });
-        },
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "players" },
-        (payload) => {
-          setAllPlayers((prev) => {
-            if (payload.eventType === "INSERT") return [...prev, payload.new];
-            if (payload.eventType === "DELETE")
-              return prev.filter((p) => p.id !== payload.old.id);
-            return prev.map((p) => {
-              if (p.id === payload.new.id) {
-                const updated = { ...p, ...payload.new };
-                const toastFields = [
-                  "photo_url",
-                  "volleyball_experience",
-                  "previous_tournament_experience",
-                ];
-                toastFields.forEach((field) => {
-                  if (
-                    p[field] &&
-                    (payload.new[field] === null ||
-                      payload.new[field] === undefined)
-                  ) {
-                    updated[field] = p[field];
-                  }
-                });
-                return updated;
-              }
-              return p;
-            });
-          });
-          setCurrentPlayer((prev: any) => {
-            if (
-              prev &&
-              payload.eventType === "UPDATE" &&
-              prev.id === payload.new.id
-            ) {
-              const updated = { ...prev, ...payload.new };
-              const toastFields = [
-                "photo_url",
-                "volleyball_experience",
-                "previous_tournament_experience",
-              ];
-              toastFields.forEach((field) => {
-                if (
-                  prev[field] &&
-                  (payload.new[field] === null ||
-                    payload.new[field] === undefined)
-                ) {
-                  updated[field] = prev[field];
-                }
-              });
-              return updated;
-            }
-            return prev;
           });
         },
       )

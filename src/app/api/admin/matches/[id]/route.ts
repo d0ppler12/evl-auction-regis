@@ -8,7 +8,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     requireAdmin()
     const body = await request.json()
     const updates: Record<string, unknown> = {}
-    const fields = ['team_a_id', 'team_b_id', 'match_date', 'match_time', 'venue', 'status', 'sets_team_a', 'sets_team_b', 'current_set', 'points_team_a', 'points_team_b', 'live_feed']
+    const fields = ['team_a_id', 'team_b_id', 'match_date', 'match_time', 'venue', 'status', 'sets_team_a', 'sets_team_b', 'current_set', 'points_team_a', 'points_team_b', 'live_feed', 'match_type', 'bracket_round']
     for (const f of fields) {
       if (body[f] !== undefined) updates[f] = body[f]
     }

@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
+import { X, Trophy, Activity, Target, Shield, Zap, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react';
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
 import type { PlayerPoolItem } from "./PlayerPoolCard";
 
 export type PlayerDetail = PlayerPoolItem & {
@@ -99,12 +100,14 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
                   <div className="absolute -inset-2 bg-blue-500/40 blur-2xl rounded-3xl opacity-60" />
                   <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl border-2 border-blue-400/50 overflow-hidden bg-[#1a2744] shadow-2xl">
                     {player.photo_url && player.photo_url !== "placeholder" ? (
-                      <img
-                        src={player.photo_url}
-                        alt={player.full_name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
+                    <Image
+                      src={player.photo_url}
+                      alt={player.full_name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  ) : (
                       <div className="w-full h-full flex items-center justify-center text-5xl font-black text-blue-400 font-display">
                         {player.full_name?.charAt(0)}
                       </div>
@@ -123,11 +126,13 @@ export function PlayerDetailModal({ player, onClose }: PlayerDetailModalProps) {
                   </h2>
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-slate-300">
                     {player.teams?.logo_url && (
-                      <img
+                      <div className="relative w-8 h-8 rounded overflow-hidden"><Image
                         src={player.teams.logo_url}
-                        alt=""
-                        className="w-8 h-8 rounded-lg object-cover border border-white/10"
-                      />
+                        alt="Team logo"
+                        fill
+                        className="object-cover"
+                        sizes="32px"
+                      /></div>
                     )}
                     <span className="font-bold text-blue-300 uppercase tracking-wider text-sm">
                       {player.teams?.name || "No Team"}

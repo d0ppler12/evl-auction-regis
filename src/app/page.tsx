@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Navbar from "@/components/navbar";
 import {
   Trophy,
   Play,
@@ -81,7 +82,7 @@ export default function Home() {
   }, []);
 
   const filteredMatches = matches.filter((m) => m.status === scheduleTab);
-
+  const filteredMatches1 = matches.filter((m) => m.status === "live");
   return (
     <div className="min-h-screen overflow-x-hidden font-sans selection:bg-accent/30 relative">
       {/* Cyber Grid Background Overlay */}
@@ -95,99 +96,7 @@ export default function Home() {
       </div>
 
       {/* Navbar */}
-      <nav className="glass-panel sticky top-0 z-50 transition-all duration-300">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <img
-                src="/evl-hero.png"
-                alt="EVL Logo"
-                className="w-full h-full object-contain filter drop-shadow-[0_0_10px_rgba(96,165,250,0.6)]"
-              />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-primary hidden sm:block">
-              ETERNIA{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-400 font-extrabold">
-                VOLLEYBALL
-              </span>
-            </span>
-          </div>
-
-          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-400">
-            <Link
-              href="/"
-              className="text-primary hover:text-accent transition-colors relative after:absolute after:bottom-[-26px] after:left-0 after:w-full after:h-0.5 after:bg-accent"
-            >
-              HOME
-            </Link>
-            <Link
-              href="/teams"
-              className="hover:text-primary transition-colors"
-            >
-              TEAMS
-            </Link>
-            <Link
-              href="/players"
-              className="hover:text-primary transition-colors"
-            >
-              PLAYERS
-            </Link>
-            <Link
-              href="/points-table"
-              className="hover:text-primary transition-colors"
-            >
-              POINTS TABLE
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-500/10 border border-red-500/25 text-red-500 text-xs font-black tracking-wider shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-              LIVE
-            </div>
-
-            {playerSession ? (
-              <div className="flex items-center gap-4">
-                <Link
-                  href="/players/profile"
-                  className="text-sm font-black text-accent hover:text-white transition-colors tracking-wide"
-                >
-                  MY PROFILE
-                </Link>
-                <button
-                  onClick={async () => {
-                    const res = await fetch("/api/players/logout", {
-                      method: "POST",
-                    });
-                    if (res.ok) {
-                      setPlayerSession(null);
-                      window.location.reload();
-                    }
-                  }}
-                  className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-red-500/30 text-slate-300 hover:text-red-400 text-sm font-bold transition-all"
-                >
-                  LOGOUT
-                </button>
-              </div>
-            ) : (
-              <>
-                {/* <Link
-                  href="/register"
-                  className="px-6 py-2.5 rounded-full bg-gradient-to-r from-accent to-blue-500 hover:from-blue-400 hover:to-blue-600 text-sm font-extrabold text-background shadow-[0_0_20px_rgba(96,165,250,0.3)] transition-all hover:scale-105"
-                >
-                  REGISTER
-                </Link> */}
-                <Link
-                  href="/players/login"
-                  className="px-5 py-2 rounded-full bg-slate-800 border border-white/10 hover:border-white/20 text-xs sm:text-sm font-bold text-white transition-all hover:scale-105"
-                >
-                  LOGIN
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* 1. HERO SECTION */}
@@ -371,14 +280,16 @@ export default function Home() {
             <section className="card-base p-6 border border-white/5 bg-slate-900/30 rounded-2xl relative overflow-hidden">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-black tracking-tight text-white uppercase italic">
-                  UPCOMING CLASHES
+                  LIVE MATCHES
                 </h2>
-                <button className="text-xs font-black text-accent hover:text-blue-300 uppercase tracking-widest flex items-center gap-0.5">
-                  View All <ChevronRight className="w-4 h-4" />
-                </button>
+                <Link href="/fixtures">
+                  <button className="text-xs font-black text-accent hover:text-blue-300 uppercase tracking-widest flex items-center gap-0.5">
+                    View All <ChevronRight className="w-4 h-4" />
+                  </button>
+                </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {filteredMatches.slice(0, 3).map((match) => (
+                {filteredMatches1.slice(0, 3).map((match) => (
                   <div
                     key={match.id}
                     className="card-base card-hover p-5 cursor-pointer group hover:border-accent/40 bg-slate-900/30 rounded-2xl relative overflow-hidden"
@@ -564,9 +475,11 @@ export default function Home() {
               <h2 className="text-lg font-black tracking-tight text-white uppercase italic">
                 UPCOMING SCHEDULE
               </h2>
-              <button className="text-xs font-black text-accent hover:text-blue-300 uppercase tracking-widest hidden sm:block">
-                View Full
-              </button>
+              <Link href="/fixtures">
+                <button className="text-xs font-black text-accent hover:text-blue-300 uppercase tracking-widest hidden sm:block">
+                  View Full
+                </button>
+              </Link>
             </div>
 
             <div className="flex gap-2 border-b border-white/5 mb-6 pb-3">
