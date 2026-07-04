@@ -83,7 +83,7 @@ export default function AuctionDisplayPage() {
     }
     init()
 
-    const channel = supabase.channel('auction_display_channel')
+    const channel = supabase.channel('evl_auction_sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'auction_state' }, (payload) => {
         const ns = payload.new as any
         setAuctionState(ns)

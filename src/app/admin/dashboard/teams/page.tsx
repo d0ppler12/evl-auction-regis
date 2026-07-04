@@ -12,6 +12,7 @@ const emptyForm = {
   purse_remaining: "100000",
   color_theme: "",
   logo_url: "",
+  group_name: "A",
 };
 
 export default function TeamsManagement() {
@@ -55,6 +56,7 @@ export default function TeamsManagement() {
       purse_remaining: String(team.purse_remaining ?? team.total_purse ?? 100000),
       color_theme: team.color_theme || "",
       logo_url: team.logo_url || "",
+      group_name: team.group_name || "A",
     });
     setLogoFile(null);
     setShowForm(true);
@@ -73,6 +75,7 @@ export default function TeamsManagement() {
         purse_remaining: parseInt(form.purse_remaining),
         color_theme: form.color_theme || null,
         logo_url: form.logo_url || null,
+        group_name: form.group_name,
       };
       if (editingId) {
         team = await adminFetch(`/api/admin/teams/${editingId}`, {
@@ -141,6 +144,10 @@ export default function TeamsManagement() {
             <input type="number" placeholder="Total Purse" value={form.total_purse} onChange={(e) => setForm({ ...form, total_purse: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input type="number" placeholder="Purse Remaining" value={form.purse_remaining} onChange={(e) => setForm({ ...form, purse_remaining: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
             <input placeholder="Color Theme (hex)" value={form.color_theme} onChange={(e) => setForm({ ...form, color_theme: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white" />
+            <select value={form.group_name} onChange={(e) => setForm({ ...form, group_name: e.target.value })} className="bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-white outline-none">
+              <option value="A">Group A</option>
+              <option value="B">Group B</option>
+            </select>
             <label className="flex items-center gap-2 text-white text-sm col-span-full">
               <input type="checkbox" checked={form.is_playing_owner} onChange={(e) => setForm({ ...form, is_playing_owner: e.target.checked })} />
               Playing Owner
@@ -188,7 +195,12 @@ export default function TeamsManagement() {
                     <div className="w-12 h-12 bg-blue-600/20 rounded-xl flex items-center justify-center text-blue-400 font-black">{team.name?.charAt(0)}</div>
                   )}
                   <div>
-                    <h3 className="font-bold text-white">{team.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-white">{team.name}</h3>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-white/10">
+                        Grp {team.group_name || 'A'}
+                      </span>
+                    </div>
                     <p className="text-xs text-slate-400">{team.owner_name}</p>
                   </div>
                 </div>

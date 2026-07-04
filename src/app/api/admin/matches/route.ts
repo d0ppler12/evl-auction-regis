@@ -32,6 +32,8 @@ export async function POST(request: Request) {
         status: body.status || 'scheduled',
         sets_team_a: parseInt(body.sets_team_a) || 0,
         sets_team_b: parseInt(body.sets_team_b) || 0,
+        match_type: body.match_type || 'league',
+        bracket_round: body.bracket_round || null,
       })
       .select('*, team_a:team_a_id(id, name), team_b:team_b_id(id, name)')
       .single()

@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from('team_standings')
-      .select('*, team:team_id(id, name, logo_url, color_theme)')
+      .select('*, team:team_id(id, name, logo_url, color_theme, group_name)')
       .order('points', { ascending: false })
 
     if (error) throw error
@@ -15,6 +15,7 @@ export async function GET() {
       rank: index + 1,
       team_id: row.team_id,
       name: row.team?.name || 'Unknown',
+      group_name: row.team?.group_name || 'A',
       color: row.team?.color_theme || '#808080',
       logo_url: row.team?.logo_url || null,
       played: row.played || 0,

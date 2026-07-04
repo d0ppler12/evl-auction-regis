@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export type PlayerPoolItem = {
@@ -70,7 +71,7 @@ export function PlayerPoolCard({ player, index = 0, onClick }: PlayerPoolCardPro
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-blue-500/30 to-transparent blur-md opacity-60 group-hover:opacity-100 transition-opacity" />
           <div className="relative w-full h-full rounded-2xl border-2 border-blue-500/30 overflow-hidden bg-[#1a2744] flex items-center justify-center group-hover:border-blue-400/60 transition-colors">
             {player.photo_url && player.photo_url !== "placeholder" ? (
-              <img src={player.photo_url} alt={player.full_name} className="w-full h-full object-cover" />
+              <Image src={player.photo_url} alt={player.full_name} fill className="object-cover" sizes="112px" />
             ) : (
               <span className="text-3xl font-black text-blue-400/80 font-display">
                 {player.full_name?.charAt(0) || "?"}
@@ -85,7 +86,7 @@ export function PlayerPoolCard({ player, index = 0, onClick }: PlayerPoolCardPro
 
         <div className="flex items-center justify-center gap-2 mb-4 min-h-[24px]">
           {player.teams?.logo_url ? (
-            <img src={player.teams.logo_url} alt="" className="w-5 h-5 rounded object-cover" />
+            <div className="relative w-5 h-5 rounded overflow-hidden"><Image src={player.teams.logo_url} alt="" fill className="object-cover" sizes="20px" /></div>
           ) : teamName ? (
             <span className="w-5 h-5 rounded bg-blue-600/40 flex items-center justify-center text-[10px] font-bold text-blue-200">
               {teamName.charAt(0)}
