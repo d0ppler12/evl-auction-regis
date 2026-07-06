@@ -36,7 +36,7 @@ export default function FixturesPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchMatches = () => {
-    fetch("/api/public/fixtures")
+    fetch(`/api/public/fixtures?t=${Date.now()}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         setMatches(data || []);
@@ -51,14 +51,17 @@ export default function FixturesPage() {
     const channel = supabase
       .channel("evl_fixtures_sync")
       .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "matches" },
-        () => {
+        "broadcast",
+        { event: "match_updated" },
+        (payload) => {
+          console.log("Realtime match broadcast received!", payload);
           // Re-fetch matches to get the latest joined data when any match updates
           fetchMatches();
         },
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("Supabase Realtime Fixtures Status:", status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -69,6 +72,7 @@ export default function FixturesPage() {
     liveMatch,
     upcomingMatches,
     completedMatches,
+    knockoutMatches,
     quarterFinals,
     semiFinals,
     finals,
@@ -81,9 +85,8 @@ export default function FixturesPage() {
       liveMatch: live,
       upcomingMatches: upcoming,
       completedMatches: completed,
-      quarterFinals: knockout.filter(
-        (m) => m.bracket_round === "quarter_final",
-      ),
+      knockoutMatches: knockout,
+      quarterFinals: knockout.filter((m) => m.bracket_round === "quarter_final"),
       semiFinals: knockout.filter((m) => m.bracket_round === "semi_final"),
       finals: knockout.filter((m) => m.bracket_round === "final"),
     };
@@ -206,6 +209,84 @@ export default function FixturesPage() {
     );
   };
 
+  const BracketNode = ({ match, title, isCenter }: { match?: Match, title: string, isCenter?: boolean }) => {
+    return (
+      <div className={`w-48 bg-slate-900 border ${isCenter ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : 'border-white/10'} rounded-lg p-2 text-xs flex flex-col gap-1 relative z-10 shadow-xl`}>
+        <div className={`text-[10px] font-bold uppercase text-center mb-1 ${isCenter ? 'text-yellow-500' : 'text-slate-500'}`}>{title}</div>
+        {/* Team A */}
+        <div className="flex justify-between items-center bg-slate-800/50 rounded p-1">
+          <span className="truncate max-w-[100px] text-white font-bold">{match?.team_a?.name || "TBD"}</span>
+          <span className="text-emerald-400 font-mono">{match?.sets_team_a ?? '-'}</span>
+        </div>
+        {/* Team B */}
+        <div className="flex justify-between items-center bg-slate-800/50 rounded p-1">
+          <span className="truncate max-w-[100px] text-white font-bold">{match?.team_b?.name || "TBD"}</span>
+          <span className="text-emerald-400 font-mono">{match?.sets_team_b ?? '-'}</span>
+        </div>
+      </div>
+    )
+  };
+
+  const ChampionshipBracket = () => {
+    return (
+      <div className="space-y-6 pt-12 pb-8 overflow-x-auto custom-scrollbar">
+        <h2 className="text-2xl font-black text-white tracking-wider px-2 flex items-center gap-3">
+          <Trophy className="w-6 h-6 text-yellow-500" /> CHAMPIONSHIP BRACKET
+        </h2>
+        <div className="min-w-[900px] p-4 flex justify-center items-center gap-0">
+          {/* Round 1 (QF Left) */}
+          <div className="flex flex-col justify-around h-[400px] w-48 z-10">
+            <BracketNode match={quarterFinals[0]} title="Quarter Final 1" />
+            <BracketNode match={quarterFinals[1]} title="Quarter Final 2" />
+          </div>
+
+          {/* Connecting Line QF Left -> SF Left */}
+          <div className="flex flex-col justify-center h-[400px] w-8 relative">
+             <div className="border-r-2 border-t-2 border-b-2 border-slate-700/50 h-[50%] w-full rounded-r-xl absolute top-1/4" />
+             <div className="border-b-2 border-slate-700/50 w-full absolute top-1/2 right-0" />
+          </div>
+
+          {/* Round 2 (SF Left) */}
+          <div className="flex flex-col justify-center h-[400px] w-48 z-10">
+            <BracketNode match={semiFinals[0]} title="Semi Final 1" />
+          </div>
+
+          {/* Connecting Line SF Left -> Final */}
+          <div className="flex flex-col justify-center h-[400px] w-8 relative">
+             <div className="border-b-2 border-slate-700/50 w-full" />
+          </div>
+
+          {/* Center (Final) */}
+          <div className="flex flex-col justify-center h-[400px] w-56 mx-4 z-10">
+            <BracketNode match={finals[0]} title="Championship Final" isCenter />
+          </div>
+
+          {/* Connecting Line Final <- SF Right */}
+          <div className="flex flex-col justify-center h-[400px] w-8 relative">
+             <div className="border-b-2 border-slate-700/50 w-full" />
+          </div>
+
+          {/* Round 2 (SF Right) */}
+          <div className="flex flex-col justify-center h-[400px] w-48 z-10">
+            <BracketNode match={semiFinals[1]} title="Semi Final 2" />
+          </div>
+
+          {/* Connecting Line SF Right <- QF Right */}
+          <div className="flex flex-col justify-center h-[400px] w-8 relative">
+             <div className="border-l-2 border-t-2 border-b-2 border-slate-700/50 h-[50%] w-full rounded-l-xl absolute top-1/4" />
+             <div className="border-b-2 border-slate-700/50 w-full absolute top-1/2 left-0" />
+          </div>
+
+          {/* Round 1 (QF Right) */}
+          <div className="flex flex-col justify-around h-[400px] w-48 z-10">
+            <BracketNode match={quarterFinals[2]} title="Quarter Final 3" />
+            <BracketNode match={quarterFinals[3]} title="Quarter Final 4" />
+          </div>
+        </div>
+      </div>
+    )
+  };
+
   return (
     <div className="min-h-screen pb-24 overflow-x-hidden font-sans selection:bg-accent/30 relative">
       {/* Cyber Grid Background Overlay */}
@@ -264,10 +345,10 @@ export default function FixturesPage() {
                     LIVE NOW
                   </div>
 
-                  <div className="flex items-center justify-between mt-4">
-                    <div className="w-[35%] flex flex-col items-center gap-4">
+                  <div className="flex flex-col md:flex-row items-center justify-between mt-4 gap-6 md:gap-0">
+                    <div className="w-full md:w-[35%] flex flex-col items-center gap-2 md:gap-4">
                       <div
-                        className="w-24 h-24 rounded-3xl flex items-center justify-center overflow-hidden bg-slate-800 border-2 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                        className="w-20 h-20 md:w-24 md:h-24 rounded-2xl md:rounded-3xl flex items-center justify-center overflow-hidden bg-slate-800 border-2 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                         style={{
                           borderColor: liveMatch.team_a?.color_theme || "#333",
                         }}
@@ -279,27 +360,27 @@ export default function FixturesPage() {
                               alt="Team A Logo"
                               fill
                               className="object-cover"
-                              sizes="96px"
+                              sizes="(max-width: 768px) 80px, 96px"
                             />
                           </div>
                         ) : (
-                          <span className="text-4xl font-black">
+                          <span className="text-3xl md:text-4xl font-black">
                             {liveMatch.team_a?.name?.charAt(0)}
                           </span>
                         )}
                       </div>
-                      <h2 className="text-2xl font-black text-white text-center tracking-tight">
+                      <h2 className="text-xl md:text-2xl font-black text-white text-center tracking-tight">
                         {liveMatch.team_a?.name}
                       </h2>
                     </div>
 
-                    <div className="w-[30%] flex flex-col items-center">
-                      <p className="text-xs font-black text-slate-300 mb-2 tracking-widest uppercase bg-slate-800/80 px-4 py-1.5 rounded-full border border-white/10 shadow-inner">
+                    <div className="w-full md:w-[30%] flex flex-col items-center">
+                      <p className="text-[10px] md:text-xs font-black text-slate-300 mb-2 tracking-widest uppercase bg-slate-800/80 px-4 py-1.5 rounded-full border border-white/10 shadow-inner">
                         Set {liveMatch.sets_team_a + liveMatch.sets_team_b + 1}
                       </p>
 
                       {/* Points Display */}
-                      <div className="text-6xl md:text-7xl font-black font-mono text-white flex justify-center items-center gap-4 md:gap-6 mb-3">
+                      <div className="text-6xl md:text-7xl font-black font-mono text-white flex justify-center items-center gap-3 md:gap-6 mb-3">
                         <span className="text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]">
                           {liveMatch.points_team_a || 0}
                         </span>
@@ -326,9 +407,9 @@ export default function FixturesPage() {
                       </div>
                     </div>
 
-                    <div className="w-[35%] flex flex-col items-center gap-4">
+                    <div className="w-full md:w-[35%] flex flex-col items-center gap-2 md:gap-4">
                       <div
-                        className="w-24 h-24 rounded-3xl flex items-center justify-center overflow-hidden bg-slate-800 border-2 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                        className="w-20 h-20 md:w-24 md:h-24 rounded-2xl md:rounded-3xl flex items-center justify-center overflow-hidden bg-slate-800 border-2 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                         style={{
                           borderColor: liveMatch.team_b?.color_theme || "#333",
                         }}
@@ -340,16 +421,16 @@ export default function FixturesPage() {
                               alt="Team B Logo"
                               fill
                               className="object-cover"
-                              sizes="96px"
+                              sizes="(max-width: 768px) 80px, 96px"
                             />
                           </div>
                         ) : (
-                          <span className="text-4xl font-black">
+                          <span className="text-3xl md:text-4xl font-black">
                             {liveMatch.team_b?.name?.charAt(0)}
                           </span>
                         )}
                       </div>
-                      <h2 className="text-2xl font-black text-white text-center tracking-tight">
+                      <h2 className="text-xl md:text-2xl font-black text-white text-center tracking-tight">
                         {liveMatch.team_b?.name}
                       </h2>
                     </div>
@@ -357,6 +438,9 @@ export default function FixturesPage() {
                 </div>
               </motion.div>
             )}
+
+            {/* Championship Bracket */}
+            <ChampionshipBracket />
 
             {/* Upcoming & Completed Grids */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-8">

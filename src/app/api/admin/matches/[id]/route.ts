@@ -23,6 +23,13 @@ export async function PUT(request: Request, { params }: { params: { id: string }
       .single()
     if (error) throw error
 
+    // Broadcast the update so clients refresh immediately, bypassing RLS limitations
+    await supabaseAdmin.channel("evl_fixtures_sync").send({
+      type: "broadcast",
+      event: "match_updated",
+      payload: { id: params.id },
+    })
+
     if (data.status === 'completed') {
       await recalculateStandings()
     }
