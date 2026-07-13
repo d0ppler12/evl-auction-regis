@@ -67,16 +67,16 @@ export default function PlayerManagement() {
 
       if (editingId) {
         // PUT → patch the entry in local state
-        const updated = await adminFetch(`/api/admin/players/${editingId}`, {
+        const updated = await adminFetch<any>(`/api/admin/players/${editingId}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
         setPlayers((prev) =>
-          prev.map((p) => (p.id === editingId ? { ...p, ...updated } : p)),
+          prev.map((p) => (p.id === editingId ? { ...p, ...(updated as any) } : p)),
         );
       } else {
         // POST → prepend new player to local state
-        const created = await adminFetch("/api/admin/players", {
+        const created = await adminFetch<any>("/api/admin/players", {
           method: "POST",
           body: JSON.stringify(payload),
         });

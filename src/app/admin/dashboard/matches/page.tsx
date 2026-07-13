@@ -91,7 +91,7 @@ export default function MatchManagement() {
           body: JSON.stringify(payload),
         });
         setMatches((prev) =>
-          prev.map((m) => (m.id === editingId ? { ...m, ...updated } : m)),
+          prev.map((m) => (m.id === editingId ? { ...m, ...(updated as any) } : m)),
         );
       } else {
         // POST → prepend new match to local state

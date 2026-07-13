@@ -76,28 +76,28 @@ export default function TeamsManagement() {
 
       if (editingId) {
         // PUT → patch the existing entry in local state
-        team = await adminFetch(`/api/admin/teams/${editingId}`, {
+        team = await adminFetch<any>(`/api/admin/teams/${editingId}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
         setTeams((prev) =>
           prev.map((t) =>
-            t.id === editingId ? { ...t, ...team, players: t.players } : t,
+            t.id === editingId ? { ...t, ...(team as any), players: t.players } : t,
           ),
         );
       } else {
         // POST → prepend new team to local state (players array starts empty)
-        team = await adminFetch("/api/admin/teams", {
+        team = await adminFetch<any>("/api/admin/teams", {
           method: "POST",
           body: JSON.stringify(payload),
         });
-        setTeams((prev) => [{ ...team, players: [] }, ...prev]);
+        setTeams((prev) => [{ ...(team as any), players: [] }, ...prev]);
       }
 
       if (logoFile && team?.id) {
         const fd = new FormData();
         fd.append("logo", logoFile);
-        const updated = await adminFetch(`/api/admin/teams/${team.id}/logo`, {
+        const updated = await adminFetch<any>(`/api/admin/teams/${team.id}/logo`, {
           method: "POST",
           body: fd,
         });
