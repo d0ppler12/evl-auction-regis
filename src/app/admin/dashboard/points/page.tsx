@@ -94,77 +94,92 @@ export default function PointsManagement() {
           <p className="text-slate-400">Add teams to the database first.</p>
         </div>
       ) : (
-        <div className="bg-slate-900/50 border border-white/5 rounded-2xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 text-slate-400 uppercase text-xs">
-                <th className="text-left p-4">Pos</th>
-                <th className="text-left p-4">Team</th>
-                <th className="text-center p-4">Played</th>
-                <th className="text-center p-4">Wins</th>
-                <th className="text-center p-4">Losses</th>
-                <th className="text-center p-4">Sets Won</th>
-                <th className="text-center p-4">Sets Lost</th>
-                <th className="text-center p-4 bg-blue-900/20">Points</th>
-              </tr>
-            </thead>
-            <tbody>
-              {standings.map((row, idx) => (
-                <tr key={row.team_id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="p-4 font-mono text-slate-400">{idx + 1}</td>
-                  <td className="p-4 font-bold text-white whitespace-nowrap">{row.team?.name || "—"}</td>
-                  <td className="p-2 text-center">
-                    <input 
-                      type="number" 
-                      value={row.played} 
-                      onChange={(e) => handleChange(idx, 'played', e.target.value)}
-                      className="w-16 bg-slate-800 border border-white/10 rounded px-2 py-1 text-center text-white"
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <input 
-                      type="number" 
-                      value={row.wins} 
-                      onChange={(e) => handleChange(idx, 'wins', e.target.value)}
-                      className="w-16 bg-slate-800 border border-emerald-500/30 rounded px-2 py-1 text-center text-emerald-400"
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <input 
-                      type="number" 
-                      value={row.losses} 
-                      onChange={(e) => handleChange(idx, 'losses', e.target.value)}
-                      className="w-16 bg-slate-800 border border-red-500/30 rounded px-2 py-1 text-center text-red-400"
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <input 
-                      type="number" 
-                      value={row.sets_won} 
-                      onChange={(e) => handleChange(idx, 'sets_won', e.target.value)}
-                      className="w-16 bg-slate-800 border border-white/10 rounded px-2 py-1 text-center text-white"
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <input 
-                      type="number" 
-                      value={row.sets_lost} 
-                      onChange={(e) => handleChange(idx, 'sets_lost', e.target.value)}
-                      className="w-16 bg-slate-800 border border-white/10 rounded px-2 py-1 text-center text-white"
-                    />
-                  </td>
-                  <td className="p-2 text-center bg-blue-900/10">
-                    <input 
-                      type="number" 
-                      value={row.points} 
-                      onChange={(e) => handleChange(idx, 'points', e.target.value)}
-                      className="w-16 bg-blue-900/40 border border-blue-500/50 rounded px-2 py-1 text-center text-blue-400 font-bold"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-8">
+          {['A', 'B'].map((group) => (
+            <div key={group} className="space-y-4">
+              <h2 className="text-xl font-bold text-white">GROUP {group}</h2>
+              <div className="bg-slate-900/50 border border-white/5 rounded-2xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-white/10 text-slate-400 uppercase text-xs">
+                      <th className="text-left p-4">Pos</th>
+                      <th className="text-left p-4">Team</th>
+                      <th className="text-center p-4">Played</th>
+                      <th className="text-center p-4">Wins</th>
+                      <th className="text-center p-4">Losses</th>
+                      <th className="text-center p-4">Sets Won</th>
+                      <th className="text-center p-4">Sets Lost</th>
+                      <th className="text-center p-4 bg-blue-900/20">Points</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {standings
+                      .map((row, idx) => ({ ...row, originalIndex: idx }))
+                      .filter(row => (row.team?.group_name || 'A') === group)
+                      .map((row, groupIdx) => (
+                        <tr key={row.team_id} className="border-b border-white/5 hover:bg-white/5">
+                          <td className="p-4 font-mono text-slate-400">{groupIdx + 1}</td>
+                          <td className="p-4 font-bold text-white whitespace-nowrap">{row.team?.name || "—"}</td>
+                          <td className="p-2 text-center">
+                            <input 
+                              type="number" 
+                              value={row.played} 
+                              onChange={(e) => handleChange(row.originalIndex, 'played', e.target.value)}
+                              className="w-16 bg-slate-800 border border-white/10 rounded px-2 py-1 text-center text-white"
+                            />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input 
+                              type="number" 
+                              value={row.wins} 
+                              onChange={(e) => handleChange(row.originalIndex, 'wins', e.target.value)}
+                              className="w-16 bg-slate-800 border border-emerald-500/30 rounded px-2 py-1 text-center text-emerald-400"
+                            />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input 
+                              type="number" 
+                              value={row.losses} 
+                              onChange={(e) => handleChange(row.originalIndex, 'losses', e.target.value)}
+                              className="w-16 bg-slate-800 border border-red-500/30 rounded px-2 py-1 text-center text-red-400"
+                            />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input 
+                              type="number" 
+                              value={row.sets_won} 
+                              onChange={(e) => handleChange(row.originalIndex, 'sets_won', e.target.value)}
+                              className="w-16 bg-slate-800 border border-white/10 rounded px-2 py-1 text-center text-white"
+                            />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input 
+                              type="number" 
+                              value={row.sets_lost} 
+                              onChange={(e) => handleChange(row.originalIndex, 'sets_lost', e.target.value)}
+                              className="w-16 bg-slate-800 border border-white/10 rounded px-2 py-1 text-center text-white"
+                            />
+                          </td>
+                          <td className="p-2 text-center bg-blue-900/10">
+                            <input 
+                              type="number" 
+                              value={row.points} 
+                              onChange={(e) => handleChange(row.originalIndex, 'points', e.target.value)}
+                              className="w-16 bg-blue-900/50 border border-blue-500/30 rounded px-2 py-1 text-center font-bold text-blue-400"
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    {standings.filter(row => (row.team?.group_name || 'A') === group).length === 0 && (
+                      <tr>
+                        <td colSpan={8} className="p-8 text-center text-slate-500 italic">No teams in Group {group}</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
