@@ -86,7 +86,7 @@ export default function MatchManagement() {
 
       if (editingId) {
         // PUT → patch the entry in local state
-        const updated = await adminFetch(`/api/admin/matches/${editingId}`, {
+        const updated = await adminFetch<any>(`/api/admin/matches/${editingId}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
@@ -95,7 +95,7 @@ export default function MatchManagement() {
         );
       } else {
         // POST → prepend new match to local state
-        const created = await adminFetch("/api/admin/matches", {
+        const created = await adminFetch<any>("/api/admin/matches", {
           method: "POST",
           body: JSON.stringify(payload),
         });
