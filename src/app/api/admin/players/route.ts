@@ -23,7 +23,10 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
 
-    let query = supabaseAdmin.from('players').select('*, teams(name)').order('created_at', { ascending: false })
+    let query = supabaseAdmin
+      .from('players')
+      .select('id, full_name, age, jersey_number, jersey_name, jersey_size, base_price, status, auction_status, team_id, sold_price, created_at, teams(name)')
+      .order('created_at', { ascending: false })
     if (status) query = query.eq('status', status)
 
     const { data, error } = await query

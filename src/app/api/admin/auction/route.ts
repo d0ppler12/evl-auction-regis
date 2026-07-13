@@ -8,8 +8,8 @@ export async function GET() {
   try {
     requireAdmin()
     const [playersRes, teamsRes, stateRes] = await Promise.all([
-      supabaseAdmin.from('players').select('*'),
-      supabaseAdmin.from('teams').select('*').order('name'),
+      supabaseAdmin.from('players').select('id, full_name, photo_url, auction_status, base_price, team_id, sold_price, jersey_number, wing_building, volleyball_experience, status, created_at'),
+      supabaseAdmin.from('teams').select('id, name, logo_url, color_theme, purse_remaining, total_purse, owner_name, group_name').order('name'),
       supabaseAdmin.from('auction_state').select('*').eq('id', 1).maybeSingle(),
     ])
     if (playersRes.error) throw playersRes.error
