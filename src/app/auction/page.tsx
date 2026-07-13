@@ -19,9 +19,11 @@ export default function AuctionPage() {
     async function init() {
       const { data: t } = await supabase
         .from("teams")
-        .select("*")
+        .select("id, name, logo_url, color_theme, purse_remaining, total_purse")
         .order("name");
-      const { data: p } = await supabase.from("players").select("*");
+      const { data: p } = await supabase
+        .from("players")
+        .select("id, full_name, photo_url, auction_status, base_price, team_id, sold_price, jersey_number, wing_building, volleyball_experience");
 
       if (t) setTeams(t);
       if (p) setAllPlayers(p);

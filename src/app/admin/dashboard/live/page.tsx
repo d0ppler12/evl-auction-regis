@@ -14,11 +14,15 @@ export default function LiveMatchController() {
   const loadMatches = async () => {
     try {
       const data = await adminFetch<any[]>("/api/admin/matches");
-      setMatches(data);
-      const live = data.find(m => m.status === 'live');
-      if (live && !liveMatchId) {
-        setLiveMatchId(live.id);
-      }
+      setMatches((prev) => {
+        // Skip state update if data is identical — avoids unnecessary re-renders
+        if (JSON.stringify(prev) === JSON.stringify(data)) return prev;
+        const live = data.find(m => m.status === 'live');
+        if (live && !liveMatchId) {
+          setLiveMatchId(live.id);
+        }
+        return data;
+      });
     } catch (e) {
       console.error(e);
     }
@@ -27,7 +31,7 @@ export default function LiveMatchController() {
 
   useEffect(() => {
     loadMatches();
-    const interval = setInterval(loadMatches, 5000); // Poll for updates
+    const interval = setInterval(loadMatches, 10000); // Reduced from 5s to 10s to halve egress
     return () => clearInterval(interval);
   }, []);
 

@@ -24,19 +24,12 @@ export default function PlayerManagement() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
 
-  const loadPlayers = async () => {
-    setLoading(true);
-    try {
-      const data = await adminFetch<any[]>("/api/admin/players");
-      setPlayers(data);
-    } catch {
-      setPlayers([]);
-    }
-    setLoading(false);
-  };
-
+  // Load players once on mount — not after every mutation
   useEffect(() => {
-    loadPlayers();
+    adminFetch<any[]>("/api/admin/players")
+      .then(setPlayers)
+      .catch(() => setPlayers([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const openAdd = () => {
@@ -71,19 +64,25 @@ export default function PlayerManagement() {
         jersey_number: form.jersey_number ? parseInt(form.jersey_number) : null,
         base_price: parseInt(form.base_price) ?? 0,
       };
+
       if (editingId) {
-        await adminFetch(`/api/admin/players/${editingId}`, {
+        // PUT → patch the entry in local state
+        const updated = await adminFetch(`/api/admin/players/${editingId}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
+        setPlayers((prev) =>
+          prev.map((p) => (p.id === editingId ? { ...p, ...updated } : p)),
+        );
       } else {
-        await adminFetch("/api/admin/players", {
+        // POST → prepend new player to local state
+        const created = await adminFetch("/api/admin/players", {
           method: "POST",
           body: JSON.stringify(payload),
         });
+        setPlayers((prev) => [created, ...prev]);
       }
       setShowForm(false);
-      await loadPlayers();
     } catch (e: any) {
       alert(e.message);
     }
@@ -94,7 +93,8 @@ export default function PlayerManagement() {
     if (!confirm("Delete this player?")) return;
     try {
       await adminFetch(`/api/admin/players/${id}`, { method: "DELETE" });
-      await loadPlayers();
+      // Optimistic: remove from local state immediately
+      setPlayers((prev) => prev.filter((p) => p.id !== id));
     } catch (e: any) {
       alert(e.message);
     }
@@ -236,7 +236,20 @@ export default function PlayerManagement() {
                     #{p.jersey_number || "—"}
                   </p>
                 </div>
-                <div className="flex gap-1"></div>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => openEdit(p)}
+                    className="p-2 text-slate-400 hover:text-white transition-colors"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    className="p-2 text-slate-400 hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               {p.auction_status === "sold" ? (
                 <p className="text-xs font-bold text-blue-400 uppercase">

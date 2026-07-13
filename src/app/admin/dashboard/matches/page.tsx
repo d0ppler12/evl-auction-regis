@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CalendarDays, Plus, Pencil, Trash2 } from "lucide-react";
 import { adminFetch } from "@/lib/admin-fetch";
 
@@ -25,16 +25,15 @@ export default function MatchManagement() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  // Track if teams have been fetched to avoid re-fetching
+  const teamsFetchedRef = useRef(false);
 
-  const load = async () => {
+  // Fetch matches (re-fetched after mutations) and teams (fetched once only)
+  const loadMatches = async () => {
     setLoading(true);
     try {
-      const [m, t] = await Promise.all([
-        adminFetch<any[]>("/api/admin/matches"),
-        adminFetch<any[]>("/api/admin/teams"),
-      ]);
+      const m = await adminFetch<any[]>("/api/admin/matches");
       setMatches(m);
-      setTeams(t);
     } catch {
       setMatches([]);
     }
@@ -42,7 +41,12 @@ export default function MatchManagement() {
   };
 
   useEffect(() => {
-    load();
+    // Fetch teams only once on mount
+    if (!teamsFetchedRef.current) {
+      teamsFetchedRef.current = true;
+      adminFetch<any[]>("/api/admin/teams").then(setTeams).catch(() => {});
+    }
+    loadMatches();
   }, []);
 
   const openAdd = () => {
@@ -79,13 +83,25 @@ export default function MatchManagement() {
         match_type: form.match_type,
         bracket_round: form.bracket_round || null,
       };
+
       if (editingId) {
-        await adminFetch(`/api/admin/matches/${editingId}`, { method: "PUT", body: JSON.stringify(payload) });
+        // PUT → patch the entry in local state
+        const updated = await adminFetch(`/api/admin/matches/${editingId}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+        });
+        setMatches((prev) =>
+          prev.map((m) => (m.id === editingId ? { ...m, ...updated } : m)),
+        );
       } else {
-        await adminFetch("/api/admin/matches", { method: "POST", body: JSON.stringify(payload) });
+        // POST → prepend new match to local state
+        const created = await adminFetch("/api/admin/matches", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        setMatches((prev) => [created, ...prev]);
       }
       setShowForm(false);
-      await load();
     } catch (e: any) {
       alert(e.message);
     }
@@ -96,7 +112,8 @@ export default function MatchManagement() {
     if (!confirm("Delete this match?")) return;
     try {
       await adminFetch(`/api/admin/matches/${id}`, { method: "DELETE" });
-      await load();
+      // Optimistic: remove from local state immediately
+      setMatches((prev) => prev.filter((m) => m.id !== id));
     } catch (e: any) {
       alert(e.message);
     }

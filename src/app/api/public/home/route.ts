@@ -21,12 +21,19 @@ export async function GET() {
         .limit(1),
     ])
 
-    return NextResponse.json({
-      teams: teamsRes.data || [],
-      standings: standingsRes.data || [],
-      matches: matchesRes.data || [],
-      topPlayer: soldRes.data?.[0] || null,
-    })
+    return NextResponse.json(
+      {
+        teams: teamsRes.data || [],
+        standings: standingsRes.data || [],
+        matches: matchesRes.data || [],
+        topPlayer: soldRes.data?.[0] || null,
+      },
+      {
+        headers: {
+          'Cache-Control': 's-maxage=60, stale-while-revalidate=300',
+        },
+      },
+    )
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
