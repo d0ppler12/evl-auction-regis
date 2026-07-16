@@ -376,7 +376,7 @@ export default function FixturesPage() {
 
                     <div className="w-full md:w-[30%] flex flex-col items-center">
                       <p className="text-[10px] md:text-xs font-black text-slate-300 mb-2 tracking-widest uppercase bg-slate-800/80 px-4 py-1.5 rounded-full border border-white/10 shadow-inner">
-                        Set {liveMatch.sets_team_a + liveMatch.sets_team_b + 1}
+                        Set {liveMatch.current_set || 1}
                       </p>
 
                       {/* Points Display */}

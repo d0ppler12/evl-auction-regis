@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from('matches')
-      .select('id, team_a_id, team_b_id, match_date, match_time, venue, status, sets_team_a, sets_team_b, points_team_a, points_team_b, match_type, bracket_round, team_a:team_a_id(id, name, logo_url, color_theme), team_b:team_b_id(id, name, logo_url, color_theme)')
+      .select('id, team_a_id, team_b_id, match_date, match_time, venue, status, sets_team_a, sets_team_b, points_team_a, points_team_b, current_set, match_type, bracket_round, team_a:team_a_id(id, name, logo_url, color_theme), team_b:team_b_id(id, name, logo_url, color_theme)')
       .order('match_date', { ascending: true })
       .order('match_time', { ascending: true })
 
