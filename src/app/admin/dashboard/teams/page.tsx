@@ -82,7 +82,9 @@ export default function TeamsManagement() {
         });
         setTeams((prev) =>
           prev.map((t) =>
-            t.id === editingId ? { ...t, ...(team as any), players: t.players } : t,
+            t.id === editingId
+              ? { ...t, ...(team as any), players: t.players }
+              : t,
           ),
         );
       } else {
@@ -97,14 +99,19 @@ export default function TeamsManagement() {
       if (logoFile && team?.id) {
         const fd = new FormData();
         fd.append("logo", logoFile);
-        const updated = await adminFetch<any>(`/api/admin/teams/${team.id}/logo`, {
-          method: "POST",
-          body: fd,
-        });
+        const updated = await adminFetch<any>(
+          `/api/admin/teams/${team.id}/logo`,
+          {
+            method: "POST",
+            body: fd,
+          },
+        );
         // Patch just the logo_url in state
         setTeams((prev) =>
           prev.map((t) =>
-            t.id === team.id ? { ...t, logo_url: updated?.logo_url ?? t.logo_url } : t,
+            t.id === team.id
+              ? { ...t, logo_url: updated?.logo_url ?? t.logo_url }
+              : t,
           ),
         );
       }
@@ -322,20 +329,7 @@ export default function TeamsManagement() {
                     <p className="text-xs text-slate-400">{team.owner_name}</p>
                   </div>
                 </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => openEdit(team)}
-                    className="p-2 text-slate-400 hover:text-white transition-colors"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(team.id)}
-                    className="p-2 text-slate-400 hover:text-red-400 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                <div className="flex gap-1"></div>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                 <div className="bg-slate-800 rounded-lg p-2">
@@ -378,12 +372,6 @@ export default function TeamsManagement() {
                           <span className="text-xs font-mono font-bold text-blue-400">
                             {p.sold_price?.toLocaleString()} pts
                           </span>
-                          <button
-                            onClick={() => handleReleasePlayer(team.id, p.id)}
-                            className="text-[10px] font-bold text-red-400/70 hover:text-red-400 transition-colors px-2 py-1 rounded bg-red-500/10 hover:bg-red-500/20"
-                          >
-                            Release
-                          </button>
                         </div>
                       </div>
                     ))}

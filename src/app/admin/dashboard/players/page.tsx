@@ -67,12 +67,17 @@ export default function PlayerManagement() {
 
       if (editingId) {
         // PUT → patch the entry in local state
-        const updated = await adminFetch<any>(`/api/admin/players/${editingId}`, {
-          method: "PUT",
-          body: JSON.stringify(payload),
-        });
+        const updated = await adminFetch<any>(
+          `/api/admin/players/${editingId}`,
+          {
+            method: "PUT",
+            body: JSON.stringify(payload),
+          },
+        );
         setPlayers((prev) =>
-          prev.map((p) => (p.id === editingId ? { ...p, ...(updated as any) } : p)),
+          prev.map((p) =>
+            p.id === editingId ? { ...p, ...(updated as any) } : p,
+          ),
         );
       } else {
         // POST → prepend new player to local state
@@ -236,20 +241,7 @@ export default function PlayerManagement() {
                     #{p.jersey_number || "—"}
                   </p>
                 </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => openEdit(p)}
-                    className="p-2 text-slate-400 hover:text-white transition-colors"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(p.id)}
-                    className="p-2 text-slate-400 hover:text-red-400 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                <div className="flex gap-1"></div>
               </div>
               {p.auction_status === "sold" ? (
                 <p className="text-xs font-bold text-blue-400 uppercase">
