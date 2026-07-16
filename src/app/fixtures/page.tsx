@@ -27,6 +27,7 @@ type Match = {
   sets_team_b: number;
   points_team_a: number;
   points_team_b: number;
+  current_set?: number;
   match_type: string; // 'league', 'knockout'
   bracket_round: string | null;
 };
