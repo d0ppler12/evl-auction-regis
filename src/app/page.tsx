@@ -12,6 +12,34 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
+const formatDate = (dateString: string) => {
+  if (!dateString) return "TBD";
+  const [year, month, day] = dateString.split("-");
+  if (!year || !month || !day) return dateString;
+  return `${day}/${month}/${year}`;
+};
+
+const formatTime = (timeStr: string) => {
+  if (!timeStr) return "TBD";
+  if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) {
+    return timeStr;
+  }
+  const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (match) {
+    let hours = parseInt(match[1]);
+    const minutes = match[2];
+    if (hours >= 12) {
+      const pmHours = hours === 12 ? 12 : hours - 12;
+      return `${pmHours.toString().padStart(2, '0')}:${minutes} PM`;
+    }
+    if (hours >= 1 && hours <= 11) {
+      return `${hours.toString().padStart(2, '0')}:${minutes} PM`;
+    }
+    if (hours === 0) return `12:${minutes} AM`;
+  }
+  return timeStr;
+};
+
 // Dynamic data is fetched from DB
 
 // Dynamic matches are fetched from DB
@@ -42,11 +70,29 @@ export default function Home() {
 
     const fetchMatches = async () => {
       try {
-        const res = await fetch("/api/public/matches", { cache: "no-store" });
-        const data = await res.json();
-        if (Array.isArray(data)) setMatches(data);
-      } catch (e) {
-        console.error("Failed to fetch matches", e);
+        const res = await fetch(`/api/public/fixtures?t=${Date.now()}`);
+        if (!res.ok) throw new Error("Failed to fetch matches");
+        let data = await res.json();
+        
+        if (Array.isArray(data)) {
+          // Sort by date and time properly using the formatted time (so AM/PM is correctly sorted)
+          data = data.sort((a, b) => {
+            const timeA = formatTime(a.match_time || '00:00');
+            const timeB = formatTime(b.match_time || '00:00');
+            const dateA = new Date(`${a.match_date} ${timeA}`);
+            const dateB = new Date(`${b.match_date} ${timeB}`);
+            if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+              return dateA.getTime() - dateB.getTime();
+            }
+            // Fallback to string comparison if date parsing fails
+            if (a.match_date !== b.match_date) return (a.match_date || "").localeCompare(b.match_date || "");
+            return timeA.localeCompare(timeB);
+          });
+        }
+        
+        setMatches(data || []);
+      } catch (err) {
+        console.error("Failed to fetch matches", err);
       }
     };
     fetchMatches();
@@ -318,10 +364,10 @@ export default function Home() {
 
                       <div className="text-center w-1/3">
                         <div className="inline-block px-2.5 py-0.5 rounded bg-accent/15 border border-accent/20 text-[9px] text-accent font-extrabold uppercase mb-2 tracking-widest">
-                          {match.match_date || "TBD"}
+                          {formatDate(match.match_date)}
                         </div>
                         <div className="text-xs md:text-sm font-black text-white font-mono tracking-tight">
-                          {match.match_time || "TBD"}
+                          {formatTime(match.match_time)}
                         </div>
                       </div>
 
@@ -500,24 +546,24 @@ export default function Home() {
                   COMING SOON
                 </div>
               )}
-              {filteredMatches.map((match) => (
+              {filteredMatches.slice(0, 3).map((match) => (
                 <div
                   key={match.id}
                   className="flex flex-col sm:flex-row items-center justify-between p-4 card-base card-hover gap-4 bg-slate-900/20 border-white/5 hover:border-accent/25 hover:bg-slate-900/40"
                 >
                   <div className="w-full sm:w-1/4 text-center sm:text-left border-b sm:border-b-0 border-white/5 pb-2 sm:pb-0">
                     <div className="inline-block px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] text-slate-400 font-black mb-1">
-                      {match.match_date || "TBD"}
+                      {formatDate(match.match_date)}
                     </div>
                     <div className="text-sm font-black text-white font-mono">
-                      {match.match_time || "TBD"}
+                      {formatTime(match.match_time)}
                     </div>
                   </div>
                   <div className="flex items-center justify-center gap-4 w-full sm:w-1/2">
-                    <span className="font-extrabold text-xs md:text-sm hidden sm:block w-24 text-right text-slate-200 group-hover:text-white truncate">
+                    <span className="font-extrabold text-xs md:text-sm hidden sm:block w-32 text-right text-slate-200 group-hover:text-white truncate">
                       {match.team_a?.name || "TBD"}
                     </span>
-                    <div className="w-9 h-9 bg-slate-800 rounded-xl border border-white/5 flex items-center justify-center text-primary text-xs font-bold overflow-hidden shadow-inner group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 bg-slate-800 rounded-xl border border-white/5 flex items-center justify-center text-primary text-xs font-bold overflow-hidden shadow-inner group-hover:scale-105 transition-transform shrink-0">
                       {match.team_a?.logo_url ? (
                         <img
                           src={match.team_a.logo_url}
@@ -528,10 +574,10 @@ export default function Home() {
                         match.team_a?.name?.[0] || "T"
                       )}
                     </div>
-                    <span className="text-[10px] text-accent font-black tracking-widest px-2.5 py-1 rounded bg-accent/10 border border-accent/20">
+                    <span className="text-[10px] text-accent font-black tracking-widest px-2.5 py-1 rounded bg-accent/10 border border-accent/20 shrink-0">
                       VS
                     </span>
-                    <div className="w-9 h-9 bg-slate-800 rounded-xl border border-white/5 flex items-center justify-center text-primary text-xs font-bold overflow-hidden shadow-inner group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 bg-slate-800 rounded-xl border border-white/5 flex items-center justify-center text-primary text-xs font-bold overflow-hidden shadow-inner group-hover:scale-105 transition-transform shrink-0">
                       {match.team_b?.logo_url ? (
                         <img
                           src={match.team_b.logo_url}
@@ -542,17 +588,23 @@ export default function Home() {
                         match.team_b?.name?.[0] || "T"
                       )}
                     </div>
-                    <span className="font-extrabold text-xs md:text-sm hidden sm:block w-24 text-left text-slate-200 group-hover:text-white truncate">
+                    <span className="font-extrabold text-xs md:text-sm hidden sm:block w-32 text-left text-slate-200 group-hover:text-white truncate">
                       {match.team_b?.name || "TBD"}
                     </span>
                   </div>
-                  <div className="w-full sm:w-1/4 text-center sm:text-right">
-                    <button className="w-full sm:w-auto px-6 py-2 bg-slate-900/60 hover:bg-accent border border-white/5 hover:border-accent/40 text-xs font-extrabold text-slate-300 hover:text-slate-950 rounded-xl transition-all shadow-inner">
-                      DETAILS
-                    </button>
-                  </div>
+                  {/* Dummy right column to balance the date on the left and force absolute center */}
+                  <div className="hidden sm:block sm:w-1/4"></div>
                 </div>
               ))}
+              {filteredMatches.length > 3 && (
+                <div className="pt-4 flex justify-center">
+                  <Link href="/fixtures">
+                    <button className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black tracking-widest uppercase rounded-xl border border-white/10 transition-colors shadow-lg">
+                      See More Matches
+                    </button>
+                  </Link>
+                </div>
+              )}
             </div>
           </section>
 

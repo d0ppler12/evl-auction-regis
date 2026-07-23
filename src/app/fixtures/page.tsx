@@ -8,6 +8,34 @@ import Navbar from "@/components/navbar";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 
+const formatDate = (dateString: string) => {
+  if (!dateString) return "TBD";
+  const [year, month, day] = dateString.split("-");
+  if (!year || !month || !day) return dateString;
+  return `${day}/${month}/${year}`;
+};
+
+const formatTime = (timeStr: string) => {
+  if (!timeStr) return "TBD";
+  if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) {
+    return timeStr;
+  }
+  const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (match) {
+    let hours = parseInt(match[1]);
+    const minutes = match[2];
+    if (hours >= 12) {
+      const pmHours = hours === 12 ? 12 : hours - 12;
+      return `${pmHours.toString().padStart(2, '0')}:${minutes} PM`;
+    }
+    if (hours >= 1 && hours <= 11) {
+      return `${hours.toString().padStart(2, '0')}:${minutes} PM`;
+    }
+    if (hours === 0) return `12:${minutes} AM`;
+  }
+  return timeStr;
+};
+
 type Team = {
   id: string;
   name: string;
@@ -35,11 +63,26 @@ type Match = {
 export default function FixturesPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAllUpcoming, setShowAllUpcoming] = useState(false);
 
   const fetchMatches = () => {
     fetch(`/api/public/fixtures?t=${Date.now()}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
+        if (Array.isArray(data)) {
+          // Sort by date and time properly
+          data = data.sort((a, b) => {
+            const timeA = formatTime(a.match_time || '00:00');
+            const timeB = formatTime(b.match_time || '00:00');
+            const dateA = new Date(`${a.match_date} ${timeA}`);
+            const dateB = new Date(`${b.match_date} ${timeB}`);
+            if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+              return dateA.getTime() - dateB.getTime();
+            }
+            if (a.match_date !== b.match_date) return (a.match_date || "").localeCompare(b.match_date || "");
+            return timeA.localeCompare(timeB);
+          });
+        }
         setMatches(data || []);
         setLoading(false);
       });
@@ -104,10 +147,10 @@ export default function FixturesPage() {
         <div className="flex justify-between items-center mb-6">
           <div className="flex gap-3 text-xs font-semibold text-slate-400">
             <span className="flex items-center gap-1 bg-black/20 px-2 py-1 rounded-md">
-              <Calendar className="w-3.5 h-3.5" /> {m.match_date}
+              <Calendar className="w-3.5 h-3.5" /> {formatDate(m.match_date)}
             </span>
             <span className="flex items-center gap-1 bg-black/20 px-2 py-1 rounded-md">
-              <Clock className="w-3.5 h-3.5" /> {m.match_time}
+              <Clock className="w-3.5 h-3.5" /> {formatTime(m.match_time)}
             </span>
           </div>
           {m.match_type === "knockout" && (
@@ -457,9 +500,19 @@ export default function FixturesPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {upcomingMatches.map((m) => (
+                    {(showAllUpcoming ? upcomingMatches : upcomingMatches.slice(0, 3)).map((m) => (
                       <MatchCard key={m.id} m={m} />
                     ))}
+                    {upcomingMatches.length > 3 && (
+                      <div className="pt-4 flex justify-center">
+                        <button 
+                          onClick={() => setShowAllUpcoming(!showAllUpcoming)}
+                          className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black tracking-widest uppercase rounded-xl border border-white/10 transition-colors shadow-lg"
+                        >
+                          {showAllUpcoming ? "Show Less" : `See More (${upcomingMatches.length - 3})`}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

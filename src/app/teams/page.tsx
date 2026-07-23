@@ -8,6 +8,34 @@ import { Loader } from "@/components/ui/Loader";
 import { ChevronRight, Filter, Users, X, Menu, Search, Trophy, History } from "lucide-react";
 import Navbar from "@/components/navbar";
 
+const formatDate = (dateString: string) => {
+  if (!dateString) return "TBD";
+  const [year, month, day] = dateString.split("-");
+  if (!year || !month || !day) return dateString;
+  return `${day}/${month}/${year}`;
+};
+
+const formatTime = (timeStr: string) => {
+  if (!timeStr) return "TBD";
+  if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) {
+    return timeStr;
+  }
+  const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (match) {
+    let hours = parseInt(match[1]);
+    const minutes = match[2];
+    if (hours >= 12) {
+      const pmHours = hours === 12 ? 12 : hours - 12;
+      return `${pmHours.toString().padStart(2, '0')}:${minutes} PM`;
+    }
+    if (hours >= 1 && hours <= 11) {
+      return `${hours.toString().padStart(2, '0')}:${minutes} PM`;
+    }
+    if (hours === 0) return `12:${minutes} AM`;
+  }
+  return timeStr;
+};
+
 export default function TeamsPage() {
   const [teams, setTeams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -302,7 +330,7 @@ export default function TeamsPage() {
                         <div key={match.id} className={`flex items-center justify-between p-4 rounded-2xl border ${resultClass}`}>
                           <div className="flex flex-col gap-1">
                             <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-                              {match.match_date ? new Date(match.match_date).toLocaleDateString() : 'TBD'} {match.match_time && `• ${match.match_time}`}
+                              {formatDate(match.match_date)} {match.match_time && `• ${formatTime(match.match_time)}`}
                             </span>
                             <div className="flex items-center gap-3">
                               {opponent.logo_url && (
