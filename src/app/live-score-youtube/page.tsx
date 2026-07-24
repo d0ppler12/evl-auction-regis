@@ -81,44 +81,59 @@ export default function YouTubeLiveScorePage() {
 
   if (!liveMatch) return null; // Fully transparent if no live match
 
+  const currentSet = liveMatch.current_set || 1;
+  const isEvenSet = currentSet % 2 === 0;
+  
+  const leftTeam = isEvenSet ? liveMatch.team_b : liveMatch.team_a;
+  const rightTeam = isEvenSet ? liveMatch.team_a : liveMatch.team_b;
+  
+  const leftSets = isEvenSet ? liveMatch.sets_team_b : liveMatch.sets_team_a;
+  const rightSets = isEvenSet ? liveMatch.sets_team_a : liveMatch.sets_team_b;
+  
+  const leftPoints = isEvenSet ? liveMatch.points_team_b : liveMatch.points_team_a;
+  const rightPoints = isEvenSet ? liveMatch.points_team_a : liveMatch.points_team_b;
+
+  const leftKey = isEvenSet ? 'b' : 'a';
+  const rightKey = isEvenSet ? 'a' : 'b';
+
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden">
       
       {/* BOTTOM SCOREBOARD */}
       <div className="absolute bottom-8 inset-x-0 h-[50px] flex justify-center items-end drop-shadow-2xl">
         
-        {/* TEAM A SIDE */}
+        {/* LEFT TEAM SIDE */}
         <div className="flex h-full items-end drop-shadow-xl">
           {/* Logo Box (Overlapping Top) */}
-          <div className="h-[70px] w-[100px] bg-white relative z-20 flex items-center justify-center shadow-lg border-b-[6px]" style={{ borderBottomColor: liveMatch.team_a?.color_theme || '#475569' }}>
-             {liveMatch.team_a?.logo_url ? (
+          <div className="h-[70px] w-[100px] bg-white relative z-20 flex items-center justify-center shadow-lg border-b-[6px]" style={{ borderBottomColor: leftTeam?.color_theme || '#475569' }}>
+             {leftTeam?.logo_url ? (
                 <div className="absolute -top-6 w-24 h-24 drop-shadow-xl">
-                  <Image src={liveMatch.team_a.logo_url} alt="Team A" fill className="object-contain" />
+                  <Image src={leftTeam.logo_url} alt="Left Team" fill className="object-contain" />
                 </div>
               ) : (
-                <span className="text-2xl font-black text-black">{liveMatch.team_a?.name?.charAt(0)}</span>
+                <span className="text-2xl font-black text-black">{leftTeam?.name?.charAt(0)}</span>
               )}
           </div>
           
           {/* Name Box */}
-          <div className="h-full bg-black/90 backdrop-blur px-6 flex items-center w-[250px] border-b-[6px]" style={{ borderBottomColor: liveMatch.team_a?.color_theme || '#475569' }}>
-             <span className="text-xl font-black text-white uppercase truncate tracking-tight">{liveMatch.team_a?.name}</span>
+          <div className="h-full bg-black/90 backdrop-blur px-6 flex items-center w-[250px] border-b-[6px]" style={{ borderBottomColor: leftTeam?.color_theme || '#475569' }}>
+             <span className="text-xl font-black text-white uppercase truncate tracking-tight">{leftTeam?.name}</span>
           </div>
 
           {/* Sets Box */}
           <div className="h-full bg-slate-900 w-[80px] flex flex-col justify-center items-center text-yellow-500 border-b-[6px] border-slate-950">
             <span className="text-[11px] font-black tracking-widest uppercase leading-none mt-1">SETS</span>
-            <span className="text-2xl font-black leading-none mt-0.5">{liveMatch.sets_team_a}</span>
+            <span className="text-2xl font-black leading-none mt-0.5">{leftSets}</span>
           </div>
 
           {/* Points Box */}
           <div className="h-full bg-gradient-to-b from-[#E5C058] to-[#B8860B] w-[90px] flex justify-center items-center text-white border-b-[6px] border-[#8B6508]">
             <motion.span 
-              key={`pts-a-${liveMatch.points_team_a}`}
+              key={`pts-${leftKey}-${leftPoints}`}
               initial={{ scale: 1.5 }} animate={{ scale: 1 }}
               className="text-4xl font-black font-mono drop-shadow-md leading-none"
             >
-              {liveMatch.points_team_a}
+              {leftPoints}
             </motion.span>
           </div>
         </div>
@@ -129,42 +144,42 @@ export default function YouTubeLiveScorePage() {
             <Image src="/evl-hero.png" alt="EVL Logo" fill className="object-contain" />
           </div>
           <div className="absolute bottom-1 text-[#D4AF37] font-black text-[10px] tracking-[0.2em]">
-            SET {liveMatch.current_set || 1}
+            SET {currentSet}
           </div>
         </div>
 
-        {/* TEAM B SIDE */}
+        {/* RIGHT TEAM SIDE */}
         <div className="flex h-full items-end drop-shadow-xl">
           {/* Points Box */}
           <div className="h-full bg-gradient-to-b from-[#E5C058] to-[#B8860B] w-[90px] flex justify-center items-center text-white border-b-[6px] border-[#8B6508]">
             <motion.span 
-              key={`pts-b-${liveMatch.points_team_b}`}
+              key={`pts-${rightKey}-${rightPoints}`}
               initial={{ scale: 1.5 }} animate={{ scale: 1 }}
               className="text-4xl font-black font-mono drop-shadow-md leading-none"
             >
-              {liveMatch.points_team_b}
+              {rightPoints}
             </motion.span>
           </div>
 
           {/* Sets Box */}
           <div className="h-full bg-slate-900 w-[80px] flex flex-col justify-center items-center text-yellow-500 border-b-[6px] border-slate-950">
             <span className="text-[11px] font-black tracking-widest uppercase leading-none mt-1">SETS</span>
-            <span className="text-2xl font-black leading-none mt-0.5">{liveMatch.sets_team_b}</span>
+            <span className="text-2xl font-black leading-none mt-0.5">{rightSets}</span>
           </div>
           
           {/* Name Box */}
-          <div className="h-full bg-black/90 backdrop-blur px-6 flex items-center justify-end w-[250px] border-b-[6px]" style={{ borderBottomColor: liveMatch.team_b?.color_theme || '#475569' }}>
-             <span className="text-xl font-black text-white uppercase truncate tracking-tight">{liveMatch.team_b?.name}</span>
+          <div className="h-full bg-black/90 backdrop-blur px-6 flex items-center justify-end w-[250px] border-b-[6px]" style={{ borderBottomColor: rightTeam?.color_theme || '#475569' }}>
+             <span className="text-xl font-black text-white uppercase truncate tracking-tight">{rightTeam?.name}</span>
           </div>
 
           {/* Logo Box (Overlapping Top) */}
-          <div className="h-[70px] w-[100px] bg-white relative z-20 flex items-center justify-center shadow-lg border-b-[6px]" style={{ borderBottomColor: liveMatch.team_b?.color_theme || '#475569' }}>
-             {liveMatch.team_b?.logo_url ? (
+          <div className="h-[70px] w-[100px] bg-white relative z-20 flex items-center justify-center shadow-lg border-b-[6px]" style={{ borderBottomColor: rightTeam?.color_theme || '#475569' }}>
+             {rightTeam?.logo_url ? (
                 <div className="absolute -top-6 w-24 h-24 drop-shadow-xl">
-                  <Image src={liveMatch.team_b.logo_url} alt="Team B" fill className="object-contain" />
+                  <Image src={rightTeam.logo_url} alt="Right Team" fill className="object-contain" />
                 </div>
               ) : (
-                <span className="text-2xl font-black text-black">{liveMatch.team_b?.name?.charAt(0)}</span>
+                <span className="text-2xl font-black text-black">{rightTeam?.name?.charAt(0)}</span>
               )}
           </div>
         </div>
