@@ -190,10 +190,10 @@ export default function Home() {
 
               <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                 <Link
-                  href="/teams"
+                  href="/fixtures"
                   className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-accent to-blue-600 hover:from-blue-400 hover:to-blue-700 text-slate-950 text-base font-extrabold shadow-[0_0_30px_rgba(96,165,250,0.3)] hover:shadow-[0_0_45px_rgba(96,165,250,0.5)] transition-all duration-300 hover:-translate-y-1 transform hover:scale-[1.02]"
                 >
-                  VIEW TEAMS
+                  VIEW MATCHES
                 </Link>
                 <button
                   onClick={() =>
@@ -620,10 +620,10 @@ export default function Home() {
                 CHECK PLAYER LIST OF EVL SEASON 3
               </p>
               <Link
-                href="/players"
+                href="/fixtures"
                 className="w-full py-4 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-950 font-black uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(250,204,21,0.25)] hover:shadow-[0_0_30px_rgba(250,204,21,0.45)] transition-all hover:scale-105 active:scale-95 text-sm"
               >
-                VIEW PLAYERS POOL
+                VIEW MATCHES
               </Link>
             </div>
           </section>
