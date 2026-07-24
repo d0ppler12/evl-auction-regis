@@ -21,7 +21,10 @@ const formatDate = (dateString: string) => {
 
 const formatTime = (timeStr: string) => {
   if (!timeStr) return "TBD";
-  if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) {
+  if (
+    timeStr.toLowerCase().includes("am") ||
+    timeStr.toLowerCase().includes("pm")
+  ) {
     return timeStr;
   }
   const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})$/);
@@ -30,10 +33,10 @@ const formatTime = (timeStr: string) => {
     const minutes = match[2];
     if (hours >= 12) {
       const pmHours = hours === 12 ? 12 : hours - 12;
-      return `${pmHours.toString().padStart(2, '0')}:${minutes} PM`;
+      return `${pmHours.toString().padStart(2, "0")}:${minutes} PM`;
     }
     if (hours >= 1 && hours <= 11) {
-      return `${hours.toString().padStart(2, '0')}:${minutes} PM`;
+      return `${hours.toString().padStart(2, "0")}:${minutes} PM`;
     }
     if (hours === 0) return `12:${minutes} AM`;
   }
@@ -73,23 +76,24 @@ export default function Home() {
         const res = await fetch(`/api/public/fixtures?t=${Date.now()}`);
         if (!res.ok) throw new Error("Failed to fetch matches");
         let data = await res.json();
-        
+
         if (Array.isArray(data)) {
           // Sort by date and time properly using the formatted time (so AM/PM is correctly sorted)
           data = data.sort((a, b) => {
-            const timeA = formatTime(a.match_time || '00:00');
-            const timeB = formatTime(b.match_time || '00:00');
+            const timeA = formatTime(a.match_time || "00:00");
+            const timeB = formatTime(b.match_time || "00:00");
             const dateA = new Date(`${a.match_date} ${timeA}`);
             const dateB = new Date(`${b.match_date} ${timeB}`);
             if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
               return dateA.getTime() - dateB.getTime();
             }
             // Fallback to string comparison if date parsing fails
-            if (a.match_date !== b.match_date) return (a.match_date || "").localeCompare(b.match_date || "");
+            if (a.match_date !== b.match_date)
+              return (a.match_date || "").localeCompare(b.match_date || "");
             return timeA.localeCompare(timeB);
           });
         }
-        
+
         setMatches(data || []);
       } catch (err) {
         console.error("Failed to fetch matches", err);
@@ -305,14 +309,6 @@ export default function Home() {
                               </span>
                               <span className="text-slate-300 font-extrabold mt-0.5">
                                 {team.owner_name?.split(" ")[0] || "—"}
-                              </span>
-                            </div>
-                            <div className="flex flex-col items-end">
-                              <span className="text-slate-500 font-semibold">
-                                Win %
-                              </span>
-                              <span className="text-accent font-black mt-0.5">
-                                {winRate}
                               </span>
                             </div>
                           </div>

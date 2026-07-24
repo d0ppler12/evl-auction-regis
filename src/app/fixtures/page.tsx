@@ -17,7 +17,10 @@ const formatDate = (dateString: string) => {
 
 const formatTime = (timeStr: string) => {
   if (!timeStr) return "TBD";
-  if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) {
+  if (
+    timeStr.toLowerCase().includes("am") ||
+    timeStr.toLowerCase().includes("pm")
+  ) {
     return timeStr;
   }
   const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})$/);
@@ -26,10 +29,10 @@ const formatTime = (timeStr: string) => {
     const minutes = match[2];
     if (hours >= 12) {
       const pmHours = hours === 12 ? 12 : hours - 12;
-      return `${pmHours.toString().padStart(2, '0')}:${minutes} PM`;
+      return `${pmHours.toString().padStart(2, "0")}:${minutes} PM`;
     }
     if (hours >= 1 && hours <= 11) {
-      return `${hours.toString().padStart(2, '0')}:${minutes} PM`;
+      return `${hours.toString().padStart(2, "0")}:${minutes} PM`;
     }
     if (hours === 0) return `12:${minutes} AM`;
   }
@@ -64,22 +67,24 @@ export default function FixturesPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAllUpcoming, setShowAllUpcoming] = useState(false);
+  const [showAllCompleted, setShowAllCompleted] = useState(false);
 
   const fetchMatches = () => {
-    fetch(`/api/public/fixtures?t=${Date.now()}`, { cache: 'no-store' })
+    fetch(`/api/public/fixtures?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
           // Sort by date and time properly
           data = data.sort((a, b) => {
-            const timeA = formatTime(a.match_time || '00:00');
-            const timeB = formatTime(b.match_time || '00:00');
+            const timeA = formatTime(a.match_time || "00:00");
+            const timeB = formatTime(b.match_time || "00:00");
             const dateA = new Date(`${a.match_date} ${timeA}`);
             const dateB = new Date(`${b.match_date} ${timeB}`);
             if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
               return dateA.getTime() - dateB.getTime();
             }
-            if (a.match_date !== b.match_date) return (a.match_date || "").localeCompare(b.match_date || "");
+            if (a.match_date !== b.match_date)
+              return (a.match_date || "").localeCompare(b.match_date || "");
             return timeA.localeCompare(timeB);
           });
         }
@@ -94,15 +99,11 @@ export default function FixturesPage() {
     // Subscribe to realtime changes on the matches table
     const channel = supabase
       .channel("evl_fixtures_sync")
-      .on(
-        "broadcast",
-        { event: "match_updated" },
-        (payload) => {
-          console.log("Realtime match broadcast received!", payload);
-          // Re-fetch matches to get the latest joined data when any match updates
-          fetchMatches();
-        },
-      )
+      .on("broadcast", { event: "match_updated" }, (payload) => {
+        console.log("Realtime match broadcast received!", payload);
+        // Re-fetch matches to get the latest joined data when any match updates
+        fetchMatches();
+      })
       .subscribe((status) => {
         console.log("Supabase Realtime Fixtures Status:", status);
       });
@@ -130,7 +131,9 @@ export default function FixturesPage() {
       upcomingMatches: upcoming,
       completedMatches: completed,
       knockoutMatches: knockout,
-      quarterFinals: knockout.filter((m) => m.bracket_round === "quarter_final"),
+      quarterFinals: knockout.filter(
+        (m) => m.bracket_round === "quarter_final",
+      ),
       semiFinals: knockout.filter((m) => m.bracket_round === "semi_final"),
       finals: knockout.filter((m) => m.bracket_round === "final"),
     };
@@ -253,22 +256,44 @@ export default function FixturesPage() {
     );
   };
 
-  const BracketNode = ({ match, title, isCenter }: { match?: Match, title: string, isCenter?: boolean }) => {
+  const BracketNode = ({
+    match,
+    title,
+    isCenter,
+  }: {
+    match?: Match;
+    title: string;
+    isCenter?: boolean;
+  }) => {
     return (
-      <div className={`w-48 bg-slate-900 border ${isCenter ? 'border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]' : 'border-white/10'} rounded-lg p-2 text-xs flex flex-col gap-1 relative z-10 shadow-xl`}>
-        <div className={`text-[10px] font-bold uppercase text-center mb-1 ${isCenter ? 'text-yellow-500' : 'text-slate-500'}`}>{title}</div>
+      <div
+        className={`w-48 bg-slate-900 border ${isCenter ? "border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]" : "border-white/10"} rounded-lg p-2 text-xs flex flex-col gap-1 relative z-10 shadow-xl`}
+      >
+        <div
+          className={`text-[10px] font-bold uppercase text-center mb-1 ${isCenter ? "text-yellow-500" : "text-slate-500"}`}
+        >
+          {title}
+        </div>
         {/* Team A */}
         <div className="flex justify-between items-center bg-slate-800/50 rounded p-1">
-          <span className="truncate max-w-[100px] text-white font-bold">{match?.team_a?.name || "TBD"}</span>
-          <span className="text-emerald-400 font-mono">{match?.sets_team_a ?? '-'}</span>
+          <span className="truncate max-w-[100px] text-white font-bold">
+            {match?.team_a?.name || "TBD"}
+          </span>
+          <span className="text-emerald-400 font-mono">
+            {match?.sets_team_a ?? "-"}
+          </span>
         </div>
         {/* Team B */}
         <div className="flex justify-between items-center bg-slate-800/50 rounded p-1">
-          <span className="truncate max-w-[100px] text-white font-bold">{match?.team_b?.name || "TBD"}</span>
-          <span className="text-emerald-400 font-mono">{match?.sets_team_b ?? '-'}</span>
+          <span className="truncate max-w-[100px] text-white font-bold">
+            {match?.team_b?.name || "TBD"}
+          </span>
+          <span className="text-emerald-400 font-mono">
+            {match?.sets_team_b ?? "-"}
+          </span>
         </div>
       </div>
-    )
+    );
   };
 
   const ChampionshipBracket = () => {
@@ -286,8 +311,8 @@ export default function FixturesPage() {
 
           {/* Connecting Line QF Left -> SF Left */}
           <div className="flex flex-col justify-center h-[400px] w-8 relative">
-             <div className="border-r-2 border-t-2 border-b-2 border-slate-700/50 h-[50%] w-full rounded-r-xl absolute top-1/4" />
-             <div className="border-b-2 border-slate-700/50 w-full absolute top-1/2 right-0" />
+            <div className="border-r-2 border-t-2 border-b-2 border-slate-700/50 h-[50%] w-full rounded-r-xl absolute top-1/4" />
+            <div className="border-b-2 border-slate-700/50 w-full absolute top-1/2 right-0" />
           </div>
 
           {/* Round 2 (SF Left) */}
@@ -297,17 +322,21 @@ export default function FixturesPage() {
 
           {/* Connecting Line SF Left -> Final */}
           <div className="flex flex-col justify-center h-[400px] w-8 relative">
-             <div className="border-b-2 border-slate-700/50 w-full" />
+            <div className="border-b-2 border-slate-700/50 w-full" />
           </div>
 
           {/* Center (Final) */}
           <div className="flex flex-col justify-center h-[400px] w-56 mx-4 z-10">
-            <BracketNode match={finals[0]} title="Championship Final" isCenter />
+            <BracketNode
+              match={finals[0]}
+              title="Championship Final"
+              isCenter
+            />
           </div>
 
           {/* Connecting Line Final <- SF Right */}
           <div className="flex flex-col justify-center h-[400px] w-8 relative">
-             <div className="border-b-2 border-slate-700/50 w-full" />
+            <div className="border-b-2 border-slate-700/50 w-full" />
           </div>
 
           {/* Round 2 (SF Right) */}
@@ -317,8 +346,8 @@ export default function FixturesPage() {
 
           {/* Connecting Line SF Right <- QF Right */}
           <div className="flex flex-col justify-center h-[400px] w-8 relative">
-             <div className="border-l-2 border-t-2 border-b-2 border-slate-700/50 h-[50%] w-full rounded-l-xl absolute top-1/4" />
-             <div className="border-b-2 border-slate-700/50 w-full absolute top-1/2 left-0" />
+            <div className="border-l-2 border-t-2 border-b-2 border-slate-700/50 h-[50%] w-full rounded-l-xl absolute top-1/4" />
+            <div className="border-b-2 border-slate-700/50 w-full absolute top-1/2 left-0" />
           </div>
 
           {/* Round 1 (QF Right) */}
@@ -328,7 +357,7 @@ export default function FixturesPage() {
           </div>
         </div>
       </div>
-    )
+    );
   };
 
   return (
@@ -500,16 +529,21 @@ export default function FixturesPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(showAllUpcoming ? upcomingMatches : upcomingMatches.slice(0, 3)).map((m) => (
+                    {(showAllUpcoming
+                      ? upcomingMatches
+                      : upcomingMatches.slice(0, 3)
+                    ).map((m) => (
                       <MatchCard key={m.id} m={m} />
                     ))}
                     {upcomingMatches.length > 3 && (
                       <div className="pt-4 flex justify-center">
-                        <button 
+                        <button
                           onClick={() => setShowAllUpcoming(!showAllUpcoming)}
                           className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black tracking-widest uppercase rounded-xl border border-white/10 transition-colors shadow-lg"
                         >
-                          {showAllUpcoming ? "Show Less" : `See More (${upcomingMatches.length - 3})`}
+                          {showAllUpcoming
+                            ? "Show Less"
+                            : `See More (${upcomingMatches.length - 3})`}
                         </button>
                       </div>
                     )}
@@ -529,9 +563,24 @@ export default function FixturesPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {completedMatches.map((m) => (
+                    {(showAllCompleted
+                      ? completedMatches
+                      : completedMatches.slice(0, 3)
+                    ).map((m) => (
                       <MatchCard key={m.id} m={m} />
                     ))}
+                    {completedMatches.length > 3 && (
+                      <div className="pt-4 flex justify-center">
+                        <button
+                          onClick={() => setShowAllCompleted(!showAllCompleted)}
+                          className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-black tracking-widest uppercase rounded-xl border border-white/10 transition-colors shadow-lg"
+                        >
+                          {showAllCompleted
+                            ? "Show Less"
+                            : `See More (${completedMatches.length - 3})`}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
