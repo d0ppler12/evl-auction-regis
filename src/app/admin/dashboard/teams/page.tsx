@@ -24,19 +24,12 @@ export default function TeamsManagement() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const loadTeams = async () => {
-    setLoading(true);
-    try {
-      const data = await adminFetch<any[]>("/api/admin/teams");
-      setTeams(data);
-    } catch {
-      setTeams([]);
-    }
-    setLoading(false);
-  };
-
+  // Load teams once on mount — not after every mutation
   useEffect(() => {
-    loadTeams();
+    adminFetch<any[]>("/api/admin/teams")
+      .then(setTeams)
+      .catch(() => setTeams([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const openAdd = () => {
@@ -80,29 +73,50 @@ export default function TeamsManagement() {
         logo_url: form.logo_url || null,
         group_name: form.group_name,
       };
+
       if (editingId) {
-        team = await adminFetch(`/api/admin/teams/${editingId}`, {
+        // PUT → patch the existing entry in local state
+        team = await adminFetch<any>(`/api/admin/teams/${editingId}`, {
           method: "PUT",
           body: JSON.stringify(payload),
         });
+        setTeams((prev) =>
+          prev.map((t) =>
+            t.id === editingId
+              ? { ...t, ...(team as any), players: t.players }
+              : t,
+          ),
+        );
       } else {
-        team = await adminFetch("/api/admin/teams", {
+        // POST → prepend new team to local state (players array starts empty)
+        team = await adminFetch<any>("/api/admin/teams", {
           method: "POST",
           body: JSON.stringify(payload),
         });
+        setTeams((prev) => [{ ...(team as any), players: [] }, ...prev]);
       }
 
       if (logoFile && team?.id) {
         const fd = new FormData();
         fd.append("logo", logoFile);
-        team = await adminFetch(`/api/admin/teams/${team.id}/logo`, {
-          method: "POST",
-          body: fd,
-        });
+        const updated = await adminFetch<any>(
+          `/api/admin/teams/${team.id}/logo`,
+          {
+            method: "POST",
+            body: fd,
+          },
+        );
+        // Patch just the logo_url in state
+        setTeams((prev) =>
+          prev.map((t) =>
+            t.id === team.id
+              ? { ...t, logo_url: updated?.logo_url ?? t.logo_url }
+              : t,
+          ),
+        );
       }
 
       setShowForm(false);
-      await loadTeams();
     } catch (e: any) {
       alert(e.message);
     }
@@ -113,7 +127,8 @@ export default function TeamsManagement() {
     if (!confirm("Delete this team?")) return;
     try {
       await adminFetch(`/api/admin/teams/${id}`, { method: "DELETE" });
-      await loadTeams();
+      // Optimistic: remove from local state immediately
+      setTeams((prev) => prev.filter((t) => t.id !== id));
     } catch (e: any) {
       alert(e.message);
     }
@@ -135,7 +150,19 @@ export default function TeamsManagement() {
           team_id: teamId,
         }),
       });
-      await loadTeams();
+      // Optimistic: remove player from team's roster and refund purse
+      setTeams((prev) =>
+        prev.map((t) => {
+          if (t.id !== teamId) return t;
+          const releasedPlayer = t.players?.find((p: any) => p.id === playerId);
+          const refund = releasedPlayer?.sold_price || 0;
+          return {
+            ...t,
+            purse_remaining: (t.purse_remaining || 0) + refund,
+            players: (t.players || []).filter((p: any) => p.id !== playerId),
+          };
+        }),
+      );
     } catch (e: any) {
       alert(e.message);
     }
@@ -302,6 +329,7 @@ export default function TeamsManagement() {
                     <p className="text-xs text-slate-400">{team.owner_name}</p>
                   </div>
                 </div>
+                <div className="flex gap-1"></div>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                 <div className="bg-slate-800 rounded-lg p-2">

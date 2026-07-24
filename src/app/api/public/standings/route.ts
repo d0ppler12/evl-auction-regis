@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from('team_standings')
-      .select('*, team:team_id(id, name, logo_url, color_theme, group_name)')
+      .select('team_id, played, wins, losses, sets_won, sets_lost, points, team:team_id(id, name, logo_url, color_theme, group_name)')
       .order('points', { ascending: false })
 
     if (error) throw error
@@ -27,7 +27,11 @@ export async function GET() {
       points: row.points || 0,
     }))
 
-    return NextResponse.json(standings)
+    return NextResponse.json(standings, {
+      headers: {
+        'Cache-Control': 's-maxage=60, stale-while-revalidate=300',
+      },
+    })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }

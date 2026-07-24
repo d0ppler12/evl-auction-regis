@@ -14,11 +14,15 @@ export default function LiveMatchController() {
   const loadMatches = async () => {
     try {
       const data = await adminFetch<any[]>("/api/admin/matches");
-      setMatches(data);
-      const live = data.find(m => m.status === 'live');
-      if (live && !liveMatchId) {
-        setLiveMatchId(live.id);
-      }
+      setMatches((prev) => {
+        // Skip state update if data is identical — avoids unnecessary re-renders
+        if (JSON.stringify(prev) === JSON.stringify(data)) return prev;
+        const live = data.find(m => m.status === 'live');
+        if (live && !liveMatchId) {
+          setLiveMatchId(live.id);
+        }
+        return data;
+      });
     } catch (e) {
       console.error(e);
     }
@@ -27,7 +31,7 @@ export default function LiveMatchController() {
 
   useEffect(() => {
     loadMatches();
-    const interval = setInterval(loadMatches, 5000); // Poll for updates
+    const interval = setInterval(loadMatches, 10000); // Reduced from 5s to 10s to halve egress
     return () => clearInterval(interval);
   }, []);
 
@@ -145,6 +149,24 @@ export default function LiveMatchController() {
                 </button>
               </div>
 
+              <button 
+                onClick={() => {
+                  if(confirm("Swap teams (Toss)? This will swap Team A and Team B in the database.")) {
+                    updateMatch({ 
+                      team_a_id: activeMatch.team_b_id || activeMatch.team_b?.id, 
+                      team_b_id: activeMatch.team_a_id || activeMatch.team_a?.id,
+                      points_team_a: activeMatch.points_team_b,
+                      points_team_b: activeMatch.points_team_a,
+                      sets_team_a: activeMatch.sets_team_b,
+                      sets_team_b: activeMatch.sets_team_a,
+                    });
+                  }
+                }}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold uppercase tracking-wider rounded-full transition-all border border-white/10 text-xs flex items-center gap-2 mr-4"
+              >
+                Swap Teams (Toss)
+              </button>
+
               {activeMatch.status !== 'live' ? (
                 <button 
                   onClick={() => {
@@ -170,49 +192,68 @@ export default function LiveMatchController() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-12">
-              {/* Team A */}
-              <div className="flex flex-col items-center gap-6">
-                <div className="text-center">
-                  <div className="text-2xl font-black text-white">{activeMatch.team_a?.name}</div>
-                  <div className="text-sm font-bold text-slate-400">Sets Won: {activeMatch.sets_team_a || 0}</div>
-                  <div className="flex gap-2 mt-2 justify-center">
-                    <button onClick={() => updateSets('a', -1)} className="p-1 bg-slate-800 rounded text-slate-400"><Minus className="w-3 h-3"/></button>
-                    <button onClick={() => updateSets('a', 1)} className="p-1 bg-slate-800 rounded text-emerald-400"><Plus className="w-3 h-3"/></button>
+            {(() => {
+              const currentSet = activeMatch.current_set || 1;
+              const isEvenSet = currentSet % 2 === 0;
+              const leftKey = isEvenSet ? 'b' : 'a';
+              const rightKey = isEvenSet ? 'a' : 'b';
+              const leftTeam = isEvenSet ? activeMatch.team_b : activeMatch.team_a;
+              const rightTeam = isEvenSet ? activeMatch.team_a : activeMatch.team_b;
+              const leftSets = isEvenSet ? activeMatch.sets_team_b : activeMatch.sets_team_a;
+              const rightSets = isEvenSet ? activeMatch.sets_team_a : activeMatch.sets_team_b;
+              const leftPoints = isEvenSet ? activeMatch.points_team_b : activeMatch.points_team_a;
+              const rightPoints = isEvenSet ? activeMatch.points_team_a : activeMatch.points_team_b;
+              const leftColor = isEvenSet ? 'border-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.2)]' : 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.2)]';
+              const rightColor = isEvenSet ? 'border-blue-500 shadow-[0_0_30px_rgba(37,99,235,0.2)]' : 'border-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.2)]';
+              const leftBtnClass = isEvenSet ? 'bg-orange-500 hover:bg-orange-400 shadow-orange-500/20' : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20';
+              const rightBtnClass = isEvenSet ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20' : 'bg-orange-500 hover:bg-orange-400 shadow-orange-500/20';
+              
+              return (
+                <div className="grid grid-cols-2 gap-12">
+                  {/* Left Team */}
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="text-center">
+                      <div className="text-2xl font-black text-white">{leftTeam?.name}</div>
+                      <div className="text-sm font-bold text-slate-400">Sets Won: {leftSets || 0}</div>
+                      <div className="flex gap-2 mt-2 justify-center">
+                        <button onClick={() => updateSets(leftKey, -1)} className="p-1 bg-slate-800 rounded text-slate-400"><Minus className="w-3 h-3"/></button>
+                        <button onClick={() => updateSets(leftKey, 1)} className="p-1 bg-slate-800 rounded text-emerald-400"><Plus className="w-3 h-3"/></button>
+                      </div>
+                    </div>
+                    
+                    <div className={`w-full aspect-square max-w-[200px] bg-slate-800 rounded-3xl border-2 flex items-center justify-center relative ${leftColor}`}>
+                      <span className="text-8xl font-black text-white font-mono">{leftPoints || 0}</span>
+                    </div>
+                    
+                    <div className="flex gap-4 w-full justify-center">
+                      <button onClick={() => updatePoints(leftKey, -1)} className="w-16 h-16 rounded-2xl bg-slate-800 text-slate-400 hover:bg-slate-700 flex items-center justify-center text-2xl font-black transition-colors">-1</button>
+                      <button onClick={() => updatePoints(leftKey, 1)} className={`flex-1 h-16 rounded-2xl text-white flex items-center justify-center text-3xl font-black shadow-lg transition-all active:scale-95 ${leftBtnClass}`}>+1</button>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="w-full aspect-square max-w-[200px] bg-slate-800 rounded-3xl border-2 border-blue-500 flex items-center justify-center relative shadow-[0_0_30px_rgba(37,99,235,0.2)]">
-                  <span className="text-8xl font-black text-white font-mono">{activeMatch.points_team_a || 0}</span>
-                </div>
-                
-                <div className="flex gap-4 w-full justify-center">
-                  <button onClick={() => updatePoints('a', -1)} className="w-16 h-16 rounded-2xl bg-slate-800 text-slate-400 hover:bg-slate-700 flex items-center justify-center text-2xl font-black transition-colors">-1</button>
-                  <button onClick={() => updatePoints('a', 1)} className="flex-1 h-16 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center text-3xl font-black shadow-lg shadow-blue-500/20 transition-all active:scale-95">+1</button>
-                </div>
-              </div>
 
-              {/* Team B */}
-              <div className="flex flex-col items-center gap-6">
-                <div className="text-center">
-                  <div className="text-2xl font-black text-white">{activeMatch.team_b?.name}</div>
-                  <div className="text-sm font-bold text-slate-400">Sets Won: {activeMatch.sets_team_b || 0}</div>
-                  <div className="flex gap-2 mt-2 justify-center">
-                    <button onClick={() => updateSets('b', -1)} className="p-1 bg-slate-800 rounded text-slate-400"><Minus className="w-3 h-3"/></button>
-                    <button onClick={() => updateSets('b', 1)} className="p-1 bg-slate-800 rounded text-emerald-400"><Plus className="w-3 h-3"/></button>
+                  {/* Right Team */}
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="text-center">
+                      <div className="text-2xl font-black text-white">{rightTeam?.name}</div>
+                      <div className="text-sm font-bold text-slate-400">Sets Won: {rightSets || 0}</div>
+                      <div className="flex gap-2 mt-2 justify-center">
+                        <button onClick={() => updateSets(rightKey, -1)} className="p-1 bg-slate-800 rounded text-slate-400"><Minus className="w-3 h-3"/></button>
+                        <button onClick={() => updateSets(rightKey, 1)} className="p-1 bg-slate-800 rounded text-emerald-400"><Plus className="w-3 h-3"/></button>
+                      </div>
+                    </div>
+                    
+                    <div className={`w-full aspect-square max-w-[200px] bg-slate-800 rounded-3xl border-2 flex items-center justify-center relative ${rightColor}`}>
+                      <span className="text-8xl font-black text-white font-mono">{rightPoints || 0}</span>
+                    </div>
+                    
+                    <div className="flex gap-4 w-full justify-center">
+                      <button onClick={() => updatePoints(rightKey, -1)} className="w-16 h-16 rounded-2xl bg-slate-800 text-slate-400 hover:bg-slate-700 flex items-center justify-center text-2xl font-black transition-colors">-1</button>
+                      <button onClick={() => updatePoints(rightKey, 1)} className={`flex-1 h-16 rounded-2xl text-white flex items-center justify-center text-3xl font-black shadow-lg transition-all active:scale-95 ${rightBtnClass}`}>+1</button>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="w-full aspect-square max-w-[200px] bg-slate-800 rounded-3xl border-2 border-orange-500 flex items-center justify-center relative shadow-[0_0_30px_rgba(249,115,22,0.2)]">
-                  <span className="text-8xl font-black text-white font-mono">{activeMatch.points_team_b || 0}</span>
-                </div>
-                
-                <div className="flex gap-4 w-full justify-center">
-                  <button onClick={() => updatePoints('b', -1)} className="w-16 h-16 rounded-2xl bg-slate-800 text-slate-400 hover:bg-slate-700 flex items-center justify-center text-2xl font-black transition-colors">-1</button>
-                  <button onClick={() => updatePoints('b', 1)} className="flex-1 h-16 rounded-2xl bg-orange-500 hover:bg-orange-400 text-white flex items-center justify-center text-3xl font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95">+1</button>
-                </div>
-              </div>
-            </div>
+              );
+            })()}
             
             <div className="mt-8 flex justify-center">
                <button 

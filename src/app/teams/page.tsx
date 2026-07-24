@@ -5,14 +5,64 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader } from "@/components/ui/Loader";
-import { ChevronRight, Filter, Users, X, Menu, Search, Trophy } from "lucide-react";
+import { ChevronRight, Filter, Users, X, Menu, Search, Trophy, History } from "lucide-react";
 import Navbar from "@/components/navbar";
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return "TBD";
+  const [year, month, day] = dateString.split("-");
+  if (!year || !month || !day) return dateString;
+  return `${day}/${month}/${year}`;
+};
+
+const formatTime = (timeStr: string) => {
+  if (!timeStr) return "TBD";
+  if (timeStr.toLowerCase().includes('am') || timeStr.toLowerCase().includes('pm')) {
+    return timeStr;
+  }
+  const match = timeStr.trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (match) {
+    let hours = parseInt(match[1]);
+    const minutes = match[2];
+    if (hours >= 12) {
+      const pmHours = hours === 12 ? 12 : hours - 12;
+      return `${pmHours.toString().padStart(2, '0')}:${minutes} PM`;
+    }
+    if (hours >= 1 && hours <= 11) {
+      return `${hours.toString().padStart(2, '0')}:${minutes} PM`;
+    }
+    if (hours === 0) return `12:${minutes} AM`;
+  }
+  return timeStr;
+};
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [playerSession, setPlayerSession] = useState<any>(null);
+
+  const [selectedRecordTeam, setSelectedRecordTeam] = useState<any>(null);
+  const [teamRecords, setTeamRecords] = useState<any[]>([]);
+  const [loadingRecords, setLoadingRecords] = useState(false);
+
+  const fetchTeamRecords = async (team: any) => {
+    setSelectedRecordTeam(team);
+    setLoadingRecords(true);
+    try {
+      const res = await fetch(`/api/public/fixtures?t=${Date.now()}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      
+      // Filter matches where this team is playing
+      const matches = data.filter((m: any) => m.team_a_id === team.id || m.team_b_id === team.id);
+      setTeamRecords(matches || []);
+    } catch (err) {
+      console.error("Error fetching team records:", err);
+    } finally {
+      setLoadingRecords(false);
+    }
+  };
 
   useEffect(() => {
     async function checkSession() {
@@ -155,6 +205,13 @@ export default function TeamsPage() {
                         <h3 className="text-xs font-black text-slate-400 tracking-widest uppercase">
                           SQUAD ROSTER ({team.players?.length || 0})
                         </h3>
+                        <button
+                          onClick={() => fetchTeamRecords(team)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white text-[10px] font-black transition-colors border border-white/10 tracking-widest uppercase shadow-sm"
+                        >
+                          <History className="w-3.5 h-3.5 text-blue-400" />
+                          RECORD
+                        </button>
                       </div>
 
                       {team.players && team.players.length > 0 ? (
@@ -194,6 +251,123 @@ export default function TeamsPage() {
           </div>
         )}
       </main>
+
+      {/* Record Modal */}
+      <AnimatePresence>
+        {selectedRecordTeam && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              onClick={() => setSelectedRecordTeam(null)}
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]"
+            >
+              <div
+                className="h-2 w-full"
+                style={{ backgroundColor: selectedRecordTeam.color_theme || "#2563EB" }}
+              />
+              
+              <div className="p-6 md:p-8 flex items-center justify-between border-b border-white/5 bg-slate-800/50">
+                <div className="flex items-center gap-4">
+                  {selectedRecordTeam.logo_url ? (
+                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-800">
+                      <img src={selectedRecordTeam.logo_url} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  ) : null}
+                  <div>
+                    <h2 className="text-2xl font-black text-white italic tracking-tight uppercase">
+                      {selectedRecordTeam.name}
+                    </h2>
+                    <p className="text-sm font-bold text-slate-400 tracking-widest uppercase">
+                      Match Record
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedRecordTeam(null)}
+                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="p-6 md:p-8 overflow-y-auto space-y-4">
+                {loadingRecords ? (
+                  <div className="flex justify-center py-10">
+                    <Loader />
+                  </div>
+                ) : teamRecords.length > 0 ? (
+                  <div className="space-y-4">
+                    {teamRecords.map((match) => {
+                      const isTeamA = match.team_a_id === selectedRecordTeam.id;
+                      const opponent = isTeamA ? match.team_b : match.team_a;
+                      const mySets = isTeamA ? match.sets_team_a : match.sets_team_b;
+                      const oppSets = isTeamA ? match.sets_team_b : match.sets_team_a;
+                      
+                      let resultClass = "border-white/10 bg-slate-800/50";
+                      let resultText = "VS";
+                      if (match.status === "completed") {
+                         if (mySets > oppSets) {
+                           resultClass = "border-emerald-500/30 bg-emerald-500/10";
+                           resultText = "WON";
+                         } else if (mySets < oppSets) {
+                           resultClass = "border-red-500/30 bg-red-500/10";
+                           resultText = "LOST";
+                         } else {
+                           resultClass = "border-yellow-500/30 bg-yellow-500/10";
+                           resultText = "DRAW";
+                         }
+                      }
+
+                      return (
+                        <div key={match.id} className={`flex items-center justify-between p-4 rounded-2xl border ${resultClass}`}>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                              {formatDate(match.match_date)} {match.match_time && `• ${formatTime(match.match_time)}`}
+                            </span>
+                            <div className="flex items-center gap-3">
+                              {opponent.logo_url && (
+                                <img src={opponent.logo_url} className="w-8 h-8 rounded-lg object-cover bg-slate-800" />
+                              )}
+                              <span className="text-lg font-black text-white uppercase tracking-tight">
+                                {opponent.name}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={`text-[10px] font-black tracking-widest uppercase ${match.status === 'completed' ? (resultText === 'WON' ? 'text-emerald-400' : resultText === 'LOST' ? 'text-red-400' : 'text-yellow-400') : 'text-slate-400'}`}>
+                              {match.status === 'completed' ? resultText : match.status}
+                            </span>
+                            {match.status !== 'scheduled' && (
+                              <div className="flex items-center gap-2 text-xl font-black font-mono">
+                                <span className="text-white">{mySets}</span>
+                                <span className="text-slate-500 text-sm">-</span>
+                                <span className="text-slate-400">{oppSets}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-10 bg-white/5 rounded-2xl border border-dashed border-white/10">
+                    <p className="text-slate-400 font-bold">No matches scheduled yet.</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
