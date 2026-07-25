@@ -10,7 +10,6 @@ export async function GET() {
       .from('matches')
       .select('*, team_a:team_a_id(id, name, logo_url), team_b:team_b_id(id, name, logo_url)')
       .eq('status', 'live')
-      .order('updated_at', { ascending: false })
       .limit(1)
       .single()
 
