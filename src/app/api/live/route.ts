@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-// Revalidate frequently or use no-store for live updates
-export const revalidate = 0;
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET() {
   try {

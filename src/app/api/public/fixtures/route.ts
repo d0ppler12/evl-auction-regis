@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-// Cache fixtures for 2 minutes; stale responses OK for 10 minutes.
-// Fixtures rarely change mid-session. Remove force-dynamic to allow caching.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
@@ -15,7 +16,7 @@ export async function GET() {
 
     return NextResponse.json(data || [], {
       headers: {
-        'Cache-Control': 's-maxage=120, stale-while-revalidate=600',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
       },
     })
   } catch (error: any) {

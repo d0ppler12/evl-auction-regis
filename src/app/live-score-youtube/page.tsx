@@ -67,6 +67,10 @@ export default function YouTubeLiveScorePage() {
   useEffect(() => {
     fetchLiveMatch();
 
+    const pollInterval = window.setInterval(() => {
+      fetchLiveMatch();
+    }, 5000);
+
     const channel = supabase
       .channel("evl_fixtures_sync")
       .on("broadcast", { event: "match_updated" }, () => {
@@ -75,6 +79,7 @@ export default function YouTubeLiveScorePage() {
       .subscribe();
 
     return () => {
+      window.clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, []);

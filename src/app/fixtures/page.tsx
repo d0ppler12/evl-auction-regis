@@ -96,6 +96,10 @@ export default function FixturesPage() {
   useEffect(() => {
     fetchMatches();
 
+    const pollInterval = window.setInterval(() => {
+      fetchMatches();
+    }, 5000);
+
     // Subscribe to realtime changes on the matches table
     const channel = supabase
       .channel("evl_fixtures_sync")
@@ -109,6 +113,7 @@ export default function FixturesPage() {
       });
 
     return () => {
+      window.clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, []);
