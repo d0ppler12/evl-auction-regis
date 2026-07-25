@@ -1,18 +1,19 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from('team_standings')
       .select('team_id, played, wins, losses, sets_won, sets_lost, points, team:team_id(id, name, logo_url, color_theme, group_name)')
-      .order('points', { ascending: false })
 
     if (error) throw error
 
     // Map to a clean shape for the public points table
-    const standings = (data || []).map((row: any, index: number) => ({
-      rank: index + 1,
+    const standings = (data || []).map((row: any) => ({
       team_id: row.team_id,
       name: row.team?.name || 'Unknown',
       group_name: row.team?.group_name || 'A',
@@ -27,9 +28,22 @@ export async function GET() {
       points: row.points || 0,
     }))
 
+    // Sort by points (descending), then by set difference (descending)
+    standings.sort((a, b) => {
+      if (b.points !== a.points) {
+        return b.points - a.points
+      }
+      return b.setDiff - a.setDiff
+    })
+
+    // Assign rank
+    standings.forEach((team, index) => {
+      team.rank = index + 1
+    })
+
     return NextResponse.json(standings, {
       headers: {
-        'Cache-Control': 's-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': 'no-store, max-age=0',
       },
     })
   } catch (e: any) {
