@@ -14,6 +14,7 @@ export async function GET() {
 
     // Map to a clean shape for the public points table
     const standings = (data || []).map((row: any) => ({
+      rank: 0,
       team_id: row.team_id,
       name: row.team?.name || 'Unknown',
       group_name: row.team?.group_name || 'A',
